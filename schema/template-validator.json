@@ -78,6 +78,7 @@
     }
   },
   "required": [
+    "$schema",
     "title",
     "version",
     "description",
