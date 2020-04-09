@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "description": "A reference to this schema",
+      "type": "string",
+      "enum": [
+        "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json"
+      ]
+    },
+    "title": {
+      "description": "Template title",
+      "type": "string"
+    },
+    "version": {
+      "description": "Semver version",
+      "type": "string",
+      "format": "regex",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "description": {
+      "description": "A short description of the template",
+      "type": "string",
+      "maxLength": 150
+    },
+    "authors": {
+      "description": "A list of authors who contributed to the template",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the author",
+            "type": "string"
+          },
+          "email": {
+            "description": "The email of the author",
+            "type": "string",
+            "format": "email"
+          }
+        }
+      }
+    },
+    "url": {
+      "description": "A url to the source code or website of the template",
+      "type": "string",
+      "format": "url"
+    },
+    "tags": {
+      "description": "A set of tags describing the template",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "description": "A license identified by https://spdx.org/licenses/",
+      "type": "string"
+    },
+    "template": {
+      "description": "Template information and configuration",
+      "type": "object",
+      "properties": {
+        "file": {
+          "description": "The template file relative to this directory",
+          "type": "string"
+        },
+        "profile": {
+          "description": "The jupyter-template pre-made profile to base the template off of",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file",
+        "profile"
+      ]
+    }
+  },
+  "required": [
+    "title",
+    "version",
+    "description",
+    "authors",
+    "license",
+    "template"
+  ]
+}
