@@ -1,0 +1,8 @@
+xlwt
+statsmodels
+https://urldefense.proofpoint.com/v2/url?u=https-3A__github.com_MaayanLab_jupyter-2Dtemplate_archive_master.zip&d=DwIGAg&c=shNJtf5dKgNcPZ6Yh64b-A&r=mUjxs0NmD7ZSRd8G-kLTrOCpXykyOOqAzE13k6FQwLs&m=Nt6OPoyBFsKceKljdw4uOlNozoBZ9wB3UcyFXkxIzv8&s=C3XAkjQTe5mJKBd-5zGYCSdLoBcIwjU5wUeFzG6Ss10&e= 
+ipykernel
+openpyxl
+matplotlib_venn
+rpy2
+magic-impute
