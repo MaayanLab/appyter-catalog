@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json",
+  "title": "Single cell RNA-seq analysis pipeline Template",
+  "version": "0.0.1",
+  "description": "Single cell RNA-seq analysis pipeline template. It enables users to analyze and visualize single cell  RNA sequencing datasets with state-of-the-art algorithms and visualization methods.",
+  "authors": [
+    {
+      "name": "Minji Jeon",
+      "email": "minji.jeon1@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/jupyter-template-catalog",
+  "tags": [
+    "SC_RNA_seq"
+  ],
+  "license": "Apache-2.0",
+  "template": {
+    "file": "Single_cell_RNA_seq_Analysis_Pipeline_Template.ipynb",
+    "profile": "biojupies"
+  }
+}
