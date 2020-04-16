@@ -18,4 +18,5 @@ jobs:
         pip install -r validate/requirements.txt
     - name: Running validate merge
       run: |
-        python validate/validate_merge.py
+        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
+        curl -s -X GET -G $URL | python validate/validate_merge.py

@@ -8,16 +8,27 @@ import jsonschema
 from subprocess import Popen, PIPE
 
 def get_changed_templates():
-  return {
-    # templates/{template}/* => {template}
-    line.split('/', maxsplit=3)[1]
-    for line in map(
-      bytes.decode,
-      # returns all paths that will be changed
-      Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE).stdout
-    )
-    if line.startswith('templates/')
-  }
+  try:
+    # try to load files from stdin
+    return {
+      element['filename']
+      for element in json.load(sys.stdin)
+    }
+  except:
+    # otherwise use git
+    p = Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE)
+    files = {
+      # templates/{template}/* => {template}
+      line.split('/', maxsplit=3)[1]
+      for line in map(
+        bytes.decode,
+        # returns all paths that will be changed
+        p.stdout
+      )
+      if line.startswith('templates/')
+    }
+    assert p.returncode == 0, '`git diff` command failed'
+    return files
 
 def validate_template(template):
   assert os.path.isfile(os.path.join('templates', template, 'README.md')), f"Missing templates/{template}/README.md"
