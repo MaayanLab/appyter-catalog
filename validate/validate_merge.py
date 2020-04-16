@@ -11,8 +11,10 @@ def get_changed_templates():
   try:
     # try to load files from stdin
     return {
-      element['filename']
+      file.split('/', maxsplit=3)[1]
       for element in json.load(sys.stdin)
+      for file in [element['filename']]
+      if file.startswith('templates/')
     }
   except:
     # otherwise use git
