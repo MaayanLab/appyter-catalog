@@ -2,7 +2,6 @@
 import os
 import sys
 import json
-import logging
 import traceback
 import jsonschema
 from subprocess import Popen, PIPE
@@ -33,9 +32,11 @@ def get_changed_templates():
     return files
 
 def validate_template(template):
+  print(f"{template}: Checking for existing of files...")
   assert os.path.isfile(os.path.join('templates', template, 'README.md')), f"Missing templates/{template}/README.md"
   assert os.path.isfile(os.path.join('templates', template, 'template.json')), f"Missing templates/{template}/template.json"
-  # process template.json
+  #
+  print(f"{template}: Validating `{template}/template.json`...")
   config = json.load(open(os.path.join('templates', template, 'template.json'), 'r'))
   validator = jsonschema.Draft7Validator({
     '$ref': f"file:///{os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'schema', 'template-validator.json'))}",
@@ -44,9 +45,12 @@ def validate_template(template):
   assert errors == [], '\n'.join(errors)
   #
   nbfile = config['template']['file']
+  #
+  print(f"{template}: Preparing system to run `{nbfile}`...")
   assert os.path.isfile(os.path.join('templates', template, nbfile)), f"Missing templates/{template}/{nbfile}"
-  # process deps.txt
+  #
   if os.path.isfile(os.path.join('templates', template, 'deps.txt')):
+    print(f"{template}: Installing system dependencies from `deps.txt`...")
     exit_code = Popen([
       'sudo', 'apt-get', 'install',
       *filter(None, [
@@ -56,16 +60,18 @@ def validate_template(template):
     ]).wait()
     assert exit_code == 0, f"`xargs | sudo apt-get install < deps.txt` failed with code {exit_code}"
   else:
-    logging.warn(f"templates/{template}/deps.txt not found, assuming no system dependencies required.")
-  # process requirements.txt
+    print(f"{template}: [WARN] templates/{template}/deps.txt not found, assuming no system dependencies required.")
+  #
   if os.path.isfile(os.path.join('templates', template, 'requirements.txt')):
+    print(f"{template}: Installing system dependencies from `requirements.txt`...")
     exit_code = Popen([
       'pip', 'install', '-r', f"templates/{template}/requirements.txt"
     ]).wait()
     assert exit_code == 0, f"`pip install -r templates/{template}/requirements.txt` failed with code {exit_code}"
   else:
-    logging.warn(f"templates/{template}/requirements.txt not found, assuming no python dependencies required.")
-  # TODO: run ipynb w/ nbconvert or at least test imports
+    print(f"{template}: [WARN] templates/{template}/requirements.txt not found, assuming no python dependencies required.")
+  #
+  print(f"{template}: [WARN] Checking {nbfile} not yet implemented")
 
 if __name__ == '__main__':
   valid = True
