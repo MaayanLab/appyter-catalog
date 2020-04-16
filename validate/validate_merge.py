@@ -60,18 +60,18 @@ def validate_template(template):
     ]).wait()
     assert exit_code == 0, f"`xargs | sudo apt-get install < deps.txt` failed with code {exit_code}"
   else:
-    print(f"{template}: [WARN] templates/{template}/deps.txt not found, assuming no system dependencies required.")
+    print(f"{template}: [WARN] `templates/{template}/deps.txt` not found, assuming no system dependencies required.")
   #
   if os.path.isfile(os.path.join('templates', template, 'requirements.txt')):
-    print(f"{template}: Installing system dependencies from `requirements.txt`...")
+    print(f"{template}: Installing python dependencies from `requirements.txt`...")
     exit_code = Popen([
       'pip', 'install', '-r', f"templates/{template}/requirements.txt"
     ]).wait()
     assert exit_code == 0, f"`pip install -r templates/{template}/requirements.txt` failed with code {exit_code}"
   else:
-    print(f"{template}: [WARN] templates/{template}/requirements.txt not found, assuming no python dependencies required.")
+    print(f"{template}: [WARN] `templates/{template}/requirements.txt` not found, assuming no python dependencies required.")
   #
-  print(f"{template}: [WARN] Checking {nbfile} not yet implemented")
+  print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")
 
 if __name__ == '__main__':
   valid = True
