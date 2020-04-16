@@ -14,7 +14,7 @@ def get_changed_templates():
     for line in map(
       bytes.decode,
       # returns all paths that will be changed
-      Popen(['git', 'diff', '--name-only', 'master'], stdout=PIPE).stdout
+      Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE).stdout
     )
     if line.startswith('templates/')
   }
