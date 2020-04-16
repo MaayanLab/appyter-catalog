@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json",
   "title": "Bulk RNA-seq analysis pipeline Template",
   "version": "0.0.1",
-  "description": "Bulk RNA-seq analysis pipeline template. It enables users to analyze and visualize bulk RNA sequencing datasets with state-of-the-art algorithms and visualization methods.",
+  "description": "It enables users to analyze and visualize bulk RNA sequencing datasets with state-of-the-art algorithms and visualization methods.",
   "authors": [
     {
       "name": "Minji Jeon",
