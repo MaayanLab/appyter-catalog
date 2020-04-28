@@ -1,0 +1,12 @@
+<div class="row px-4 px-lg-3 pb-4">
+  <div class="col-lg-3 bold text-lg-right my-auto">
+    <div>{{ this.args.label }}<sup><i class="fa fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title="{{ this.args.description }}"></i></sup>:</div>
+  </div>
+  <div class="col-lg-6 pt-2 pt-lg-0">
+    <textarea
+        name="{{ this.args.name }}"
+        placeholder="{{ this.args.hint }}"
+        class="form-control nodecoration tiny"
+    >{{ this.args.default }}</textarea>
+  </div>
+</div>
