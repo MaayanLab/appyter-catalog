@@ -43,7 +43,7 @@ def validate_template(template):
   errors = [error.message for error in validator.iter_errors(config)]
   assert errors == [], '\n'.join(errors)
   #
-  name = config['template']['name']
+  name = config['name']
   assert name == template, f"The directory should be named like `name`"
   #
   nbfile = config['template']['file']
