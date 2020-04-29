@@ -56,7 +56,10 @@ def validate_template(template):
       print(build_dockerfile(os.path.join('templates', template), config), file=fw)
   #
   print(f"{template}: Building Dockerfile...")
-  p = Popen(['docker', 'build', '.'], cwd=os.path.join('templates', template))
+  p = Popen(['docker', 'build', '.'], cwd=os.path.join('templates', template), stdout=PIPE)
+  for line in map(str.decode, p.stdout):
+    print(f"{template}: `docker build .`: {line}")
+  p.stdout.close()
   assert p.wait() == 0, '`docker build .` command failed'
   #
   print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")

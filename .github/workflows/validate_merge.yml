@@ -19,4 +19,4 @@ jobs:
     - name: Running validate merge
       run: |
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
-        curl -s -X GET -G $URL | python -u validate/validate_merge.py
+        curl -s -X GET -G $URL | python validate/validate_merge.py
