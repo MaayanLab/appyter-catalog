@@ -1,7 +1,8 @@
-# These are recipes for getting all template docker-files setup in a unified docker-compose
-
 # Get all template directories
 TEMPLATES=$(shell ls -d templates/*)
+
+
+# These are recipes for getting all template docker-files setup in a unified docker-compose
 
 # The Dockerfile in each template directory
 DOCKERFILES=$(foreach template, $(TEMPLATES), $(template)/Dockerfile)
@@ -11,8 +12,21 @@ $(DOCKERFILES):
 	python3 compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
 # You can make a docker-compose given that all dockerfiles are present with compose/build_compose.py
-docker-compose.yml: $(DOCKERFILES)
+docker-compose.yml: $(DOCKERFILES) app/Dockerfile
 	python3 compose/build_compose.py > $@
+
+
+# These are recipes for setting up the app itself
+TEMPLATEFILES=$(foreach template, $(TEMPLATES), $(template)/template.json)
+
+app/public/templates.json: $(TEMPLATEFILES)
+	cat $^ | jq -s '.' > $@
+
+.PHONY: buildApp
+buildApp: app/public/templates.json
+	cd app && npm i && npm run build
+
+app/Dockerfile: buildApp
 
 
 # These are just convenient wrappers for docker-compose depending on the fact that the docker-compose exists

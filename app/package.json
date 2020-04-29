@@ -1,0 +1,30 @@
+{
+  "name": "jupyter-template-catalog",
+  "version": "1.0.0",
+  "description": "A catalog of jupyter templates",
+  "main": "index.js",
+  "scripts": {
+    "build": "parcel build --no-cache public/index.html",
+    "dev": "parcel serve --no-cache public/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaayanLab/jupyter-template-catalog.git"
+  },
+  "author": "Daniel J. B. Clarke <u8sand@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/MaayanLab/jupyter-template-catalog/issues"
+  },
+  "homepage": "https://github.com/MaayanLab/jupyter-template-catalog#readme",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-svelte": "^4.0.6",
+    "svelte": "^3.21.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.4.1"
+  }
+}
