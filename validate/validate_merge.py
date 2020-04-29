@@ -1,4 +1,3 @@
-#%%
 import os
 import sys
 import json
@@ -49,27 +48,19 @@ def validate_template(template):
   print(f"{template}: Preparing system to run `{nbfile}`...")
   assert os.path.isfile(os.path.join('templates', template, nbfile)), f"Missing templates/{template}/{nbfile}"
   #
-  if os.path.isfile(os.path.join('templates', template, 'deps.txt')):
-    print(f"{template}: Installing system dependencies from `deps.txt`...")
-    exit_code = Popen([
-      'sudo', 'apt-get', 'install',
-      *filter(None, [
-        line.split('#', maxsplit=1)[0].strip()
-        for line in open(os.path.join('templates', template, 'deps.txt'))
-      ])
-    ]).wait()
-    assert exit_code == 0, f"`xargs | sudo apt-get install < deps.txt` failed with code {exit_code}"
-  else:
-    print(f"{template}: [WARN] `templates/{template}/deps.txt` not found, assuming no system dependencies required.")
+  if not os.path.isfile(os.path.join('templates', template, 'Dockerfile')):
+    print(f"{template}: Creating Dockerfile...")
+    import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    from compose.build_dockerfile import build_dockerfile
+    with open(os.path.join('templates', template, 'Dockerfile'), 'w') as fw:
+      print(build_dockerfile(os.path.join('templates', template), config), file=fw)
   #
-  if os.path.isfile(os.path.join('templates', template, 'requirements.txt')):
-    print(f"{template}: Installing python dependencies from `requirements.txt`...")
-    exit_code = Popen([
-      'pip', 'install', '-r', f"templates/{template}/requirements.txt"
-    ]).wait()
-    assert exit_code == 0, f"`pip install -r templates/{template}/requirements.txt` failed with code {exit_code}"
-  else:
-    print(f"{template}: [WARN] `templates/{template}/requirements.txt` not found, assuming no python dependencies required.")
+  print(f"{template}: Building Dockerfile...")
+  p = Popen(['docker', 'build', '.'], cwd=os.path.join('templates', template), stdout=PIPE)
+  for line in p.stdout:
+    print(f"{template}: `docker build .`: {line}")
+  p.stdout.close()
+  assert p.wait() == 0, '`docker build .` command failed'
   #
   print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")
 
