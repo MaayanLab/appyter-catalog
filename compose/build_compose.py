@@ -27,7 +27,7 @@ docker_compose = f"""
 version: '3'
 services:
   app:
-    build: ./app
+    build: app
     image: maayanlab/jupyter-template-catalog:{version}
 {docker_compose_services}
 """.strip('\n')
