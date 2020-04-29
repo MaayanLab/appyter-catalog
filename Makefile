@@ -45,4 +45,4 @@ upgrade: clean
 # update the deployment, upgrading the source and restarting
 .PHONY: update
 update:
-	make upgrade && make start
+	make upgrade && make build && make start
