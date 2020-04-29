@@ -9,6 +9,10 @@
         "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json"
       ]
     },
+    "name": {
+      "description": "Slug name of this template (same as directory)",
+      "type": "string"
+    },
     "title": {
       "description": "Template title",
       "type": "string"
