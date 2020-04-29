@@ -2,14 +2,19 @@ import os
 from textwrap import dedent
 
 def build_dockerfile(template_path, config):
-  dockerfile_parts = ['FROM ubuntu']
+  dockerfile_parts = ['FROM ubuntu', '''
+    RUN set -x \\
+        && echo "Preparing system..." \\
+        && apt-get -y update \\
+        && apt-get -y install git
+  ''']
   if os.path.isfile(os.path.join(template_path, 'deps.txt')):
     dockerfile_parts.append('''
       ADD deps.txt /app/deps.txt
       RUN set -x \\
         && echo "Installing system dependencies from deps.txt..." \\
         && apt-get -y update \\
-        && apt-get -y install git $(grep -v '^#' /app/deps.txt) \\
+        && apt-get -y install $(grep -v '^#' /app/deps.txt) \\
         && rm /app/deps.txt
     ''')
   if os.path.isfile(os.path.join(template_path, 'setup.R')):
