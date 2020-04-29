@@ -43,9 +43,12 @@ def validate_template(template):
   errors = [error.message for error in validator.iter_errors(config)]
   assert errors == [], '\n'.join(errors)
   #
+  name = config['name']
+  assert name == template, f"The directory should be named like `name`"
+  #
   nbfile = config['template']['file']
   #
-  print(f"{template}: Preparing system to run `{nbfile}`...")
+  print(f"{template}: Preparing docker to run `{nbfile}`...")
   assert os.path.isfile(os.path.join('templates', template, nbfile)), f"Missing templates/{template}/{nbfile}"
   #
   if not os.path.isfile(os.path.join('templates', template, 'Dockerfile')):
@@ -63,6 +66,8 @@ def validate_template(template):
   assert p.wait() == 0, '`docker build .` command failed'
   #
   print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")
+  #
+  print(f"{template}: Success!")
 
 if __name__ == '__main__':
   valid = True
