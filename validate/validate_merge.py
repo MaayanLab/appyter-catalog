@@ -66,6 +66,8 @@ def validate_template(template):
   assert p.wait() == 0, '`docker build .` command failed'
   #
   print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")
+  #
+  print(f"{template}: Success!")
 
 if __name__ == '__main__':
   valid = True
