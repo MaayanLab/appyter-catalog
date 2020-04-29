@@ -57,7 +57,7 @@ def validate_template(template):
   #
   print(f"{template}: Building Dockerfile...")
   p = Popen(['docker', 'build', '.'], cwd=os.path.join('templates', template), stdout=PIPE)
-  for line in map(str.decode, p.stdout):
+  for line in p.stdout:
     print(f"{template}: `docker build .`: {line}")
   p.stdout.close()
   assert p.wait() == 0, '`docker build .` command failed'
