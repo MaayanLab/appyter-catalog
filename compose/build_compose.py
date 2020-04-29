@@ -28,7 +28,7 @@ proxy_service = f"""
 {proxy_environment}
       - nginx_proxy_{len(templates):03}="(/.*) http://app:80$$1"
     ports:
-      80:80
+      - 80:80
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""

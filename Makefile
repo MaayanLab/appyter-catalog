@@ -1,24 +1,29 @@
+PYTHON ?= python3
+
 # Get all template directories
-TEMPLATES=$(shell ls -d templates/*)
+TEMPLATES = $(shell ls -d templates/*)
 
 
 # These are recipes for getting all template docker-files setup in a unified docker-compose
 
 # The Dockerfile in each template directory
-DOCKERFILES=$(foreach template, $(TEMPLATES), $(template)/Dockerfile)
+DOCKERFILES = $(foreach template, $(TEMPLATES), $(template)/Dockerfile)
 
 # You can make a dockerfile for a given template with compose/build_dockerfile.py
+.PHONY: $(DOCKERFILES)
 $(DOCKERFILES):
-	python3 compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
+	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
 # You can make a docker-compose given that all dockerfiles are present with compose/build_compose.py
+.PHONY: docker-compose.yml
 docker-compose.yml: $(DOCKERFILES) app/Dockerfile
-	python3 compose/build_compose.py > $@
+	$(PYTHON) compose/build_compose.py > $@
 
 
 # These are recipes for setting up the app itself
-TEMPLATEFILES=$(foreach template, $(TEMPLATES), $(template)/template.json)
+TEMPLATEFILES = $(foreach template, $(TEMPLATES), $(template)/template.json)
 
+.PHONY: app/public/templates.json
 app/public/templates.json: $(TEMPLATEFILES)
 	cat $^ | jq -s '.' > $@
 
@@ -26,6 +31,7 @@ app/public/templates.json: $(TEMPLATEFILES)
 buildApp: app/public/templates.json
 	cd app && npm i && npm run build
 
+.PHONY: app/Dockerfile
 app/Dockerfile: buildApp
 
 
