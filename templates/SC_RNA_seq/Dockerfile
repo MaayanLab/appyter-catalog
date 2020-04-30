@@ -24,10 +24,11 @@ COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
-COPY ./biojupies_sc2/ /usr/local/lib/python3.8/dist-packages/jupyter_template/profiles/biojupies_sc/
 COPY run.sh ./
 RUN set +x run.sh
 
-EXPOSE 82
+ENV PREFIX "/"
+
+EXPOSE 80
 CMD [ "sh", "./run.sh" ]
 
