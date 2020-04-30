@@ -29,9 +29,9 @@ proxy_service = f"""
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""
-  {template['name'])}:
+  {template['name']}:
     build: {os.path.relpath(template['path'], root_dir)}
-    image: maayanlab/jtc-{template['name'])}:{template['version']}
+    image: maayanlab/jtc-{template['name']}:{template['version']}
     environment:
       - PREFIX=/{template['name']}/
 """.strip('\n') for template in templates)
