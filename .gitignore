@@ -1,2 +1,5 @@
-docker-compose.yml
+__pycache__
+.pyc
 app/public/templates.json
+docker-compose.yml
+venv
