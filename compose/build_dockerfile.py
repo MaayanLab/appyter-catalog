@@ -5,6 +5,8 @@ def build_dockerfile(template_path, config):
   dockerfile_parts = ['FROM ubuntu', '''
     RUN set -x \\
         && echo "Preparing system..." \\
+        && export DEBIAN_FRONTEND="noninteractive" \\
+        && export TZ="America/New_York" \\
         && apt-get -y update \\
         && apt-get -y install git r-base python3-pip python3-dev \\
         && pip3 install --upgrade pip
