@@ -1,0 +1,21 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+<h1>My Test</h1>
+</div>
+{{ super() }}
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="{{ url_for('static', filename='test.js') }}"></script>
+{% endblock %}

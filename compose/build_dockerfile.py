@@ -5,8 +5,16 @@ def build_dockerfile(template_path, config):
   dockerfile_parts = ['FROM ubuntu', '''
     RUN set -x \\
         && echo "Preparing system..." \\
+        && export DEBIAN_FRONTEND="noninteractive" \\
+        && export TZ="America/New_York" \\
         && apt-get -y update \\
-        && apt-get -y install git
+        && apt-get -y install git r-base python3-pip python3-dev \\
+        && pip3 install --upgrade pip
+  ''', '''
+    RUN set -x \\
+      && echo "Installing jupyter kernel..." \\
+      && pip3 install ipykernel \\
+      && python3 -m ipykernel install
   ''']
   if os.path.isfile(os.path.join(template_path, 'deps.txt')):
     dockerfile_parts.append('''
@@ -21,8 +29,6 @@ def build_dockerfile(template_path, config):
     dockerfile_parts.append('''
       ADD setup.R /app/setup.R
       RUN set -x \\
-        && echo "Installing R..." \\
-        && apt-get install -y r-base \\
         && echo "Installing R dependencies from setup.R..." \\
         && R -e "source('/app/setup.R')" \\
         && rm /app/setup.R
@@ -31,9 +37,6 @@ def build_dockerfile(template_path, config):
     dockerfile_parts.append('''
       ADD requirements.txt /app/requirements.txt
       RUN set -x \\
-        && echo "Installing python..." \\
-        && apt-get install -y  python3-pip python3-dev \\
-        && pip3 install --upgrade pip \\
         && echo "Installing python dependencies from requirements.txt..." \\
         && pip3 install -Ivr /app/requirements.txt \\
         && rm /app/requirements.txt
