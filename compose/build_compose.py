@@ -15,7 +15,7 @@ templates = [
 ]
 
 proxy_environment = '\n'.join(f"""
-      - nginx_proxy_{n:03}="/{template['name']}(/.*) http://{template['name']}:80/{template['name']}$$1"
+      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name']}:80/{template['name']}$$1
 """.strip('\n') for n, template in enumerate(templates)).strip('\n')
 
 proxy_service = f"""
@@ -23,7 +23,7 @@ proxy_service = f"""
     image: maayanlab/proxy:1.1.7
     environment:
 {proxy_environment}
-      - nginx_proxy_{len(templates):03}="(/.*) http://app:80$$1"
+      - nginx_proxy_{len(templates):03}=(/.*) http://app:80$$1
     ports:
       - 80:80
 """.strip('\n')
