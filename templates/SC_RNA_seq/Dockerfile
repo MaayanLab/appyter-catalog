@@ -13,7 +13,11 @@ RUN set -x \
     git \
     r-base \
     make \
-    gcc
+    gcc \
+    build-essential \
+    libcurl4-gnutls-dev \
+    libxml2-dev \
+    libssl-dev
 
 WORKDIR /usr/src/app
 

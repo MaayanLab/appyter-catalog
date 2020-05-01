@@ -3,7 +3,7 @@
   "name": "SC_RNA_seq",
   "title": "Single cell RNA-seq analysis pipeline",
   "version": "0.0.1",
-  "description": "scRNA-seq analysis pipeline enables you to analyze scRNA-seq datasets with state-of-the-art algorithms.",
+  "description": "scRNA-seq analysis pipeline enables users to analyze and visualize scRNA-seq datasets with state-of-the-art algorithms and visualization methods.",
   "authors": [
     {
       "name": "Minji Jeon",
