@@ -1,8 +1,3 @@
 # Single-cell RNA-seq analysis pipeline
 
-This is a Single-cell RNA-seq analysis pipeline template in the catalog. 
-
-- `SC_RNA_seq/Single_cell_RNA_seq_Analysis_Pipeline_Template.ipynb`: Single-cell RNA-seq analysis pipeline
-- `SC_RNA_seq/README.md`: Long description of Single-cell RNA-seq analysis pipeline template
-- `SC_RNA_seq/requirements.txt`: Python dependencies necessary to run Single-cell RNA-seq analysis pipeline template
-- `SC_RNA_seq/template.json`: Metadata about Single-cell RNA-seq analysis pipeline template
+This pipeline enables you to analyze and visualize your single cell RNA sequencing datasets with an array of algorithms and data visualization methods. The pipeline includes PCA analysis, MAGIC normalization, K-means clustering, enrichment analysis, Monocle trajectory inference, SingleR cell type prediction, and library size analysis.
