@@ -2,13 +2,16 @@ import os
 from textwrap import dedent
 
 def build_dockerfile(template_path, config):
-  dockerfile_parts = ['FROM ubuntu', '''
+  dockerfile_parts = ['''
+    FROM ubuntu
+  ''', '''
+    ENV DEBIAN_FRONTEND "noninteractive"
+    ENV TZ "America/New_York"
+  ''', '''
     RUN set -x \\
         && echo "Preparing system..." \\
-        && export DEBIAN_FRONTEND="noninteractive" \\
-        && export TZ="America/New_York" \\
         && apt-get -y update \\
-        && apt-get -y install git r-base python3-pip python3-dev \\
+        && apt-get -y install git python3-pip python3-dev \\
         && pip3 install --upgrade pip
   ''', '''
     RUN set -x \\
@@ -29,7 +32,10 @@ def build_dockerfile(template_path, config):
     dockerfile_parts.append('''
       ADD setup.R /app/setup.R
       RUN set -x \\
-        && echo "Installing R dependencies from setup.R..." \\
+        && echo "Installing R..." \\
+        && apt-get -y update \\
+        && apt-get -y install r-base \\
+        && echo "Setting up R with setup.R..." \\
         && R -e "source('/app/setup.R')" \\
         && rm /app/setup.R
     ''')

@@ -10,8 +10,9 @@
       ]
     },
     "name": {
-      "description": "Slug name of this template (same as directory)",
-      "type": "string"
+      "description": "Slug name of this template (same as directory, used as url location)",
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
     },
     "title": {
       "description": "Template title",

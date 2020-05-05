@@ -15,7 +15,7 @@ templates = [
 ]
 
 proxy_environment = '\n'.join(f"""
-      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name']}:80/{template['name']}$$1
+      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name'].lower()}:80/{template['name']}$$1
 """.strip('\n') for n, template in enumerate(templates)).strip('\n')
 
 proxy_service = f"""
@@ -29,9 +29,9 @@ proxy_service = f"""
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""
-  {template['name']}:
+  {template['name'].lower()}:
     build: {os.path.relpath(template['path'], root_dir)}
-    image: maayanlab/jtc-{template['name']}:{template['version']}
+    image: maayanlab/jtc-{template['name'].lower()}:{template['version']}
     environment:
       - PREFIX=/{template['name']}/
 """.strip('\n') for template in templates)
