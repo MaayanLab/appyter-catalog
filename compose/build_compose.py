@@ -15,7 +15,7 @@ templates = [
 ]
 
 proxy_environment = '\n'.join(f"""
-      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name']}:80/{template['name']}$$1
+      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name'].lower()}:80/{template['name']}$$1
 """.strip('\n') for n, template in enumerate(templates)).strip('\n')
 
 proxy_service = f"""
