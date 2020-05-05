@@ -1,0 +1,16 @@
+git+git://github.com/Maayanlab/jupyter-template.git
+ipykernel
+matplotlib_venn
+rpy2
+magic-impute
+pandas
+urllib3
+requests
+plotly
+matplotlib
+scipy
+stats
+sklearn
+numpy
+chart_studio
+seaborn
