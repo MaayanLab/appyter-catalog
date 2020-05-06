@@ -20,12 +20,19 @@ proxy_environment = '\n'.join(f"""
 
 proxy_service = f"""
   proxy:
-    image: maayanlab/proxy:1.1.7
+    image: maayanlab/proxy:1.2.0
     environment:
 {proxy_environment}
+      - nginx_server_name=${{nginx_server_name}}
+      - nginx_ssl=1
+      - nginx_ssl_letsencrypt=1
+      - letsencrypt_email=${{letsencrypt_email}}
       - nginx_proxy_{len(templates):03}=(/.*) http://app:80$$1
     ports:
       - 80:80
+      - 443:443
+    volumes:
+      - letsencrypt:/etc/letsencrypt/
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""
@@ -44,6 +51,8 @@ services:
     build: app
     image: maayanlab/jupyter-template-catalog:{version}
 {docker_compose_services}
+volumes:
+  letsencrypt:
 """.strip('\n')
 
 print(docker_compose)
