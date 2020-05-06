@@ -12,6 +12,7 @@ def build_dockerfile(template_path, config):
         && echo "Preparing system..." \\
         && apt-get -y update \\
         && apt-get -y install git python3-pip python3-dev \\
+        && rm -rf /var/lib/apt/lists/* \\
         && pip3 install --upgrade pip
   ''', '''
     RUN set -x \\
@@ -26,6 +27,7 @@ def build_dockerfile(template_path, config):
         && echo "Installing system dependencies from deps.txt..." \\
         && apt-get -y update \\
         && apt-get -y install $(grep -v '^#' /app/deps.txt) \\
+        && rm -rf /var/lib/apt/lists/* \\
         && rm /app/deps.txt
     ''')
   if os.path.isfile(os.path.join(template_path, 'setup.R')):
@@ -35,6 +37,7 @@ def build_dockerfile(template_path, config):
         && echo "Installing R..." \\
         && apt-get -y update \\
         && apt-get -y install r-base \\
+        && rm -rf /var/lib/apt/lists/* \\
         && echo "Setting up R with setup.R..." \\
         && R -e "source('/app/setup.R')" \\
         && rm /app/setup.R
