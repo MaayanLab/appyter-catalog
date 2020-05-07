@@ -14,7 +14,7 @@ docker-compose.yml: app/Dockerfile $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
 
 app/public/templates.json: $(TEMPLATEFILES)
-	cat $^ | jq -s '.' > $@
+	$(PYTHON) compose/build_templates.py > $@
 
 app/.build: app/public/templates.json app/package.json $$(shell find app/public -type f)
 	cd app && npm i && npm run build && cd .. && docker-compose build app && touch $@
