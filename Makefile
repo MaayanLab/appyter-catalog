@@ -22,20 +22,31 @@ app/.build: app/public/templates.json app/package.json $$(shell find app/public 
 templates/%/.build: templates/%/Dockerfile
 	docker-compose build $(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
 
-.build: docker-compose.yml app/.build $(BUILDTEMPLATES)
-
-.PHONY: build
-build: .build
+.build: app/.build $(BUILDTEMPLATES)
 
 .env: .env.example
 	test -f .env || ( echo "Warning: Using .env.example, please update .env as required" && cp .env.example .env )
 
+.PHONY: prepare
+prepare: .env docker-compose.yml $(DOCKERFILES)
+
+.PHONY: build
+build: .build
+
+.PHONY: push
+push: build
+	docker-compose push
+
+.PHONY: pull
+pull: prepare
+	docker-compose pull
+
 .PHONY: start
-start: build .env
-	docker-compose up -d
+start: prepare
+	( make pull || make build ) && docker-compose up -d
 
 .PHONY: stop
-stop: docker-compose.yml
+stop: prepare
 	docker-compose down
 
 .PHONY: clean
