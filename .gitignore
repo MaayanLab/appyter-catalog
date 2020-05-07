@@ -1,4 +1,6 @@
 __pycache__
+.build
+.env
 .pyc
 app/public/templates.json
 docker-compose.yml
