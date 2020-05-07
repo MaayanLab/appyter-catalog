@@ -1,9 +1,16 @@
 <script>
+  import mdIt from 'markdown-it'
+  const md = mdIt()
+
   // store templates as list and lookup table based on name slugs
   import templateList from './templates.json'
   const templateLookup = {}
-  for (const template of templateList) {
-    templateLookup[template.name] = template
+  for (const {description, long_description, ...template} of templateList) {
+    templateLookup[template.name] = {
+      description: md.render(description || ''),
+      long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
+      ...template,
+    }
   }
 
   // sync template variable and url hash
@@ -68,18 +75,17 @@
             <span class="badge badge-primary">{tag}</span>
           {/each}
         </span>
-        <p>&nbsp;</p>
-        <p>{template.description}</p>
         {#if template.url !== undefined}
-          <a href="{template.url}">{template.url}</a>
+          <p><a href="{template.url}">{template.url}</a></p>
         {/if}
-        <p>&nbsp;</p>
         <p>
           <b>Authors:</b><br />
           {#each template.authors as author}
             <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
           {/each}
         </p>
+        {@html template.long_description}
+        <p>&nbsp;</p>
         <a href="./{template.name}/" class="btn btn-primary">Start Template</a>
       </div>
     </div>
