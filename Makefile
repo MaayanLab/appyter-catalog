@@ -2,67 +2,50 @@ PYTHON ?= python3
 
 # Get all template directories
 TEMPLATES = $(shell ls -d templates/*)
-
-
-# These are recipes for getting all template docker-files setup in a unified docker-compose
-
-# The Dockerfile in each template directory
+TEMPLATEFILES = $(foreach template, $(TEMPLATES), $(template)/template.json)
 DOCKERFILES = $(foreach template, $(TEMPLATES), $(template)/Dockerfile)
+BUILDTEMPLATES = $(foreach template, $(TEMPLATES), $(template)/.build)
 
-# You can make a dockerfile for a given template with compose/build_dockerfile.py
-.PHONY: $(DOCKERFILES)
-$(DOCKERFILES):
+.SECONDEXPANSION:
+templates/%/Dockerfile: compose/build_dockerfile.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
 	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
-# You can make a docker-compose given that all dockerfiles are present with compose/build_compose.py
-.PHONY: docker-compose.yml
-docker-compose.yml: $(DOCKERFILES) app/Dockerfile
+docker-compose.yml: app/Dockerfile $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
 
-
-# These are recipes for setting up the app itself
-TEMPLATEFILES = $(foreach template, $(TEMPLATES), $(template)/template.json)
-
-.PHONY: app/public/templates.json
 app/public/templates.json: $(TEMPLATEFILES)
 	cat $^ | jq -s '.' > $@
 
-.PHONY: buildApp
-buildApp: app/public/templates.json
-	cd app && npm i && npm run build
+app/.build: app/public/templates.json app/package.json $$(shell find app/public -type f)
+	cd app && npm i && npm run build && cd .. && docker-compose build app && touch $@
 
-.PHONY: app/Dockerfile
-app/Dockerfile: buildApp
+templates/%/.build: templates/%/Dockerfile
+	docker-compose build $(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
 
-
-# These are just convenient wrappers for docker-compose depending on the fact that the docker-compose exists
+.build: docker-compose.yml app/.build $(BUILDTEMPLATES)
 
 .PHONY: build
-build: docker-compose.yml
-	docker-compose build
+build: .build
+
+.env: .env.example
+	test -f .env || ( echo "Warning: Using .env.example, please update .env as required" && cp .env.example .env )
 
 .PHONY: start
-start: docker-compose.yml
+start: build .env
 	docker-compose up -d
 
 .PHONY: stop
 stop: docker-compose.yml
 	docker-compose down
 
-
-# These are convenient wrappers for deployment management
-
-# clean this directory of any un-tracked files
 .PHONY: clean
 clean:
 	git reset --hard
 
-# upgrade the project to the latest git commit
 .PHONY: upgrade
 upgrade: clean
 	git pull --rebase
 
-# update the deployment, upgrading the source and restarting
 .PHONY: update
 update:
-	make upgrade && make build && make start
+	make upgrade && make start
