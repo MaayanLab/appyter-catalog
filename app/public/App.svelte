@@ -1,15 +1,43 @@
 <script>
+  import * as JsSearch from 'js-search'
+
   import mdIt from 'markdown-it'
   const md = mdIt()
 
   // store templates as list and lookup table based on name slugs
   import templateList from './templates.json'
   const templateLookup = {}
-  for (const {description, long_description, ...template} of templateList) {
-    templateLookup[template.name] = {
+  for (const template of templateList) {
+    const {name, description, long_description, ..._} = template
+    // modify templates in-place
+    Object.assign(template, {
       description: md.render(description || ''),
       long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
-      ...template,
+    })
+    // save a reference in the lookup table
+    templateLookup[name] = template
+  }
+
+  // index documents for search
+  const search = new JsSearch.Search('name')
+  search.addIndex('name')
+  search.addIndex('title')
+  search.addIndex(['authors', 'name']) // TODO: this doesn't work
+  search.addIndex(['authors', 'email']) // TODO: this doesn't work
+  search.addIndex('description')
+  search.addIndex('long_description')
+  search.addIndex('license')
+  search.addIndex('tags')
+  search.addIndex('url')
+  search.addDocuments(templateList)
+
+  // facilitate search
+  let searchString = ''
+  const searchTemplates = (searchString) => {
+    if (searchString === '') {
+      return templateList
+    } else {
+      return search.search(searchString)
     }
   }
 
@@ -43,7 +71,19 @@
 <div class="container">
   {#if template === undefined}
     <div class="row">
-      {#each templateList as template}
+      <div class="offset-sm-2 col-sm-8 text-center">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search templates..."
+          aria-label="Search templates"
+          bind:value={searchString}
+        />
+        <p>&nbsp;</p>
+      </div>
+    </div>
+    <div class="row">
+      {#each searchTemplates(searchString) as template}
         <div class="col-sm-12 col-md-6 col-xl-4">
           <div class="card">
             <div class="card-body">
@@ -55,7 +95,7 @@
                   <span class="badge badge-primary">{tag}</span>
                 {/each}
               </h6>
-              <p class="card-text">{template.description}</p>
+              <p class="card-text">{@html template.description}</p>
               <a href="#{template.name}" class="btn btn-primary btn-sm stretched-link">
                 Select
               </a>
