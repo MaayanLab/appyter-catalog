@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json",
+  "name": "Enrichr_figure",
+  "title": "Enrichr Figure",
+  "version": "0.0.1",
+  "description": "A jupyter template that turns gene set enrichment analysis results from Enrichr into a publishable figure.",
+  "authors": [
+    {
+      "name": "Megan L. Wojciechowicz",
+      "email": "megan.wojciechowicz@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/jupyter-template-catalog",
+  "tags": [
+    "Enrichment Analysis"
+  ],
+  "license": "Apache-2.0",
+  "template": {
+    "file": "Enrichr_figure.ipynb",
+    "profile": "biojupies"
+  }
+}
