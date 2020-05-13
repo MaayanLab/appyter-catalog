@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json",
+  "name":"Enrichr_compressed_bar_chart_figure",
+  "title": "Enrichr Compressed Bar Chart Figure",
+  "version": "0.0.1",
+  "description": "A template that turns gene set enrichment analysis results from Enrichr into a publishable figure.",
+  "authors": [
+    {
+      "name": "Megan L. Wojciechowicz",
+      "email": "megan.wojciechowicz@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/jupyter-template-catalog",
+  "tags": [
+    "Enrichment Analysis"
+  ],
+  "license": "Apache-2.0",
+  "template": {
+    "file": "Enrichr_compressed_bar_chart_figure.ipynb",
+    "profile": "biojupies"
+  }
+}
