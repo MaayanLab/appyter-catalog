@@ -1,0 +1,8 @@
+
+git+git://github.com/Maayanlab/jupyter-template.git
+pandas
+numpy
+requests
+matplotlib
+seaborn
+datetime
