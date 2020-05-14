@@ -58,6 +58,7 @@ def build_dockerfile(template_path, config):
     ENV PREFIX "/"
     ENV HOST "0.0.0.0"
     ENV PORT "80"
+    ENV DEBUG "false"
   ''')
   dockerfile_parts.append('''
     COPY . /app
