@@ -72,7 +72,7 @@ def validate_template(template):
 if __name__ == '__main__':
   valid = True
   for template in get_changed_templates():
-    if os.path.exists(os.path.join('templates', template)):
+    if not os.path.exists(os.path.join('templates', template)):
       print(f"{template}: Directory no longer exists, ignoring")
       continue
     try:
