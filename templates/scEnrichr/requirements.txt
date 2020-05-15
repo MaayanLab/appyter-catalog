@@ -1,0 +1,11 @@
+git+git://github.com/Maayanlab/geode.git
+git+git://github.com/Maayanlab/jupyter-template.git
+ipython
+matplotlib
+numpy
+pandas
+plotly
+scipy
+seaborn
+sklearn
+umap-learn
