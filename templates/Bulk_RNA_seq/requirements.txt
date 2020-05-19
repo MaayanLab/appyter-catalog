@@ -1,4 +1,4 @@
-git+git://github.com/Maayanlab/jupyter-template.git
+git+git://github.com/Maayanlab/jupyter-template.git#v0.2.1
 git+git://github.com/Maayanlab/geode.git
 ipykernel
 matplotlib_venn
