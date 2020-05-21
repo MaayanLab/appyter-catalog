@@ -22,4 +22,3 @@ leidenalg
 umap-learn
 digitalcellsorter
 datetime
-shutil
