@@ -51,6 +51,12 @@ def build_dockerfile(template_path, config):
         && rm /app/requirements.txt
     ''')
   dockerfile_parts.append('''
+    ARG jupyter_template_version=git+git://github.com/Maayanlab/jupyter-template.git
+    RUN set -x \\
+      && echo "Installing jupyter-template..." \\
+      && pip3 install -Iv ${jupyter_template_version}
+  ''')
+  dockerfile_parts.append('''
     WORKDIR /app
     EXPOSE 80
   ''')
