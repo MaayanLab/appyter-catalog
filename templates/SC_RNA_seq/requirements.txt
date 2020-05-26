@@ -3,7 +3,7 @@ ipykernel
 matplotlib_venn
 rpy2
 magic-impute
-pandas
+pandas==0.25.3
 urllib3
 requests
 plotly
@@ -14,3 +14,12 @@ sklearn
 numpy
 chart_studio
 seaborn
+scanpy
+python-igraph
+anndata
+fa2
+leidenalg
+umap-learn
+digitalcellsorter
+datetime
+pytest-shutil
