@@ -24,8 +24,8 @@ proxy_service = f"""
     environment:
 {proxy_environment}
       - nginx_server_name=${{nginx_server_name}}
-      - nginx_ssl=1
-      - nginx_ssl_letsencrypt=1
+      - nginx_ssl=${{nginx_ssl}}
+      - nginx_ssl_letsencrypt=${{nginx_ssl}}
       - letsencrypt_email=${{letsencrypt_email}}
       - nginx_proxy_{len(templates):03}=(/.*) http://app:80$$1
     ports:
@@ -37,7 +37,11 @@ proxy_service = f"""
 
 docker_compose_services = '\n'.join(f"""
   {template['name'].lower()}:
-    build: {os.path.relpath(template['path'], root_dir)}
+    build:
+      context: {os.path.relpath(template['path'], root_dir)}
+      dockerfile: Dockerfile
+      args:
+        - jupyter_template_version=${{jupyter_template_version}}
     image: maayanlab/jtc-{template['name'].lower()}:{template['version']}
     environment:
       - PREFIX=/{template['name']}/
