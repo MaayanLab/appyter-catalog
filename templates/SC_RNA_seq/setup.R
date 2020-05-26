@@ -13,7 +13,3 @@ BiocManager::install("edgeR")
 install.packages("devtools")
 devtools::install_github("cole-trapnell-lab/monocle-release")
 
-BiocManager::install("SingleR")
-BiocManager::install("scater")
-BiocManager::install("scRNAseq")
-
