@@ -1,7 +1,7 @@
 {
-  "name": "jupyter-template-catalog",
+  "name": "appyters",
   "version": "1.0.0",
-  "description": "A catalog of jupyter templates",
+  "description": "A catalog of appyter notebooks",
   "main": "index.js",
   "scripts": {
     "build": "parcel build --no-cache public/index.html",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MaayanLab/jupyter-template-catalog.git"
+    "url": "git+https://github.com/MaayanLab/appyters.git"
   },
   "author": "Daniel J. B. Clarke <u8sand@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/MaayanLab/jupyter-template-catalog/issues"
+    "url": "https://github.com/MaayanLab/appyters/issues"
   },
-  "homepage": "https://github.com/MaayanLab/jupyter-template-catalog#readme",
+  "homepage": "https://github.com/MaayanLab/appyters#readme",
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-transform-runtime": "^7.9.0",
