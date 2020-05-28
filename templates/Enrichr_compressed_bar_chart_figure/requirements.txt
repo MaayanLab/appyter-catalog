@@ -4,4 +4,4 @@ numpy
 requests
 matplotlib
 seaborn
-datetime
+ipython
