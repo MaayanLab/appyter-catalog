@@ -5,18 +5,18 @@ import glob
 
 version = '0.0.1'
 root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-template_path = os.path.join(root_dir, 'templates')
-templates = [
+appyter_path = os.path.join(root_dir, 'appyters')
+appyters = [
   dict(
     path=os.path.dirname(path),
     **json.load(open(path, 'r')),
   )
-  for path in glob.glob(os.path.join(template_path, '*', 'template.json'))
+  for path in glob.glob(os.path.join(appyter_path, '*', 'appyter.json'))
 ]
 
 proxy_environment = '\n'.join(f"""
-      - nginx_proxy_{n:03}=/{template['name']}(/.*) http://{template['name'].lower()}:80/{template['name']}$$1
-""".strip('\n') for n, template in enumerate(templates)).strip('\n')
+      - nginx_proxy_{n:03}=/{appyter['name']}(/.*) http://{appyter['name'].lower()}:80/{appyter['name']}$$1
+""".strip('\n') for n, appyter in enumerate(appyters)).strip('\n')
 
 proxy_service = f"""
   proxy:
@@ -27,7 +27,7 @@ proxy_service = f"""
       - nginx_ssl=${{nginx_ssl}}
       - nginx_ssl_letsencrypt=${{nginx_ssl}}
       - letsencrypt_email=${{letsencrypt_email}}
-      - nginx_proxy_{len(templates):03}=(/.*) http://app:80$$1
+      - nginx_proxy_{len(appyters):03}=(/.*) http://app:80$$1
     ports:
       - 80:80
       - 443:443
@@ -36,16 +36,16 @@ proxy_service = f"""
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""
-  {template['name'].lower()}:
+  {appyter['name'].lower()}:
     build:
-      context: {os.path.relpath(template['path'], root_dir)}
+      context: {os.path.relpath(appyter['path'], root_dir)}
       dockerfile: Dockerfile
       args:
-        - jupyter_template_version=${{jupyter_template_version}}
-    image: maayanlab/jtc-{template['name'].lower()}:{template['version']}
+        - appyter_version=${{appyter_version}}
+    image: maayanlab/jtc-{appyter['name'].lower()}:{appyter['version']}
     environment:
-      - PREFIX=/{template['name']}/
-""".strip('\n') for template in templates)
+      - PREFIX=/{appyter['name']}/
+""".strip('\n') for appyter in appyters)
 
 docker_compose = f"""
 version: '3'
@@ -53,7 +53,7 @@ services:
 {proxy_service}
   app:
     build: app
-    image: maayanlab/jupyter-template-catalog:{version}
+    image: maayanlab/appyters:{version}
 {docker_compose_services}
 volumes:
   letsencrypt:

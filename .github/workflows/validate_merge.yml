@@ -1,8 +1,8 @@
-name: Validate template
+name: Validate appyter
 on:
   pull_request:
     paths:
-    - 'templates/**'
+    - 'appyters/**'
 jobs:
   test:
     runs-on: ubuntu-latest

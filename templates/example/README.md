@@ -1,9 +1,9 @@
 # Example
 
-This is an example template in the catalog. Please reference it when submitting your own template.
+This is an example appyter in the catalog. Please reference it when submitting your own appyter.
 
-- `{name}/{name}.ipynb`: The template iteself
-- `{name}/README.md`: Long description of template
-- `{name}/deps.txt`: Docker image (ubuntu) packages necessary to run your template
-- `{name}/requirements.txt`: Python dependencies necessary to run your template
-- `{name}/template.json`: Metadata about your template to be used for the website
+- `{name}/{name}.ipynb`: The appyter iteself
+- `{name}/README.md`: Long description of appyter
+- `{name}/deps.txt`: Docker image (ubuntu) packages necessary to run your appyter
+- `{name}/requirements.txt`: Python dependencies necessary to run your appyter
+- `{name}/appyter.json`: Metadata about your appyter to be used for the website

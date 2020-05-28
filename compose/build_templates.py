@@ -4,15 +4,15 @@ import json
 import glob
 
 root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-template_path = os.path.join(root_dir, 'templates')
-templates = [
+appyter_path = os.path.join(root_dir, 'appyters')
+appyters = [
   dict(
     path=path,
     long_description=open(os.path.join(path, 'README.md'), 'r').read(),
-    **json.load(open(os.path.join(path, 'template.json'), 'r')),
+    **json.load(open(os.path.join(path, 'appyter.json'), 'r')),
   )
-  for path in map(os.path.dirname, glob.glob(os.path.join(template_path, '*', 'template.json')))
+  for path in map(os.path.dirname, glob.glob(os.path.join(appyter_path, '*', 'appyter.json')))
 ]
 
 if __name__ == '__main__':
-  print(json.dumps(templates))
+  print(json.dumps(appyters))

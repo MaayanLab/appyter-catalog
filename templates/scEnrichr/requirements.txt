@@ -1,5 +1,5 @@
 git+git://github.com/Maayanlab/geode.git
-git+git://github.com/Maayanlab/jupyter-template.git
+git+git://github.com/Maayanlab/appyter.git
 ipython
 matplotlib
 numpy
