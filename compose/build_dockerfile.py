@@ -1,7 +1,7 @@
 import os
 from textwrap import dedent
 
-def build_dockerfile(template_path, config):
+def build_dockerfile(appyter_path, config):
   dockerfile_parts = ['''
     FROM ubuntu
   ''', '''
@@ -20,7 +20,7 @@ def build_dockerfile(template_path, config):
       && pip3 install ipykernel \\
       && python3 -m ipykernel install
   ''']
-  if os.path.isfile(os.path.join(template_path, 'deps.txt')):
+  if os.path.isfile(os.path.join(appyter_path, 'deps.txt')):
     dockerfile_parts.append('''
       ADD deps.txt /app/deps.txt
       RUN set -x \\
@@ -30,7 +30,7 @@ def build_dockerfile(template_path, config):
         && rm -rf /var/lib/apt/lists/* \\
         && rm /app/deps.txt
     ''')
-  if os.path.isfile(os.path.join(template_path, 'setup.R')):
+  if os.path.isfile(os.path.join(appyter_path, 'setup.R')):
     dockerfile_parts.append('''
       ADD setup.R /app/setup.R
       RUN set -x \\
@@ -42,7 +42,7 @@ def build_dockerfile(template_path, config):
         && R -e "source('/app/setup.R')" \\
         && rm /app/setup.R
     ''')
-  if os.path.isfile(os.path.join(template_path, 'requirements.txt')):
+  if os.path.isfile(os.path.join(appyter_path, 'requirements.txt')):
     dockerfile_parts.append('''
       ADD requirements.txt /app/requirements.txt
       RUN set -x \\
@@ -51,10 +51,10 @@ def build_dockerfile(template_path, config):
         && rm /app/requirements.txt
     ''')
   dockerfile_parts.append('''
-    ARG jupyter_template_version=git+git://github.com/Maayanlab/jupyter-template.git
+    ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
     RUN set -x \\
-      && echo "Installing jupyter-template..." \\
-      && pip3 install -Iv ${jupyter_template_version}
+      && echo "Installing appyter..." \\
+      && pip3 install -Iv ${appyter_version}
   ''')
   dockerfile_parts.append('''
     WORKDIR /app
@@ -70,14 +70,14 @@ def build_dockerfile(template_path, config):
     COPY . /app
   ''')
   dockerfile_parts.append(f'''
-    CMD [ "jupyter-template", "--profile={config['template'].get('profile', 'default')}", "{config['template']['file']}" ]
+    CMD [ "appyter", "--profile={config['appyter'].get('profile', 'default')}", "{config['appyter']['file']}" ]
   ''')
   return '\n\n'.join(map(str.strip, map(dedent, dockerfile_parts)))
 
 if __name__ == '__main__':
   import sys
   import json
-  template = sys.argv[1]
-  template_path = os.path.join(os.path.dirname(__file__), '..', 'templates', template)
-  config = json.load(open(os.path.join(template_path, 'template.json'), 'r'))
-  print(build_dockerfile(template_path, config))
+  appyter = sys.argv[1]
+  appyter_path = os.path.join(os.path.dirname(__file__), '..', 'appyters', appyter)
+  config = json.load(open(os.path.join(appyter_path, 'appyter.json'), 'r'))
+  print(build_dockerfile(appyter_path, config))

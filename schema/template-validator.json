@@ -6,16 +6,16 @@
       "description": "A reference to this schema",
       "type": "string",
       "enum": [
-        "https://raw.githubusercontent.com/MaayanLab/jupyter-template-catalog/master/schema/template-validator.json"
+        "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/app-validator.json"
       ]
     },
     "name": {
-      "description": "Slug name of this template (same as directory, used as url location)",
+      "description": "Slug name of this appyter (same as directory, used as url location)",
       "type": "string",
       "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
     },
     "title": {
-      "description": "Template title",
+      "description": "Appyter title",
       "type": "string"
     },
     "version": {
@@ -25,12 +25,12 @@
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
     "description": {
-      "description": "A short description of the template",
+      "description": "A short description of the appyter",
       "type": "string",
       "maxLength": 150
     },
     "authors": {
-      "description": "A list of authors who contributed to the template",
+      "description": "A list of authors who contributed to the appyter",
       "type": "array",
       "items": {
         "type": "object",
@@ -48,12 +48,12 @@
       }
     },
     "url": {
-      "description": "A url to the source code or website of the template",
+      "description": "A url to the source code or website of the appyter",
       "type": "string",
       "format": "url"
     },
     "tags": {
-      "description": "A set of tags describing the template",
+      "description": "A set of tags describing the appyter",
       "type": "array",
       "items": {
         "type": "string"
@@ -63,16 +63,16 @@
       "description": "A license identified by https://spdx.org/licenses/",
       "type": "string"
     },
-    "template": {
-      "description": "Template information and configuration",
+    "appyter": {
+      "description": "Appyter information and configuration",
       "type": "object",
       "properties": {
         "file": {
-          "description": "The template file relative to this directory",
+          "description": "The appyter file relative to this directory",
           "type": "string"
         },
         "profile": {
-          "description": "The jupyter-template pre-made profile to base the template off of",
+          "description": "The pre-made profile to base the appyter off of",
           "type": "string"
         }
       },
@@ -90,6 +90,6 @@
     "description",
     "authors",
     "license",
-    "template"
+    "appyter"
   ]
 }

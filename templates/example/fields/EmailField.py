@@ -1,4 +1,4 @@
-from jupyter_template.fields import Field
+from appyter.fields import Field
 
 class EmailField(Field):
   def __init__(self, **kwargs):

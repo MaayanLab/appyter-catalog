@@ -1,28 +1,28 @@
 PYTHON ?= python3
 
-# Get all template directories
-TEMPLATES = $(shell ls -d templates/*)
-TEMPLATEFILES = $(foreach template, $(TEMPLATES), $(template)/template.json)
-DOCKERFILES = $(foreach template, $(TEMPLATES), $(template)/Dockerfile)
-BUILDTEMPLATES = $(foreach template, $(TEMPLATES), $(template)/.build)
+# Get all appyter directories
+APPYTERS = $(shell ls -d appyters/*)
+APPYTERFILES = $(foreach appyter, $(APPYTERS), $(appyter)/appyter.json)
+DOCKERFILES = $(foreach appyter, $(APPYTERS), $(appyter)/Dockerfile)
+BUILDAPPYTERS = $(foreach appyter, $(APPYTERS), $(appyter)/.build)
 
 .SECONDEXPANSION:
-templates/%/Dockerfile: compose/build_dockerfile.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
+appyters/%/Dockerfile: compose/build_dockerfile.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
 	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
 docker-compose.yml: app/Dockerfile $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
 
-app/public/templates.json: $(TEMPLATEFILES)
-	$(PYTHON) compose/build_templates.py > $@
+app/public/appyters.json: $(APPYTERFILES)
+	$(PYTHON) compose/build_appyters.py > $@
 
-app/.build: app/public/templates.json app/package.json $$(shell find app/public -type f)
+app/.build: app/public/appyters.json app/package.json $$(shell find app/public -type f)
 	cd app && npm i && npm run build && cd .. && docker-compose build app && touch $@
 
-templates/%/.build: templates/%/Dockerfile
+appyters/%/.build: appyters/%/Dockerfile
 	docker-compose build $(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
 
-.build: app/.build $(BUILDTEMPLATES)
+.build: app/.build $(BUILDAPPYTERS)
 
 .env: .env.example
 	test -f .env || ( echo "Warning: Using .env.example, please update .env as required" && cp .env.example .env )
