@@ -5,78 +5,78 @@ import traceback
 import jsonschema
 from subprocess import Popen, PIPE
 
-def get_changed_templates():
+def get_changed_appyters():
   try:
     # try to load files from stdin
     return {
       file.split('/', maxsplit=3)[1]
       for element in json.load(sys.stdin)
       for file in [element['filename']]
-      if file.startswith('templates/')
+      if file.startswith('appyters/')
     }
   except:
     # otherwise use git
     p = Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE)
     files = {
-      # templates/{template}/* => {template}
+      # appyters/{appyter}/* => {appyter}
       line.split('/', maxsplit=3)[1]
       for line in map(
         bytes.decode,
         # returns all paths that will be changed
         p.stdout
       )
-      if line.startswith('templates/')
+      if line.startswith('appyters/')
     }
     assert p.returncode == 0, '`git diff` command failed'
     return files
 
-def validate_template(template):
-  print(f"{template}: Checking for existing of files...")
-  assert os.path.isfile(os.path.join('templates', template, 'README.md')), f"Missing templates/{template}/README.md"
-  assert os.path.isfile(os.path.join('templates', template, 'template.json')), f"Missing templates/{template}/template.json"
+def validate_appyter(appyter):
+  print(f"{appyter}: Checking for existing of files...")
+  assert os.path.isfile(os.path.join('appyters', appyter, 'README.md')), f"Missing appyters/{appyter}/README.md"
+  assert os.path.isfile(os.path.join('appyters', appyter, 'appyter.json')), f"Missing appyters/{appyter}/appyter.json"
   #
-  print(f"{template}: Validating `{template}/template.json`...")
-  config = json.load(open(os.path.join('templates', template, 'template.json'), 'r'))
+  print(f"{appyter}: Validating `{appyter}/appyter.json`...")
+  config = json.load(open(os.path.join('appyters', appyter, 'appyter.json'), 'r'))
   validator = jsonschema.Draft7Validator({
-    '$ref': f"file:///{os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'schema', 'template-validator.json'))}",
+    '$ref': f"file:///{os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'schema', 'appyter-validator.json'))}",
   })
   errors = [error.message for error in validator.iter_errors(config)]
   assert errors == [], '\n'.join(errors)
   #
   name = config['name']
-  assert name == template, f"The directory should be named like `name`"
+  assert name == appyter, f"The directory should be named like `name`"
   #
-  nbfile = config['template']['file']
+  nbfile = config['appyter']['file']
   #
-  print(f"{template}: Preparing docker to run `{nbfile}`...")
-  assert os.path.isfile(os.path.join('templates', template, nbfile)), f"Missing templates/{template}/{nbfile}"
+  print(f"{appyter}: Preparing docker to run `{nbfile}`...")
+  assert os.path.isfile(os.path.join('appyters', appyter, nbfile)), f"Missing appyters/{appyter}/{nbfile}"
   #
-  if not os.path.isfile(os.path.join('templates', template, 'Dockerfile')):
-    print(f"{template}: Creating Dockerfile...")
+  if not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')):
+    print(f"{appyter}: Creating Dockerfile...")
     import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
     from compose.build_dockerfile import build_dockerfile
-    with open(os.path.join('templates', template, 'Dockerfile'), 'w') as fw:
-      print(build_dockerfile(os.path.join('templates', template), config), file=fw)
+    with open(os.path.join('appyters', appyter, 'Dockerfile'), 'w') as fw:
+      print(build_dockerfile(os.path.join('appyters', appyter), config), file=fw)
   #
-  print(f"{template}: Building Dockerfile...")
-  p = Popen(['docker', 'build', '.'], cwd=os.path.join('templates', template), stdout=PIPE)
+  print(f"{appyter}: Building Dockerfile...")
+  p = Popen(['docker', 'build', '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
   for line in p.stdout:
-    print(f"{template}: `docker build .`: {line}")
+    print(f"{appyter}: `docker build .`: {line}")
   p.stdout.close()
   assert p.wait() == 0, '`docker build .` command failed'
   #
-  print(f"{template}: [WARN] Checking `{nbfile}` not yet implemented")
+  print(f"{appyter}: [WARN] Checking `{nbfile}` not yet implemented")
   #
-  print(f"{template}: Success!")
+  print(f"{appyter}: Success!")
 
 if __name__ == '__main__':
   valid = True
-  for template in get_changed_templates():
-    if not os.path.exists(os.path.join('templates', template)):
-      print(f"{template}: Directory no longer exists, ignoring")
+  for appyter in get_changed_appyters():
+    if not os.path.exists(os.path.join('appyters', appyter)):
+      print(f"{appyter}: Directory no longer exists, ignoring")
       continue
     try:
-      validate_template(template)
+      validate_appyter(appyter)
     except Exception:
       traceback.print_exc()
       valid = False

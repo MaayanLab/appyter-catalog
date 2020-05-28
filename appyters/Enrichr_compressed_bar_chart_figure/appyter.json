@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/appyter-validator.json",
+  "name":"Enrichr_compressed_bar_chart_figure",
+  "title": "Enrichr Compressed Bar Chart Figure",
+  "version": "0.0.1",
+  "description": "An appyter that turns gene set enrichment analysis results from Enrichr into a publishable figure.",
+  "authors": [
+    {
+      "name": "Megan L. Wojciechowicz",
+      "email": "megan.wojciechowicz@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyters",
+  "tags": [
+    "Enrichment Analysis"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "Enrichr_compressed_bar_chart_figure.ipynb",
+    "profile": "biojupies"
+  }
+}

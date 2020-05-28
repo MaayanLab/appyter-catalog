@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/appyter-validator.json",
+  "name": "example",
+  "title": "My Example Appyter",
+  "version": "0.0.2",
+  "description": "An awesome appyter that I created.",
+  "authors": [
+    {
+      "name": "Daniel J. B. Clarke",
+      "email": "u8sand@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyters",
+  "tags": [
+    "example"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "example.ipynb",
+    "profile": "biojupies"
+  }
+}

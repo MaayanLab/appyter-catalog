@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/appyter-validator.json",
+  "name": "scEnrichr",
+  "title": "scEnrichr",
+  "version": "0.0.1",
+  "description": "An Enrichr interface for single cell data",
+  "authors": [
+    {
+      "name": "Daniel J. B. Clarke",
+      "email": "u8sand@gmail.com"
+    }
+  ],
+  "url": "https://github.com/maayanLab/scEnrichr",
+  "tags": [
+    "Enrichment Analysis",
+    "RNA-seq",
+    "scRNA-seq"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "scEnrichr.ipynb",
+    "profile": "biojupies"
+  }
+}

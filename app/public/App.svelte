@@ -4,18 +4,18 @@
   import mdIt from 'markdown-it'
   const md = mdIt()
 
-  // store templates as list and lookup table based on name slugs
-  import templateList from './templates.json'
-  const templateLookup = {}
-  for (const template of templateList) {
-    const {name, description, long_description, ..._} = template
-    // modify templates in-place
-    Object.assign(template, {
+  // store appyters as list and lookup table based on name slugs
+  import appyterList from './appyters.json'
+  const appyterLookup = {}
+  for (const appyter of appyterList) {
+    const {name, description, long_description, ..._} = appyter
+    // modify appyters in-place
+    Object.assign(appyter, {
       description: md.render(description || ''),
       long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
     })
     // save a reference in the lookup table
-    templateLookup[name] = template
+    appyterLookup[name] = appyter
   }
 
   // index documents for search
@@ -29,22 +29,22 @@
   search.addIndex('license')
   search.addIndex('tags')
   search.addIndex('url')
-  search.addDocuments(templateList)
+  search.addDocuments(appyterList)
 
   // facilitate search
   let searchString = ''
-  const searchTemplates = (searchString) => {
+  const searchAppyters = (searchString) => {
     if (searchString === '') {
-      return templateList
+      return appyterList
     } else {
       return search.search(searchString)
     }
   }
 
-  // sync template variable and url hash
-  let template
+  // sync appyter variable and url hash
+  let appyter
   const updatehash = () => {
-    template = templateLookup[`${window.location.hash || '#'}`.slice(1)]
+    appyter = appyterLookup[`${window.location.hash || '#'}`.slice(1)]
   }
   window.onhashchange = updatehash
   updatehash()
@@ -63,40 +63,40 @@
 
 <div class="row">
   <div class="col-sm-12 text-center">
-    <h1>Jupyter Template Catalog</h1>
-    <h3 class="card-subtitle mb-2 text-muted">A catalog of jupyter templates</h3>
+    <h1>Appyters</h1>
+    <h3 class="card-subtitle mb-2 text-muted">A catalog of appyter notebooks</h3>
     <hr />
   </div>
 </div>
 <div class="container">
-  {#if template === undefined}
+  {#if appyter === undefined}
     <div class="row">
       <div class="offset-sm-2 col-sm-8 text-center">
         <input
           type="text"
           class="form-control"
-          placeholder="Search templates..."
-          aria-label="Search templates"
+          placeholder="Search appyters..."
+          aria-label="Search appyters"
           bind:value={searchString}
         />
         <p>&nbsp;</p>
       </div>
     </div>
     <div class="row">
-      {#each searchTemplates(searchString) as template}
+      {#each searchAppyters(searchString) as appyter}
         <div class="col-sm-12 col-md-6 col-xl-4">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{template.title}</h5>
+              <h5 class="card-title">{appyter.title}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
-                <span class="badge badge-success">v{template.version}</span>
-                <span class="badge badge-secondary">{template.license}</span>
-                {#each template.tags as tag}
+                <span class="badge badge-success">v{appyter.version}</span>
+                <span class="badge badge-secondary">{appyter.license}</span>
+                {#each appyter.tags as tag}
                   <span class="badge badge-primary">{tag}</span>
                 {/each}
               </h6>
-              <p class="card-text">{@html template.description}</p>
-              <a href="#{template.name}" class="btn btn-primary btn-sm stretched-link">
+              <p class="card-text">{@html appyter.description}</p>
+              <a href="#{appyter.name}" class="btn btn-primary btn-sm stretched-link">
                 Select
               </a>
             </div>
@@ -107,26 +107,26 @@
   {:else}
     <div class="row">
       <div class="col-sm-12">
-        <h3>{template.title}</h3>
+        <h3>{appyter.title}</h3>
         <span class="card-subtitle mb-2 text-muted">
-          <span class="badge badge-success">v{template.version}</span>
-          <span class="badge badge-secondary">{template.license}</span>
-          {#each template.tags as tag}
+          <span class="badge badge-success">v{appyter.version}</span>
+          <span class="badge badge-secondary">{appyter.license}</span>
+          {#each appyter.tags as tag}
             <span class="badge badge-primary">{tag}</span>
           {/each}
         </span>
-        {#if template.url !== undefined}
-          <p><a href="{template.url}">{template.url}</a></p>
+        {#if appyter.url !== undefined}
+          <p><a href="{appyter.url}">{appyter.url}</a></p>
         {/if}
         <p>
           <b>Authors:</b><br />
-          {#each template.authors as author}
+          {#each appyter.authors as author}
             <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
           {/each}
         </p>
-        {@html template.long_description}
+        {@html appyter.long_description}
         <p>&nbsp;</p>
-        <a href="./{template.name}/" class="btn btn-primary">Start Template</a>
+        <a href="./{appyter.name}/" class="btn btn-primary">Start Appyter</a>
       </div>
     </div>
   {/if}
