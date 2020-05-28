@@ -32,7 +32,7 @@ proxy_service = f"""
       - 80:80
       - 443:443
     volumes:
-      - letsencrypt:/etc/letsencrypt/
+      - ./data/letsencrypt/:/etc/letsencrypt/
 """.strip('\n')
 
 docker_compose_services = '\n'.join(f"""
@@ -42,9 +42,11 @@ docker_compose_services = '\n'.join(f"""
       dockerfile: Dockerfile
       args:
         - appyter_version=${{appyter_version}}
-    image: maayanlab/jtc-{appyter['name'].lower()}:{appyter['version']}
+    image: maayanlab/appyter-{appyter['name'].lower()}:{appyter['version']}
     environment:
       - PREFIX=/{appyter['name']}/
+    volumes:
+      - ./data/{appyter['name'].lower()}/:/app/data
 """.strip('\n') for appyter in appyters)
 
 docker_compose = f"""
@@ -55,8 +57,6 @@ services:
     build: app
     image: maayanlab/appyters:{version}
 {docker_compose_services}
-volumes:
-  letsencrypt:
 """.strip('\n')
 
 print(docker_compose)
