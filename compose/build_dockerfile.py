@@ -59,6 +59,7 @@ def build_dockerfile(appyter_path, config):
   dockerfile_parts.append('''
     WORKDIR /app
     EXPOSE 80
+    VOLUME /app/data
   ''')
   dockerfile_parts.append('''
     ENV PREFIX "/"
