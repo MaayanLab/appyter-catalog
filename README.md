@@ -1,6 +1,6 @@
 # appyters: A catalog of [appyter](https://github.com/maayanLab/appyter/) notebooks
 
-Pull requests encouraged, please refer to the [example](./apps/example/) for registering your own appyter.
+Pull requests encouraged, please refer to the [example](./appyters/example/) for registering your own appyter.
 
 ## Deployment
 
