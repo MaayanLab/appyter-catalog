@@ -6,7 +6,7 @@
       "description": "A reference to this schema",
       "type": "string",
       "enum": [
-        "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/app-validator.json"
+        "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/appyter-validator.json"
       ]
     },
     "name": {
