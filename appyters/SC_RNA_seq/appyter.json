@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyters/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "SC_RNA_seq",
   "title": "Single cell RNA-seq analysis pipeline",
   "version": "0.0.1",
@@ -10,7 +10,7 @@
       "email": "minji.jeon1@gmail.com"
     }
   ],
-  "url": "https://github.com/MaayanLab/appyters",
+  "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
     "RNAseq"
   ],
