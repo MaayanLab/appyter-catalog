@@ -1,4 +1,4 @@
-# appyters: A catalog of [appyter](https://github.com/maayanLab/appyter/) notebooks
+# appyter-catalog: A catalog of [appyters](https://github.com/maayanLab/appyter/)
 
 Pull requests encouraged, please refer to the [example](./appyters/example/) for registering your own appyter.
 
@@ -8,7 +8,7 @@ Currently, because this application deals with several independent appyters, we 
 
 ```bash
 # Download the catalog locally
-git clone git@github.com:MaayanLab/appyters.git
+git clone git@github.com:MaayanLab/appyter-catalog.git
 
 # Start the server (this has several dependent steps including constructing dockerfiles, docker-compose and building it all)
 make start
