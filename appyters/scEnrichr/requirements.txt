@@ -5,8 +5,10 @@ dash-table
 flask
 git+git://github.com/Maayanlab/appyter.git
 git+git://github.com/Maayanlab/geode.git
+git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
 ipython
 matplotlib
+matplotlib_venn
 numpy
 pandas
 plotly
