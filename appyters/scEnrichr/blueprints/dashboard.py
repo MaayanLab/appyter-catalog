@@ -6,7 +6,6 @@ def dashboard(app, url_prefix='/dashboard', DATA_DIR=''):
   from functools import lru_cache
   import uuid
   import dash
-  import dash_auth
   import dash_table as dt
   import dash_core_components as dcc
   import dash_html_components as html

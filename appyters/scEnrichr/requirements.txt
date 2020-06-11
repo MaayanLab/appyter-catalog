@@ -1,4 +1,7 @@
 dash
+dash-core-components
+dash-html-components
+dash-table
 flask
 git+git://github.com/Maayanlab/appyter.git
 git+git://github.com/Maayanlab/geode.git
@@ -11,3 +14,4 @@ scipy
 seaborn
 sklearn
 umap-learn
+Werkzeug
