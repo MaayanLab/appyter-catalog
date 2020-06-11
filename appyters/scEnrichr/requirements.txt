@@ -1,5 +1,7 @@
-git+git://github.com/Maayanlab/geode.git
+dash
+flask
 git+git://github.com/Maayanlab/appyter.git
+git+git://github.com/Maayanlab/geode.git
 ipython
 matplotlib
 numpy
