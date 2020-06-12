@@ -10,3 +10,7 @@ annealing is performed so the hexagons representing the most similar gene sets
 are grouped together. In the final figure, users can hover over hexagons to see
 which gene set they represent and the similarity index between that gene set and
 the gene set they inputted.
+
+Optional: If you want to compare multiple libraries and mulitple canvases, you can
+choose to normalize the color scaling of the plots so that on both canvases, a
+certain color-level means the same Jaccard index.
