@@ -1,0 +1,14 @@
+git+git://github.com/Maayanlab/appyter.git
+requests
+pandas
+numpy
+git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+seaborn
+matplotlib
+umap
+scipy
+sklearn
+plotly
+plotly_express
+logging
+s3fs
