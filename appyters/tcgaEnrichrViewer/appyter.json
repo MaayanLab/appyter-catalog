@@ -14,7 +14,7 @@
   "tags": ["Enrichment Analysis", "TCGA"],
   "license": "MIT",
   "appyter": {
-    "file": "tcgaEnrichr-Viewer.ipynb",
+    "file": "tcgaEnrichrViewer.ipynb",
     "profile": "biojupies"
   }
 }
