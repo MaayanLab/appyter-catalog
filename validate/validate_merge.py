@@ -51,7 +51,7 @@ def validate_appyter(appyter):
   print(f"{appyter}: Preparing docker to run `{nbfile}`...")
   assert os.path.isfile(os.path.join('appyters', appyter, nbfile)), f"Missing appyters/{appyter}/{nbfile}"
   try:
-    json.load(os.path.join('appyters', appyter, nbfile))
+    json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
     traceback.print_exc()
