@@ -1,0 +1,10 @@
+git+git://github.com/Maayanlab/appyter.git
+autopep8
+pandas
+numpy
+scipy
+sklearn
+matplotlib
+requests
+umap-learn
+seaborn

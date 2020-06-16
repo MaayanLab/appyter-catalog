@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Drugmonizome_ML",
+  "title": "Drugmonizome-ML",
+  "version": "0.0.2",
+  "description": "Machine learning pipeline to predict drug screen hits from small molecule attributes",
+  "authors": [
+    {
+      "name": "Daniel Stein",
+      "email": "djs31415@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "drugs", "small molecules", "drug set libraries", "Drugmonizome", "drug screen"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "Drugmonizome-ML.ipynb",
+    "profile": "biojupies"
+  }
+}
