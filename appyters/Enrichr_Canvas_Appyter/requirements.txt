@@ -2,3 +2,4 @@ git+git://github.com/Maayanlab/appyter.git
 pandas
 requests
 matplotlib
+numpy
