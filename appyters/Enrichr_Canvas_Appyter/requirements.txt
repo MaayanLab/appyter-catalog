@@ -1,5 +1,5 @@
 git+git://github.com/Maayanlab/appyter.git
 pandas
+numpy
 requests
 matplotlib
-numpy
