@@ -1,4 +1,5 @@
 git+git://github.com/Maayanlab/appyter.git
+git+git://github.com/Maayanlab/geode.git
 ipykernel
 matplotlib_venn
 rpy2

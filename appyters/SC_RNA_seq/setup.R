@@ -13,3 +13,16 @@ BiocManager::install("edgeR")
 install.packages("devtools")
 devtools::install_github("cole-trapnell-lab/monocle-release")
 
+install_github("cran/SDMTools")
+install.packages("https://cran.r-project.org/src/contrib/Archive/foreign/foreign_0.8-74.tar.gz")
+install.packages("Hmisc")
+install.packages("https://cran.r-project.org/src/contrib/Archive/mnormt/mnormt_1.5-6.tar.gz")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("multtest")
+
+install.packages("https://cran.r-project.org/src/contrib/Archive/mutoss/mutoss_0.1-10.tar.gz")
+install.packages("https://cran.r-project.org/src/contrib/Archive/metap/metap_1.2.tar.gz")
+source("https://z.umn.edu/archived-seurat")
+devtools::install_github("BaderLab/Tempora")
