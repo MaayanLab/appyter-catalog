@@ -4,3 +4,4 @@ libcurl4-gnutls-dev
 libssl-dev
 libxml2-dev
 make
+libhdf5-dev
