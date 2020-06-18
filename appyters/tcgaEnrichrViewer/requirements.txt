@@ -10,4 +10,8 @@ scipy
 sklearn
 plotly
 plotly_express
+<<<<<<< HEAD
 git+git://github.com/nicolemoiseyev/jupyter-d3.git@v0.0.3
+=======
+git+git://github.com/nicolemoiseyev/jupyter-d3.git
+>>>>>>> c4bdc1c6b2632aea0670c72fb1f83b2f3495d2f9
