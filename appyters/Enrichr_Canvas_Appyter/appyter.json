@@ -16,7 +16,7 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "Enrichr", "canvas"
+    "Enrichr", "canvas", "d3", "javascript"
   ],
   "license": "Apache-2.0",
   "appyter": {
