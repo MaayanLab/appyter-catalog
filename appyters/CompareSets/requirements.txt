@@ -1,6 +1,5 @@
 git+git://github.com/Maayanlab/appyter.git
 ipython
 venn
-csv
 matplotlib
 requests
