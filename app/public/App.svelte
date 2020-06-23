@@ -51,6 +51,16 @@
 </script>
 
 <style>
+/* sticky footer */
+:global(body) {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+.content {
+  flex: 1;
+}
+
 /* card shadow on hover */
 .card {
   box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2);
@@ -61,14 +71,14 @@
 }
 </style>
 
-<div class="row">
+<div class="row" style="margin: 0">
   <div class="col-sm-12 text-center">
     <h1>Appyters</h1>
     <h3 class="card-subtitle mb-2 text-muted">A catalog of appyter notebooks</h3>
     <hr />
   </div>
 </div>
-<div class="container">
+<div class="container content">
   {#if appyter === undefined}
     <div class="row">
       <div class="offset-sm-2 col-sm-8 text-center">
@@ -135,48 +145,47 @@
     </div>
   {/if}
 </div>
-<div class="footer">
-  <div class="container">
-    <div class="row justify-content-center m-5">
-      <div class="col-md-3 col-sm-12 text-center">
-        <p>
-          <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
-          <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
-          <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
-        </p>
-      </div>
-      <div class="col-md-2 col-sm-3 text-center">
-        <a href="https://icahn.mssm.edu/research/bioinformatics" target="_blank">
-          <img class="rounded" src="{require('./images/icahn_cb.png')}" style="height: 5rem;">
+<div class="footer" style="margin-top: 25px;">
+  <hr />
+  <div class="row justify-content-center align-content-center" style="margin: 0">
+    <div class="col-md-3 col-sm-12 text-center">
+      <p>
+        <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
+        <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
+        <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
+      </p>
+    </div>
+    <div class="col-md-2 col-sm-3 text-center">
+      <a href="https://icahn.mssm.edu/research/bioinformatics" target="_blank">
+        <img class="rounded" src="{require('./images/icahn_cb.png')}" style="height: 5rem;">
+      </a>
+    </div>
+    <div class="col-md-2 col-sm-3 text-center">
+      <a href="http://lincs-dcic.org" target="_blank">
+        <img class="rounded" src="{require('./images/dcic_light.png')}" style="height: 5rem;">
+      </a>
+    </div>
+    <div class="col-md-2 col-sm-3 text-center">
+      <a href="https://labs.icahn.mssm.edu/maayanlab/" target="_blank">
+        <img class="rounded" src="{require('./images/maayanlab_logo.png')}" style="height: 5rem;">
+      </a>
+    </div>
+    <div class="col-md-2 col-sm-3">
+      <div class="row my-2">
+        <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog" target="_blank">
+          <span class="badge badge-light">
+            <img src="{require('./images/GitHub-Mark.png')}" style="width: 1rem;">
+          </span>
+          View source code
         </a>
       </div>
-      <div class="col-md-2 col-sm-3 text-center">
-        <a href="http://lincs-dcic.org" target="_blank">
-          <img class="rounded" src="{require('./images/dcic_light.png')}" style="height: 5rem;">
+      <div class="row my-2">
+        <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog/issues/new" target="_blank">
+          <span class="badge badge-light">
+            <img src="{require('./images/GitHub-Mark.png')}" style="width: 1rem;">
+          </span>
+          Submit an issue
         </a>
-      </div>
-      <div class="col-md-2 col-sm-3 text-center">
-        <a href="https://labs.icahn.mssm.edu/maayanlab/" target="_blank">
-          <img class="rounded" src="{require('./images/maayanlab_logo.png')}" style="height: 5rem;">
-        </a>
-      </div>
-      <div class="col-md-2 col-sm-3">
-        <div class="row my-2">
-          <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog" target="_blank">
-            <span class="badge badge-light">
-              <img src="{require('./images/GitHub-Mark.png')}" style="width: 1rem;">
-            </span>
-            View source code
-          </a>
-        </div>
-        <div class="row my-2">
-          <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog/issues/new" target="_blank">
-            <span class="badge badge-light">
-              <img src="{require('./images/GitHub-Mark.png')}" style="width: 1rem;">
-            </span>
-            Submit an issue
-          </a>
-        </div>
       </div>
     </div>
   </div>
