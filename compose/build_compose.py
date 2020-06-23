@@ -56,6 +56,21 @@ services:
   app:
     build: app
     image: maayanlab/appyters:{version}
+  postgres:
+    build: ./postgres
+    image: maayanlab/appyters-postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_SCHEMA: ${{POSTGRES_SCHEMA}}
+      POSTGRES_DB: ${{POSTGRES_DB}}
+      POSTGRES_USER: ${{POSTGRES_USER}}
+      POSTGRES_ANON_USER: ${{POSTGRES_ANON_USER}}
+      POSTGRES_PASSWORD: ${{POSTGRES_PASSWORD}}
+      POSTGRES_ROOT_PASSWORD: ${{POSTGRES_ROOT_PASSWORD}}
+    volumes:
+      - ./data/postgres/:/var/lib/postgresql/data
+
 {docker_compose_services}
 """.strip('\n')
 
