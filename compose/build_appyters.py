@@ -1,3 +1,4 @@
+import sh
 import re
 import os
 import json
@@ -9,6 +10,22 @@ appyters = [
   dict(
     path=path,
     long_description=open(os.path.join(path, 'README.md'), 'r').read(),
+    # find the oldest commit containing the appyter's appyter.json (follow for detecting renames)
+    creation_timestamp=str(sh.tail(
+      sh.git.log(
+        '--follow', r'--pretty=format:%aI', '--', os.path.join(path, 'appyter.json'),
+        _tty_out=False,
+      ),
+      '-n1'
+    )).strip(),
+    # find the most recent commit containing the appyter's directory
+    update_timestamp=str(sh.head(
+      sh.git.log(
+        r'--pretty=format:%aI', '--', path,
+        _tty_out=False,
+      ),
+      '-n1'
+    )).strip(),
     **json.load(open(os.path.join(path, 'appyter.json'), 'r')),
   )
   for path in map(os.path.dirname, glob.glob(os.path.join(appyter_path, '*', 'appyter.json')))
