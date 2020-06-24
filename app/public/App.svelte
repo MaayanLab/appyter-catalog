@@ -1,11 +1,10 @@
 <script>
-  import * as JsSearch from 'js-search'
-
   import mdIt from 'markdown-it'
   const md = mdIt()
 
   // store appyters as list and lookup table based on name slugs
   import appyterList from './appyters.json'
+  // assemble appyter lookup table
   const appyterLookup = {}
   for (const appyter of appyterList) {
     const {name, description, long_description, ..._} = appyter
@@ -19,6 +18,7 @@
   }
 
   // index documents for search
+  import * as JsSearch from 'js-search'
   const search = new JsSearch.Search('name')
   search.addIndex('name')
   search.addIndex('title')
@@ -31,9 +31,53 @@
   search.addIndex('url')
   search.addDocuments(appyterList)
 
+  // get appyter hits
+  // http://localhost:9000/postgrest/pagehits?select=hits&url=eq.test&limit=1
+  const base_url = window.location.origin
+  async function get_pagehits() {
+    const response = await fetch(
+      `${base_url}/postgrest/pagehits?url=in.(${Object.keys(appyterLookup).reduce(
+        (urls, appyter_name) => [
+          ...urls,
+          encodeURIComponent(`${base_url}/#${appyter_name}`),
+          encodeURIComponent(`${base_url}/${appyter_name}`),
+        ], []
+      ).join(',')})`
+    )
+    const pagehits = await response.json()
+    for (const {url, hits} of pagehits) {
+      if (url.startsWith(base_url + '/#')) {
+        const appyter_name = url.slice(base_url.length + 2)
+        if (appyterLookup[appyter_name] !== undefined) {
+          Object.assign(appyterLookup[appyter_name], { views: hits })
+        }
+      } else if(url.startsWith(base_url) + '/') {
+        const appyter_name = url.slice(base_url.length + 1)
+        if (appyterLookup[appyter_name] !== undefined) {
+          Object.assign(appyterLookup[appyter_name], { runs: hits })
+        }
+      }
+    }
+    searchString = undefined
+    searchString = ''
+  }
+
+  async function pagehit(appyter) {
+    await fetch(`${base_url}/postgrest/rpc/pagehit`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'pageurl': appyter === undefined ? base_url : `${base_url}/#${appyter.name}`,
+      }),
+    })
+  }
+
   // facilitate search
   let searchString = ''
   const searchAppyters = (searchString) => {
+    if (searchString === undefined) return
     if (searchString === '') {
       return appyterList
     } else {
@@ -45,9 +89,15 @@
   let appyter
   const updatehash = () => {
     appyter = appyterLookup[`${window.location.hash || '#'}`.slice(1)]
+    pagehit(appyter)
   }
   window.onhashchange = updatehash
   updatehash()
+
+  // things to do on window load
+  window.onload = () => {
+    get_pagehits()
+  }
 </script>
 
 <style>
@@ -100,10 +150,21 @@
               <h5 class="card-title">{appyter.title}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
                 <span class="badge badge-success">v{appyter.version}</span>
-                <span class="badge badge-secondary">{appyter.license}</span>
+                &nbsp;<span class="badge badge-secondary">{appyter.license}</span>
                 {#each appyter.tags as tag}
-                  <span class="badge badge-primary">{tag}</span>
+                  &nbsp;<span class="badge badge-primary">{tag}</span>
                 {/each}
+              </h6>
+              <h6 style="color: grey">
+                {#if appyter.views }
+                  Views: {appyter.views}
+                {/if}
+                {#if appyter.views && appyter.runs }
+                  &nbsp;
+                {/if}
+                {#if appyter.runs }
+                  Runs: n
+                {/if}
               </h6>
               <p class="card-text">{@html appyter.description}</p>
               <a href="#{appyter.name}" class="btn btn-primary btn-sm stretched-link">
