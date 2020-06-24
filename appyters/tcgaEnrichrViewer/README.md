@@ -1,6 +1,6 @@
-# tcgaEnrichr-Viewer
+# tcgaEnrichrViewer
 
-The Cancer Genome Atlas (TCGA) is a massive database containing laboratory analysis and clinical data for over 10,000 cancer patients spanning several hundred cancer subtypes. Specifically, TCGA offers extensive bulk RNA-sequencing (RNA-Seq) data, which can provide insight into the particular genes implicated in specific cancer subtypes.
+[The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) is a massive database containing laboratory analysis and clinical data for over 10,000 cancer patients spanning several hundred cancer subtypes. Specifically, TCGA offers extensive bulk RNA-sequencing (RNA-Seq) data, which can provide insight into the particular genes implicated in specific cancer subtypes.
 
 By default, this appyter uses TCGA data. Users can optionally also upload their own datasets.
 
