@@ -1,0 +1,36 @@
+{% extends "dynamic.j2" %}
+
+{% block script %}
+{{ super() }}
+<script>
+require.config({
+  paths: {
+    'fetch': 'https://cdnjs.cloudflare.com/ajax/libs/fetch/3.0.0/fetch.min',
+  },
+})
+define('pagehit', ['fetch'], function (fetch) {
+  return function (view) {
+    var base_url = window.location.origin
+    var app = window.location.path.split('/')[1]
+    fetch(`${base_url}/postgrest/rpc/pagehit`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'pageurl': `${base_url}/${app}${view !== undefined ? `#${view}`}`,
+      }),
+    }).then(function (response) {
+      if (response.status > 299) {
+        console.error(`Error (${response.status})`)
+      }
+      return response.text
+    }).then(function (text) {
+      if (response.text) {
+        console.log(`(${response.text})`)
+      }
+    })
+  }
+})
+</script>
+{% endblock %}
