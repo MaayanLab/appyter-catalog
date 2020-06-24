@@ -8,27 +8,23 @@ from subprocess import Popen, PIPE
 def get_changed_appyters():
   try:
     # try to load files from stdin
-    return {
-      file.split('/', maxsplit=3)[1]
-      for element in json.load(sys.stdin)
-      for file in [element['filename']]
-      if file.startswith('appyters/')
-    }
+    changed_files = [record['filename'] for record in json.load(sys.stdin)]
   except:
     # otherwise use git
     p = Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE)
-    files = {
-      # appyters/{appyter}/* => {appyter}
-      line.split('/', maxsplit=3)[1]
-      for line in map(
-        bytes.decode,
-        # returns all paths that will be changed
-        p.stdout
-      )
-      if line.startswith('appyters/')
-    }
-    assert p.returncode == 0, '`git diff` command failed'
-    return files
+    changed_files = list(map(bytes.decode, p.stdout))
+  #
+  appyters = {
+    file.split('/', maxsplit=3)[1]
+    for element in changed_files
+    for file in [element['filename']]
+    if file.startswith('appyters/')
+  }
+  for appyter in appyters:
+    print(f"{appyter}: Changed")
+    assert f"appyters/{appyter}/appyter.json" in changed_files, 'Expected update to appyter.json version'
+  #
+  return appyters
 
 def validate_appyter(appyter):
   print(f"{appyter}: Checking for existing of files...")
