@@ -72,6 +72,7 @@
   const searchAppyters = (searchString) => {
     if (searchString === undefined) return
     if (searchString === '') {
+      appyterList.sort((a, b) => (b.views||0) - (a.views||0))
       return appyterList
     } else {
       return search.search(searchString)
