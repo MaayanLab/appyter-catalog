@@ -36,13 +36,7 @@
   const base_url = window.location.origin
   async function get_pagehits() {
     const response = await fetch(
-      `${base_url}/postgrest/pagehits?url=in.(${Object.keys(appyterLookup).reduce(
-        (urls, appyter_name) => [
-          ...urls,
-          encodeURIComponent(`${base_url}/#${appyter_name}`),
-          encodeURIComponent(`${base_url}/${appyter_name}`),
-        ], []
-      ).join(',')})`
+      `${base_url}/postgrest/pagehits?url=like.${encodeURIComponent(`${base_url}%`)}`
     )
     const pagehits = await response.json()
     for (const {url, hits} of pagehits) {
