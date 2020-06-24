@@ -1,6 +1,7 @@
 # Example
 
-This is an example appyter in the catalog. Please reference it when submitting your own appyter.
+This is an example appyter in the catalog.
+Please reference it when submitting your own appyter.
 
 - `{name}/{name}.ipynb`: The appyter iteself
 - `{name}/README.md`: Long description of appyter
