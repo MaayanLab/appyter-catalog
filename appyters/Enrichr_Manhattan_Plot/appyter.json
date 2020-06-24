@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name":"Enrichr_Manhattan_Plot_Appyter",
+  "title": "Enrichr Manhattan Plot Appyter",
+  "version": "0.0.1",
+  "description": "An appyter that creates a manhattan plot comparing a user-inputted gene list with gene sets in selected Enrichr libraries.",
+  "authors": [
+    {
+      "name": "Skylar Litz",
+      "email": "litzskylar@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Enrichr", "manhattan plot", "scatter plot"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "Manhattan-Plot-Appyter.ipynb",
+    "profile": "biojupies"
+  }
+}
