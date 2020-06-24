@@ -16,8 +16,7 @@ def get_changed_appyters():
   #
   appyters = {
     file.split('/', maxsplit=3)[1]
-    for element in changed_files
-    for file in [element['filename']]
+    for file in changed_files
     if file.startswith('appyters/')
   }
   for appyter in appyters:
