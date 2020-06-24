@@ -32,7 +32,6 @@
   search.addDocuments(appyterList)
 
   // get appyter hits
-  // http://localhost:9000/postgrest/pagehits?select=hits&url=eq.test&limit=1
   const base_url = window.location.origin
   async function get_pagehits() {
     const response = await fetch(
@@ -45,7 +44,7 @@
         if (appyterLookup[appyter_name] !== undefined) {
           Object.assign(appyterLookup[appyter_name], { views: hits })
         }
-      } else if(url.startsWith(base_url) + '/') {
+      } else if(url.startsWith(base_url + '/')) {
         const appyter_name = url.slice(base_url.length + 1)
         if (appyterLookup[appyter_name] !== undefined) {
           Object.assign(appyterLookup[appyter_name], { runs: hits })
@@ -157,7 +156,7 @@
                   &nbsp;
                 {/if}
                 {#if appyter.runs }
-                  Runs: n
+                  Runs: {appyter.runs}
                 {/if}
               </h6>
               <p class="card-text">{@html appyter.description}</p>
