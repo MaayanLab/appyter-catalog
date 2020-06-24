@@ -27,7 +27,7 @@ proxy_service = f"""
       - nginx_ssl=${{nginx_ssl}}
       - nginx_ssl_letsencrypt=${{nginx_ssl}}
       - letsencrypt_email=${{letsencrypt_email}}
-      - nginx_proxy_{len(appyters):03}=(/.*) http://postgrest:3000$$1
+      - nginx_proxy_{len(appyters):03}=/postgrest(/(.*)) http://postgrest:3000$$2
       - nginx_proxy_{len(appyters)+1:03}=(/.*) http://app:80$$1
     ports:
       - 80:80
@@ -62,9 +62,9 @@ services:
     links:
       - postgres:postgres
     environment:
-      PGRST_DB_URI: postgres://${{POSTGRES_USER}}:${{POSTGRES_PASSWORD}}@postgres:5432/${{POSTGRES_DB}}
-      PGRST_DB_SCHEMA: ${{POSTGRES_SCHEMA}}
-      PGRST_DB_ANON_ROLE: ${{POSTGRES_ANON_USER}}
+      PGRST_DB_URI: postgres://appyters:${{POSTGRES_PASSWORD}}@postgres:5432/appyters
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: guest
       PGRST_SERVER_PROXY_URI: "${{nginx_server_scheme}}://${{nginx_server_name}}/postgrest"
     depends_on:
       - postgres
@@ -74,12 +74,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_SCHEMA: ${{POSTGRES_SCHEMA}}
-      POSTGRES_DB: ${{POSTGRES_DB}}
-      POSTGRES_USER: ${{POSTGRES_USER}}
-      POSTGRES_ANON_USER: ${{POSTGRES_ANON_USER}}
+      POSTGRES_DB: appyters
+      POSTGRES_USER: appyters
       POSTGRES_PASSWORD: ${{POSTGRES_PASSWORD}}
-      POSTGRES_ROOT_PASSWORD: ${{POSTGRES_ROOT_PASSWORD}}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
 
