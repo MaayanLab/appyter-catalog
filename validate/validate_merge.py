@@ -80,6 +80,9 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join('appyters', appyter)):
       print(f"{appyter}: Directory no longer exists, ignoring")
       continue
+    elif not os.path.isdir(os.path.join('appyters', appyter)):
+      print(f"{appyter}: Is not a directory, ignoring")
+      continue
     try:
       validate_appyter(appyter)
     except Exception:
