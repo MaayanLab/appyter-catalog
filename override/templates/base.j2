@@ -14,9 +14,9 @@ define('pagehit', ['jquery'], function ($) {
       headers: {
         'Content-Type': 'application/json'
       },
-      data: {
+      data: JSON.stringify({
         pageurl: base_url + '/' + app + (view !== undefined ? ('#' + view) : ''),
-      },
+      }),
     }).done(function (response, textStatus) {
       if (response.status !== 'success') {
         console.error('Error ' + response.status)
