@@ -18,8 +18,8 @@ define('pagehit', ['jquery'], function ($) {
         pageurl: base_url + '/' + app + (view !== undefined ? ('#' + view) : ''),
       }),
     }).done(function (response, textStatus) {
-      if (response.status !== 'success') {
-        console.error('Error ' + response.status)
+      if (textStatus !== 'success') {
+        console.error('Error ' + textStatus)
       }
     })
   }
