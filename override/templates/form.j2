@@ -1,6 +1,7 @@
 {% extends "biojupies/form.j2" %}
 
 {% block script %}
+{{ super() }}
 <script>
 require(['pagehit'], function (pagehit) { pagehit('run') })
 </script>

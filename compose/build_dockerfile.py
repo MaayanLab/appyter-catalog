@@ -87,7 +87,9 @@ if __name__ == '__main__':
   appyter = sys.argv[1]
   appyter_path = os.path.join(os.path.dirname(__file__), '..', 'appyters', appyter)
   config = json.load(open(os.path.join(appyter_path, 'appyter.json'), 'r'))
-  shutil.rmtree(os.path.join(appyter_path, 'override'))
+  override_path = os.path.join(appyter_path, 'override')
+  if os.path.exists(override_path):
+    shutil.rmtree(override_path)
   shutil.copytree(
     os.path.join(os.path.dirname(__file__), '..', 'override'),
     os.path.join(appyter_path, 'override'),
