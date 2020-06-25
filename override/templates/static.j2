@@ -3,6 +3,6 @@
 {% block script %}
 {{ super() }}
 <script>
-require(['pagehit'], function (pagehit) { pagehit() })
+require(['pagehit'], function (pagehit) { pagehit('view') })
 </script>
 {% endblock %}
