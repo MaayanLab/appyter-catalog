@@ -169,9 +169,10 @@
                 {/if}
                 {#if appyter.form_views }
                   &nbsp;
-                  Form Views: {appyter.form_views}
+                  Starts: {appyter.form_views}
                   &nbsp;
                 {/if}
+                <br />
                 {#if appyter.runs }
                   &nbsp;
                   Runs: {appyter.runs}
