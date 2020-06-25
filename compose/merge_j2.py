@@ -117,6 +117,6 @@ def merge_j2_directories(primary_dir, override_dir, merged_dir):
 
 if __name__ == '__main__':
   import sys
-  #
-  _, _, primary_dir, override_dir, merged_dir = sys.argv
+  _, primary_dir, override_dir, merged_dir = sys.argv
   merge_j2_directories(primary_dir, override_dir, merged_dir)
+

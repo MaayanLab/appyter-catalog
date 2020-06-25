@@ -70,6 +70,11 @@ def build_dockerfile(appyter_path, config):
   dockerfile_parts.append('''
     COPY . /app
   ''')
+  dockerfile_parts.append('''
+    RUN set -x \\
+      && echo "Overriding appyter templates..." \\
+      && python3 /app/merge_j2.py /app /app/override /app
+  ''')
   dockerfile_parts.append(f'''
     CMD [ "appyter", "--profile={config['appyter'].get('profile', 'default')}", "{config['appyter']['file']}" ]
   ''')
@@ -78,7 +83,17 @@ def build_dockerfile(appyter_path, config):
 if __name__ == '__main__':
   import sys
   import json
+  import shutil
   appyter = sys.argv[1]
   appyter_path = os.path.join(os.path.dirname(__file__), '..', 'appyters', appyter)
   config = json.load(open(os.path.join(appyter_path, 'appyter.json'), 'r'))
+  shutil.rmtree(os.path.join(appyter_path, 'override'))
+  shutil.copytree(
+    os.path.join(os.path.dirname(__file__), '..', 'override'),
+    os.path.join(appyter_path, 'override'),
+  )
+  shutil.copy(
+    os.path.join(os.path.dirname(__file__), 'merge_j2.py'),
+    os.path.join(appyter_path, 'merge_j2.py')
+  )
   print(build_dockerfile(appyter_path, config))
