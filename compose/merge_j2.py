@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 
 def merge_j2(*j2s):
   ''' Given a set of independent jinja2 templates, under certain conditions, we can merge the two together into one template.
@@ -70,3 +71,52 @@ def merge_j2(*j2s):
     ],
   ])
   return merged
+
+
+def merge_j2_directories(primary_dir, override_dir, merged_dir):
+  ''' Given a primary directory and an override directory, recursively
+  copy over or merge and overrides
+  '''
+  if primary_dir != merged_dir:
+    for dirpath, dirnames, filenames in os.walk(primary_dir):
+      for filename in filenames:
+        # handle each override file
+        file_dir = os.path.relpath(dirpath, primary_dir)
+        file_path = os.path.join(file_dir, filename)
+        # copy primary into directory
+        os.makedirs(os.path.join(merged_dir, file_dir), exist_ok=True)
+        shutil.copyfile(
+          os.path.join(primary_dir, file_path),
+          os.path.join(merged_dir, file_path)
+        )
+  #
+  for dirpath, dirnames, filenames in os.walk(override_dir):
+    for filename in filenames:
+      # handle each override file
+      file_dir = os.path.relpath(dirpath, override_dir)
+      file_path = os.path.join(file_dir, filename)
+      if os.path.exists(os.path.join(primary_dir, file_path)):
+        # join j2 and update
+        if os.path.splitext(filename)[1] == '.j2':
+          merged = merge_j2(
+            open(os.path.join(primary_dir, file_path), 'r').read(),
+            open(os.path.join(override_dir, file_path), 'r').read(),
+          )
+          os.makedirs(os.path.join(merged_dir, file_dir), exist_ok=True)
+          with open(os.path.join(merged_dir, file_path), 'w') as fw:
+            fw.write(merged)
+        else:
+          raise Exception(f"Unable to merge {file_path}")
+      else:
+        # copy override into directory
+        os.makedirs(os.path.join(merged_dir, file_dir), exist_ok=True)
+        shutil.copyfile(
+          os.path.join(override_dir, file_path),
+          os.path.join(merged_dir, file_path)
+        )
+
+if __name__ == '__main__':
+  import sys
+  #
+  _, _, primary_dir, override_dir, merged_dir = sys.argv
+  merge_j2_directories(primary_dir, override_dir, merged_dir)
