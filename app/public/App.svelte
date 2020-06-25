@@ -44,10 +44,22 @@
         if (appyterLookup[appyter_name] !== undefined) {
           Object.assign(appyterLookup[appyter_name], { views: hits })
         }
-      } else if(url.startsWith(base_url + '/')) {
-        const appyter_name = url.slice(base_url.length + 1)
-        if (appyterLookup[appyter_name] !== undefined) {
-          Object.assign(appyterLookup[appyter_name], { runs: hits })
+      } else if (url.startsWith(base_url + '/')) {
+        if (url.endsWith('#view')) {
+          const appyter_name = url.slice(base_url.length + 1, url.length - '#view'.length)
+          if (appyterLookup[appyter_name] !== undefined) {
+            Object.assign(appyterLookup[appyter_name], { persistent_views: hits })
+          }
+        } else if (url.endsWith('#execute')) {
+          const appyter_name = url.slice(base_url.length + 1, url.length - '#execute'.length)
+          if (appyterLookup[appyter_name] !== undefined) {
+            Object.assign(appyterLookup[appyter_name], { runs: hits })
+          }
+        } else {
+          const appyter_name = url.slice(base_url.length + 1)
+          if (appyterLookup[appyter_name] !== undefined) {
+            Object.assign(appyterLookup[appyter_name], { form_views: hits })
+          }
         }
       }
     }
@@ -151,13 +163,24 @@
               </h6>
               <h6 style="color: grey">
                 {#if appyter.views }
+                  &nbsp;
                   Views: {appyter.views}
+                  &nbsp;
                 {/if}
-                {#if appyter.views && appyter.runs }
+                {#if appyter.form_views }
+                  &nbsp;
+                  Form Views: {appyter.form_views}
                   &nbsp;
                 {/if}
                 {#if appyter.runs }
+                  &nbsp;
                   Runs: {appyter.runs}
+                  &nbsp;
+                {/if}
+                {#if appyter.persistent_views }
+                  &nbsp;
+                  Retrievals: {appyter.persistent_views}
+                  &nbsp;
                 {/if}
               </h6>
               <p class="card-text">{@html appyter.description}</p>
