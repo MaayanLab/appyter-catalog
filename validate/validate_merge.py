@@ -56,12 +56,12 @@ def validate_appyter(appyter):
     print(f"{nbfile} is not valid json")
     traceback.print_exc()
   #
-  if not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')):
-    print(f"{appyter}: Creating Dockerfile...")
-    import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    from compose.build_dockerfile import build_dockerfile
-    with open(os.path.join('appyters', appyter, 'Dockerfile'), 'w') as fw:
-      print(build_dockerfile(os.path.join('appyters', appyter), config), file=fw)
+  assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
+  print(f"{appyter}: Creating Dockerfile...")
+  import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+  from compose.build_dockerfile import build_dockerfile
+  with open(os.path.join('appyters', appyter, 'Dockerfile'), 'w') as fw:
+    print(build_dockerfile(os.path.join('appyters', appyter), config), file=fw)
   #
   print(f"{appyter}: Building Dockerfile...")
   p = Popen(['docker', 'build', '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
@@ -79,6 +79,9 @@ if __name__ == '__main__':
   for appyter in get_changed_appyters():
     if not os.path.exists(os.path.join('appyters', appyter)):
       print(f"{appyter}: Directory no longer exists, ignoring")
+      continue
+    elif not os.path.isdir(os.path.join('appyters', appyter)):
+      print(f"{appyter}: Is not a directory, ignoring")
       continue
     try:
       validate_appyter(appyter)
