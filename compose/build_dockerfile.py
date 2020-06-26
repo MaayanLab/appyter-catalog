@@ -80,11 +80,9 @@ def build_dockerfile(appyter_path, config):
   ''')
   return '\n\n'.join(map(str.strip, map(dedent, dockerfile_parts)))
 
-def prepare_appyter(appyter):
+def prepare_appyter(appyter_path, config):
   import json
   import shutil
-  appyter_path = os.path.join(os.path.dirname(__file__), '..', 'appyters', appyter)
-  config = json.load(open(os.path.join(appyter_path, 'appyter.json'), 'r'))
   override_path = os.path.join(appyter_path, 'override')
   if os.path.exists(override_path):
     shutil.rmtree(override_path)
@@ -101,4 +99,6 @@ def prepare_appyter(appyter):
 if __name__ == '__main__':
   import sys
   appyter = sys.argv[1]
-  print(prepare_appyter(appyter))
+  appyter_path = os.path.join(os.path.dirname(__file__), '..', 'appyters', appyter)
+  config = json.load(open(os.path.join(appyter_path, 'appyter.json'), 'r'))
+  print(prepare_appyter(appyter_path, config))
