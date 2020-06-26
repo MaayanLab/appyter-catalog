@@ -1,0 +1,6 @@
+git+git://github.com/Maayanlab/appyter.git
+pandas
+numpy
+matplotlib
+plotly
+xlrd
