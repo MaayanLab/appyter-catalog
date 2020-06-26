@@ -4,3 +4,4 @@ numpy
 requests
 matplotlib
 ipython
+bokeh
