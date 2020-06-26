@@ -1,4 +1,6 @@
 <script>
+  import Masonry from './Masonry'
+
   import mdIt from 'markdown-it'
   const md = mdIt()
 
@@ -101,9 +103,10 @@
   updatehash()
 
   // things to do on window load
-  window.onload = () => {
+  import { onMount } from 'svelte'
+  onMount(() => {
     get_pagehits()
-  }
+  })
 </script>
 
 <style>
@@ -148,9 +151,9 @@
         <p>&nbsp;</p>
       </div>
     </div>
-    <div class="row">
+    <Masonry>
       {#each searchAppyters(searchString) as appyter}
-        <div class="col-sm-12 col-md-6 col-xl-4">
+        <div>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{appyter.title}</h5>
@@ -192,7 +195,7 @@
           </div>
         </div>
       {/each}
-    </div>
+    </Masonry>
   {:else}
     <div class="row">
       <div class="col-sm-12">
