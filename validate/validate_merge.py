@@ -59,9 +59,9 @@ def validate_appyter(appyter):
   assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
   print(f"{appyter}: Creating Dockerfile...")
   import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-  from compose.build_dockerfile import build_dockerfile
+  from compose.build_dockerfile import prepare_appyter
   with open(os.path.join('appyters', appyter, 'Dockerfile'), 'w') as fw:
-    print(build_dockerfile(os.path.join('appyters', appyter), config), file=fw)
+    print(prepare_appyter(os.path.join('appyters', appyter), config), file=fw)
   #
   print(f"{appyter}: Building Dockerfile...")
   p = Popen(['docker', 'build', '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
