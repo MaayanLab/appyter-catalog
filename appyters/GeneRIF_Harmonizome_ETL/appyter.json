@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "GeneRIF_Harmonizome_ETL",
+  "title": "GeneRIF Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for the GeneRIF Dataset",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "GeneRIF"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "GeneRIF.ipynb",
+    "profile": "biojupies"
+  }
+}
