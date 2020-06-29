@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "BioGPS_Harmonizome_ETL",
+  "title": "BioGPS Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for the BioGPS Datasets",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "BioGPS"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "BioGPS.ipynb",
+    "profile": "biojupies"
+  }
+}
