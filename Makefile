@@ -7,10 +7,10 @@ DOCKERFILES = $(foreach appyter, $(APPYTERS), $(appyter)/Dockerfile)
 BUILDAPPYTERS = $(foreach appyter, $(APPYTERS), $(appyter)/.build)
 
 .SECONDEXPANSION:
-appyters/%/Dockerfile: compose/build_dockerfile.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
+appyters/%/Dockerfile: compose/build_dockerfile.py compose/merge_j2.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
 	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
-docker-compose.yml: app/Dockerfile $(DOCKERFILES)
+docker-compose.yml: compose/build_compose.py app/Dockerfile $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
 
 app/public/appyters.json: $(APPYTERFILES)
