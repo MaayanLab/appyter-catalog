@@ -6,8 +6,11 @@ APPYTERFILES = $(foreach appyter, $(APPYTERS), $(appyter)/appyter.json)
 DOCKERFILES = $(foreach appyter, $(APPYTERS), $(appyter)/Dockerfile)
 BUILDAPPYTERS = $(foreach appyter, $(APPYTERS), $(appyter)/.build)
 
+s+ = $(subst \ ,+,$1)
++s = $(subst +,\ ,$1)
+
 .SECONDEXPANSION:
-appyters/%/Dockerfile: compose/build_dockerfile.py compose/merge_j2.py $$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \))
+appyters/%/Dockerfile: compose/build_dockerfile.py compose/merge_j2.py $$(call +s,$$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \) | sed 's/ /+/g'))
 	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
 docker-compose.yml: compose/build_compose.py app/Dockerfile $(DOCKERFILES)
@@ -16,7 +19,7 @@ docker-compose.yml: compose/build_compose.py app/Dockerfile $(DOCKERFILES)
 app/public/appyters.json: $(APPYTERFILES)
 	$(PYTHON) compose/build_appyters.py > $@
 
-app/.build: app/public/appyters.json app/package.json $$(shell find app/public -type f)
+app/.build: app/public/appyters.json app/package.json $$(call +s,$$(shell find app/public -type f | sed 's/ /+/g'))
 	cd app && npm i && npm run build && cd .. && docker-compose build app && touch $@
 
 appyters/%/.build: appyters/%/Dockerfile
