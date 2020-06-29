@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "DSigDB_Harmonizome_ETL",
+  "title": "DSigDB Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for the Drug Signatures Database",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "DSigDB"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "DSigDB.ipynb",
+    "profile": "biojupies"
+  }
+}
