@@ -3,7 +3,7 @@
     "name": "CompareSets",
     "title": "Compare Sets Appyter",
     "version": "0.0.1",
-    "description": "An appyter that creates Venn diagrams by comparing user-inputted gene sets.",
+    "description": "An appyter that creates Venn diagrams by comparing user-inputted gene sets and sees whether the overlap is significant using Fisher's Exact Test.",
     "authors": [
       {
         "name": "Jason Hom",
@@ -12,7 +12,7 @@
     ],
     "url": "https://github.com/MaayanLab/appyter-catalog",
     "tags": [
-      "Venn diagrams"
+      "Venn diagrams", "Fisher's Exact Test"
     ],
     "license": "Apache-2.0",
     "appyter": {
