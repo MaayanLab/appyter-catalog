@@ -1,6 +1,0 @@
-git+https://github.com/MaayanLab/appyter
-git+https://github.com/chrlsdai/harmonizome-helper
-numpy
-pandas
-matplotlib
-xlrd
