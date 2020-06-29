@@ -133,12 +133,15 @@
 <div class="row" style="margin: 0">
   <div class="col-sm-12 text-center">
     <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
-      <a href=".">
-      <img
-        src="{require('./images/appyters_logo.svg')}"
-        style="width: 100%; padding: 10px;"
-      />
-      </a>
+      <h1>
+        <a href=".">
+          <img
+            src="{require('./images/appyters_logo.svg')}"
+            style="width: 100%; padding: 10px;"
+            alt="Appyters"
+          />
+        </a>
+      </h1>
     </div>
     <h3 class="card-subtitle mb-2 text-muted">A catalog of appyter notebooks</h3>
     <hr />
