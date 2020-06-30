@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "MGI_Harmonizome_ETL",
+  "title": "MGI Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for the Mouse Gene Ontology (MGI) Dataset",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "MGI",
+    "Mouse Gene Ontology"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "MGI.ipynb",
+    "profile": "biojupies"
+  }
+}

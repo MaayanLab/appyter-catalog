@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "GWAS_Catalog_Harmonizome_ETL",
+  "title": "GWAS Catalog Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for GWAS Catalog",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "GWAS Catalog"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "GWAS Catalog.ipynb",
+    "profile": "biojupies"
+  }
+}
