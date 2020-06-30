@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name":"KINOMEscan",
-  "title": "KINOMEscan Data Visualization",
+  "title": "KINOMEscan and TAS Vectors Data Visualization",
   "version": "0.0.1",
-  "description": "An appyter that creates bar charts to visualize KINOMEscan data from HMS LINCS.",
+  "description": "An appyter that creates bar charts to visualize KINOMEscan and TAS vectors data from HMS LINCS.",
   "authors": [
     {
       "name": "Serena Zhang",
@@ -12,7 +12,7 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "KINOMEscan", "Protein kinases", "Drug binding"
+    "KINOMEscan", "TAS vectors", "Protein kinases", "Drug binding"
   ],
   "license": "Apache-2.0",
   "appyter": {
