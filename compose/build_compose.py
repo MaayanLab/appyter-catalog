@@ -27,7 +27,8 @@ proxy_service = f"""
       - nginx_ssl=${{nginx_ssl}}
       - nginx_ssl_letsencrypt=${{nginx_ssl}}
       - letsencrypt_email=${{letsencrypt_email}}
-      - nginx_proxy_{len(appyters):03}=(/.*) http://app:80$$1
+      - nginx_proxy_{len(appyters):03}=/postgrest(/(.*)) http://postgrest:3000$$2
+      - nginx_proxy_{len(appyters)+1:03}=(/.*) http://app:80$$1
     ports:
       - 80:80
       - 443:443
@@ -56,6 +57,29 @@ services:
   app:
     build: app
     image: maayanlab/appyters:{version}
+  postgrest:
+    image: postgrest/postgrest
+    links:
+      - postgres:postgres
+    environment:
+      PGRST_DB_URI: postgres://appyters:${{POSTGRES_PASSWORD}}@postgres:5432/appyters
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: guest
+      PGRST_SERVER_PROXY_URI: "${{nginx_server_scheme}}://${{nginx_server_name}}/postgrest"
+    depends_on:
+      - postgres
+  postgres:
+    build: ./postgres
+    image: maayanlab/appyters-postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: appyters
+      POSTGRES_USER: appyters
+      POSTGRES_PASSWORD: ${{POSTGRES_PASSWORD}}
+    volumes:
+      - ./data/postgres/:/var/lib/postgresql/data
+
 {docker_compose_services}
 """.strip('\n')
 
