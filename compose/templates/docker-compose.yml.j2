@@ -24,7 +24,7 @@ services:
   postgrest:
     image: postgrest/postgrest
     environment:
-      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}postgres:5432/appyters"
+      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
       PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
