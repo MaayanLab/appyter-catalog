@@ -11,7 +11,8 @@ services:
       - nginx_ssl_letsencrypt=${nginx_ssl}
       - letsencrypt_email=${letsencrypt_email}
       - nginx_proxy_{{ "{:03}".format(len(appyters)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
-      - nginx_proxy_{{ "{:03}".format(len(appyters)+1) }}=(/.*) http://app:80$$1
+      - nginx_proxy_{{ "{:03}".format(len(appyters)+1) }}=(/((minio|storage)(/(.*)))) http://minio:9000$$2
+      - nginx_proxy_{{ "{:03}".format(len(appyters)+2) }}=(/.*) http://app:80$$1
     ports:
       - 80:80
       - 443:443
@@ -38,6 +39,23 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
+  minio:
+    image: minio/minio
+    entrypoint:
+    - /bin/sh
+    command:
+    - -c
+    - >
+      mkdir -p /data/$$MINIO_BUCKET;
+      minio server /data;
+      exit 0
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+    volumes:
+      - ./data/minio/.minio:/root/.minio
+      - ./data/minio/:/data
 {%- for appyter in appyters %}
   {{ appyter['name'].lower() }}:
     build:
