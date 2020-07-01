@@ -1,0 +1,53 @@
+version: '3'
+services:
+  proxy:
+    image: maayanlab/proxy:1.2.0
+    environment:
+{%- for n, appyter in enumerate(appyters) %}
+      - nginx_proxy_{{ "{:03}".format(n) }}=/{{ appyter['name'] }}(/.*) http://{{ appyter['name'].lower() }}:80/{{ appyter['name'] }}$$1
+{%- endfor %}
+      - nginx_server_name=${nginx_server_name}
+      - nginx_ssl=${nginx_ssl}
+      - nginx_ssl_letsencrypt=${nginx_ssl}
+      - letsencrypt_email=${letsencrypt_email}
+      - nginx_proxy_{{ "{:03}".format(len(appyters)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
+      - nginx_proxy_{{ "{:03}".format(len(appyters)+1) }}=(/.*) http://app:80$$1
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/letsencrypt/:/etc/letsencrypt/
+  app:
+    build: app
+    image: maayanlab/appyters:{{ version }}
+  postgrest:
+    image: postgrest/postgrest
+    environment:
+      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}postgres:5432/appyters"
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: guest
+      PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
+  postgres:
+    build: ./postgres
+    image: maayanlab/appyters-postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: appyters
+      POSTGRES_USER: appyters
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres/:/var/lib/postgresql/data
+{%- for appyter in appyters %}
+  {{ appyter['name'].lower() }}:
+    build:
+      context: {{ os.path.relpath(appyter['path'], root_dir) }}
+      dockerfile: Dockerfile
+      args:
+        - appyter_version=${appyter_version}
+    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    environment:
+      - PREFIX=/{{ appyter['name'] }}/
+    volumes:
+      - ./data/{{ appyter['name'].lower() }}/:/app/data
+{%- endfor %}
