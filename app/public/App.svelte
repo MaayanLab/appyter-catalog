@@ -1,4 +1,6 @@
 <script>
+  import Masonry from './Masonry'
+
   import mdIt from 'markdown-it'
   const md = mdIt()
 
@@ -101,9 +103,10 @@
   updatehash()
 
   // things to do on window load
-  window.onload = () => {
+  import { onMount } from 'svelte'
+  onMount(() => {
     get_pagehits()
-  }
+  })
 </script>
 
 <style>
@@ -129,7 +132,17 @@
 
 <div class="row" style="margin: 0">
   <div class="col-sm-12 text-center">
-    <h1>Appyters</h1>
+    <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+      <h1>
+        <a href=".">
+          <img
+            src="{require('./images/appyters_logo.svg')}"
+            style="width: 100%; padding: 10px;"
+            alt="Appyters"
+          />
+        </a>
+      </h1>
+    </div>
     <h3 class="card-subtitle mb-2 text-muted">A catalog of appyter notebooks</h3>
     <hr />
   </div>
@@ -148,9 +161,9 @@
         <p>&nbsp;</p>
       </div>
     </div>
-    <div class="row">
+    <Masonry>
       {#each searchAppyters(searchString) as appyter}
-        <div class="col-sm-12 col-md-6 col-xl-4">
+        <div>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{appyter.title}</h5>
@@ -192,7 +205,7 @@
           </div>
         </div>
       {/each}
-    </div>
+    </Masonry>
   {:else}
     <div class="row">
       <div class="col-sm-12">

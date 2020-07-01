@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Reactome_Harmonizome_ETL",
+  "title": "Reactome Harmonizome ETL",
+  "version": "0.0.1",
+  "description": "A Data Processor for the Reactome Pathways Database",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "Reactome"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "Reactome.ipynb",
+    "profile": "biojupies"
+  }
+}

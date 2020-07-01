@@ -3,3 +3,5 @@ ipython
 venn
 matplotlib
 requests
+tabulate
+scipy

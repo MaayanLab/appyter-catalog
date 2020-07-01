@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "DrugBank",
-  "title": "DrugBank",
+  "name": "miRTarBase_Harmonizome_ETL",
+  "title": "miRTarBase Harmonizome ETL",
   "version": "0.0.1",
-  "description": "A DrugBank Data Processor",
+  "description": "A Data Processor for the miRTarBase Database",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,11 +14,11 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "DrugBank"
+    "miRTarBase"
   ],
   "license": "MIT",
   "appyter": {
-    "file": "DrugBank.ipynb",
+    "file": "miRTarBase.ipynb",
     "profile": "biojupies"
   }
 }

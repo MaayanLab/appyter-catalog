@@ -1,4 +1,5 @@
 import os
+import json
 from textwrap import dedent
 
 def build_dockerfile(appyter_path, config):
@@ -81,7 +82,6 @@ def build_dockerfile(appyter_path, config):
   return '\n\n'.join(map(str.strip, map(dedent, dockerfile_parts)))
 
 def prepare_appyter(appyter_path, config):
-  import json
   import shutil
   override_path = os.path.join(appyter_path, 'override')
   if os.path.exists(override_path):
