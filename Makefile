@@ -10,10 +10,10 @@ s+ = $(subst \ ,+,$1)
 +s = $(subst +,\ ,$1)
 
 .SECONDEXPANSION:
-appyters/%/Dockerfile: compose/build_dockerfile.py compose/merge_j2.py $$(call +s,$$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \) | sed 's/ /+/g'))
+appyters/%/Dockerfile: compose/build_dockerfile.py compose/templates/Dockerfile.j2 compose/merge_j2.py $$(call +s,$$(shell find $$(@D) -type f ! \( -name Dockerfile -o -name .build \) | sed 's/ /+/g'))
 	$(PYTHON) compose/build_dockerfile.py $(shell basename $(shell dirname $@)) > $@
 
-docker-compose.yml: compose/build_compose.py app/Dockerfile $(DOCKERFILES)
+docker-compose.yml: compose/build_compose.py compose/templates/docker-compose.yml.j2 app/Dockerfile $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
 
 app/public/appyters.json: $(APPYTERFILES)
