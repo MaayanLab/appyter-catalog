@@ -3,5 +3,6 @@ git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
 pandas
 numpy
 ipython
+matplotlib
 bokeh
 umap
