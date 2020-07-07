@@ -69,7 +69,7 @@ def validate_appyter(appyter):
   print(f"{appyter}: Inspecting appyter...")
   p = Popen([
     'docker', 'run', '-it',
-    'python3', '-m', 'appyter', 'nbinspect',
+    'appyter', 'nbinspect',
     f"--profile={config['appyter'].get('profile', 'default')}",
   ], stdout=PIPE)
   inspect = json.load(p.stdout)
@@ -106,7 +106,7 @@ def validate_appyter(appyter):
     print(f"{appyter}: Constructing default notebook from appyter...")
     p = Popen([
       'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
-      'python3', '-m', 'appyter', 'nbconstruct',
+      'appyter', 'nbconstruct',
       f"--profile={config['appyter'].get('profile', 'default')}",
       f"--output=/data/{config['appyter']['file']}",
     ])
@@ -116,7 +116,7 @@ def validate_appyter(appyter):
     print(f"{appyter}: Executing default notebook with appyter...")
     p = Popen([
       'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
-      'python3', '-m', 'appyter', 'nbexecute',
+      'appyter', 'nbexecute',
       f"--profile={config['appyter'].get('profile', 'default')}",
     ], stdout=PIPE)
     for msg in map(json.loads, p.stdout):
