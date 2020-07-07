@@ -60,7 +60,7 @@ def validate_appyter(appyter):
     print(prepare_appyter(os.path.join('appyters', appyter), config), file=fw)
   #
   print(f"{appyter}: Building Dockerfile...")
-  p = Popen(['docker', 'build', '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
+  p = Popen(['docker', 'build', '-t', f"maayanlab/appyters-{config['name']}", '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
   for line in p.stdout:
     print(f"{appyter}: `docker build .`: {line}")
   p.stdout.close()
@@ -68,7 +68,8 @@ def validate_appyter(appyter):
   #
   print(f"{appyter}: Inspecting appyter...")
   p = Popen([
-    'docker', 'run', '-it',
+    'docker', 'run',
+    '-it', f"maayanlab/appyters-{config['name']}",
     'appyter', 'nbinspect',
     f"--profile={config['appyter'].get('profile', 'default')}",
     nbfile,
@@ -106,7 +107,9 @@ def validate_appyter(appyter):
     #
     print(f"{appyter}: Constructing default notebook from appyter...")
     p = Popen([
-      'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
+      'docker', 'run',
+      '-v', f"{tmp_directory}:/data",
+      '-it', f"maayanlab/appyters-{config['name']}",
       'appyter', 'nbconstruct',
       f"--profile={config['appyter'].get('profile', 'default')}",
       f"--output=/data/{nbfile}",
@@ -117,7 +120,9 @@ def validate_appyter(appyter):
     #
     print(f"{appyter}: Executing default notebook with appyter...")
     p = Popen([
-      'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
+      'docker', 'run',
+      '-v', f"{tmp_directory}:/data",
+      '-it', f"maayanlab/appyters-{config['name']}",
       'appyter', 'nbexecute',
       f"--profile={config['appyter'].get('profile', 'default')}",
       f"--cwd=/data",
