@@ -116,12 +116,14 @@ def validate_appyter(appyter):
   with Popen([
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
-    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbconstruct',
     f"--output=/data/{nbfile}",
     nbfile,
-  ], stdout=PIPE) as p:
-    for line in p.stdout:
+  ], stdin=PIPE, stdout=PIPE) as p:
+    print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
+    stdout, _ = p.communicate(json.dumps(default_args).encode())
+    for line in stdout:
       print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
