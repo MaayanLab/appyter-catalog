@@ -96,7 +96,7 @@ def validate_appyter(appyter):
   }
   file_fields = {
     field_name
-    for field_name, field in field_args.items()
+    for field_name, field in inspect.items()
     if field['field'] == 'FileField'
   }
   for file_field in file_fields:
