@@ -106,7 +106,7 @@ def validate_appyter(appyter):
     if default_file:
       if default_file in field_examples:
         print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
-        urllib.request.urlretrieve(field_examples[default_file], filename=default_file)
+        urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
