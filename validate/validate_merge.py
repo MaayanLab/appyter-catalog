@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import tempfile
 import traceback
 import jsonschema
 from subprocess import Popen, PIPE
@@ -65,7 +66,63 @@ def validate_appyter(appyter):
   p.stdout.close()
   assert p.wait() == 0, '`docker build .` command failed'
   #
-  print(f"{appyter}: [WARN] Checking `{nbfile}` not yet implemented")
+  print(f"{appyter}: Inspecting appyter...")
+  p = Popen([
+    'docker', 'run', '-it',
+    'python3', '-m', 'appyter', 'nbinspect',
+    f"--profile={config['appyter'].get('profile', 'default')}",
+  ], stdout=PIPE)
+  inspect = json.load(p.stdout)
+  assert p.returncode == 0, 'Expected 0 exitcode from appyter nbinspect'
+  field_args = {
+    field['args']['name']: fields['args']
+    for field in inspect
+  }
+  assert len(field_args) == len(inspect), "Some of your fields weren't captured, there might be duplicate `name`s"
+  #
+  print(f"{appyter}: Preparing defaults...")
+  with tempfile.TemporaryDirectory() as tmp_directory:
+    default_args = {
+      field_name: field.get('default')
+      for field_name, field in field_args.items()
+    }
+    file_fields = {
+      field_name
+      for field_name, field in field_args.items()
+      if field['field'] == 'FileField'
+    }
+    for file_field in file_fields:
+      field_examples = field_args[file_field].get('examples', {})
+      default_file = default_args[file_field]
+      if default_file:
+        if default_file in field_examples:
+          print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
+          urllib.request.urlretrieve(field_examples[default_file], filename=default_file)
+        else:
+          print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
+      else:
+        print(f"{appyter}: WARNING, no default file is provided")
+    #
+    print(f"{appyter}: Constructing default notebook from appyter...")
+    p = Popen([
+      'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
+      'python3', '-m', 'appyter', 'nbconstruct',
+      f"--profile={config['appyter'].get('profile', 'default')}",
+      f"--output=/data/{config['appyter']['file']}",
+    ])
+    assert p.wait() == 0, 'Expected 0 exitcode from appyter nbconstruct'
+    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
+    #
+    print(f"{appyter}: Executing default notebook with appyter...")
+    p = Popen([
+      'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
+      'python3', '-m', 'appyter', 'nbexecute',
+      f"--profile={config['appyter'].get('profile', 'default')}",
+    ], stdout=PIPE)
+    for msg in map(json.loads, p.stdout):
+      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+      print(f"{appyter}: {json.dumps(msg)}")
+    assert p.returncode == 0, 'Expected 0 exitcode from appyter nbexecute'
   #
   print(f"{appyter}: Success!")
 
