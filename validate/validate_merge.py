@@ -82,7 +82,7 @@ def validate_appyter(appyter):
   #
   inspect = json.loads(nbinspect_output)
   field_args = {
-    field['args']['name']: fields['args']
+    field['args']['name']: field['args']
     for field in inspect
   }
   assert len(field_args) == len(inspect), "Some of your fields weren't captured, there might be duplicate `name`s"
