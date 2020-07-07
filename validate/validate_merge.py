@@ -71,6 +71,7 @@ def validate_appyter(appyter):
     'docker', 'run', '-it',
     'appyter', 'nbinspect',
     f"--profile={config['appyter'].get('profile', 'default')}",
+    nbfile,
   ], stdout=PIPE)
   inspect = json.load(p.stdout)
   assert p.returncode == 0, 'Expected 0 exitcode from appyter nbinspect'
@@ -108,7 +109,8 @@ def validate_appyter(appyter):
       'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
       'appyter', 'nbconstruct',
       f"--profile={config['appyter'].get('profile', 'default')}",
-      f"--output=/data/{config['appyter']['file']}",
+      f"--output=/data/{nbfile}",
+      nbfile,
     ])
     assert p.wait() == 0, 'Expected 0 exitcode from appyter nbconstruct'
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
@@ -118,6 +120,8 @@ def validate_appyter(appyter):
       'docker', 'run', '-v', f"{tmp_directory}:/data", '-it',
       'appyter', 'nbexecute',
       f"--profile={config['appyter'].get('profile', 'default')}",
+      f"--cwd=/data",
+      f"/data/{nbfile}",
     ], stdout=PIPE)
     for msg in map(json.loads, p.stdout):
       assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
