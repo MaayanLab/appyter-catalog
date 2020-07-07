@@ -4,6 +4,7 @@ import json
 import tempfile
 import traceback
 import jsonschema
+import urllib.request
 from subprocess import Popen, PIPE
 
 def get_changed_appyters():
