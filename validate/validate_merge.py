@@ -60,22 +60,26 @@ def validate_appyter(appyter):
     print(prepare_appyter(os.path.join('appyters', appyter), config), file=fw)
   #
   print(f"{appyter}: Building Dockerfile...")
-  p = Popen(['docker', 'build', '-t', f"maayanlab/appyters-{config['name']}", '.'], cwd=os.path.join('appyters', appyter), stdout=PIPE)
-  for line in p.stdout:
-    print(f"{appyter}: `docker build .`: {line}")
-  p.stdout.close()
-  assert p.wait() == 0, '`docker build .` command failed'
+  with Popen([
+    'docker', 'build',
+    '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    '.',
+  ], cwd=os.path.join('appyters', appyter), stdout=PIPE) as p:
+    for line in p.stdout:
+      print(f"{appyter}: `docker build .`: {line}")
+    assert p.wait() == 0, '`docker build .` command failed'
   #
   print(f"{appyter}: Inspecting appyter...")
-  p = Popen([
+  with Popen([
     'docker', 'run',
-    '-it', f"maayanlab/appyters-{config['name']}",
+    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbinspect',
     nbfile,
-  ], stdout=PIPE)
-  nbinspect_output = p.stdout.read()
-  print(f"{appyter}: `appyter nbinspect`: {nbinspect_output})")
-  assert p.wait() == 0, '`appyter nbinspect` command failed'
+  ], stdout=PIPE) as p:
+    nbinspect_output = p.stdout.read().decode()
+    print(f"{appyter}: `appyter nbinspect {nbfile}`: {nbinspect_output})")
+    assert p.wait() == 0, f"`appyter nbinspect {nbfile}` command failed"
+  #
   inspect = json.loads(nbinspect_output)
   field_args = {
     field['args']['name']: fields['args']
@@ -107,33 +111,32 @@ def validate_appyter(appyter):
         print(f"{appyter}: WARNING, no default file is provided")
     #
     print(f"{appyter}: Constructing default notebook from appyter...")
-    p = Popen([
+    with Popen([
       'docker', 'run',
       '-v', f"{tmp_directory}:/data",
-      '-it', f"maayanlab/appyters-{config['name']}",
+      f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
       'appyter', 'nbconstruct',
       f"--output=/data/{nbfile}",
       nbfile,
-    ], stdout=PIPE)
-    for line in p.stdout:
-      print(f"{appyter}: `appyter nbconstruct`: {line}")
-    p.stdout.close()
-    assert p.wait() == 0, '`appyter nbconstruct` command failed'
-    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
+    ], stdout=PIPE) as p:
+      for line in p.stdout:
+        print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
+      assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
+      assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
     #
     print(f"{appyter}: Executing default notebook with appyter...")
-    p = Popen([
+    with Popen([
       'docker', 'run',
       '-v', f"{tmp_directory}:/data",
-      '-it', f"maayanlab/appyters-{config['name']}",
+      f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
       'appyter', 'nbexecute',
       f"--cwd=/data",
       f"/data/{nbfile}",
-    ], stdout=PIPE)
-    for msg in map(json.loads, p.stdout):
-      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
-      print(f"{appyter}: `appyter nbexecute`: {json.dumps(msg)}")
-    assert p.wait() == 0, '`appyter nbexecute` command failed'
+    ], stdout=PIPE) as p:
+      for msg in map(json.loads, p.stdout):
+        assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+        print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
+      assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
   print(f"{appyter}: Success!")
 
