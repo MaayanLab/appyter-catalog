@@ -71,11 +71,12 @@ def validate_appyter(appyter):
     'docker', 'run',
     '-it', f"maayanlab/appyters-{config['name']}",
     'appyter', 'nbinspect',
-    f"--profile={config['appyter'].get('profile', 'default')}",
     nbfile,
   ], stdout=PIPE)
-  inspect = json.load(p.stdout)
-  assert p.returncode == 0, 'Expected 0 exitcode from appyter nbinspect'
+  nbinspect_output = p.stdout.read()
+  print(f"{appyter}: `appyter nbinspect`: {nbinspect_output})")
+  assert p.wait() == 0, '`appyter nbinspect` command failed'
+  inspect = json.loads(nbinspect_output)
   field_args = {
     field['args']['name']: fields['args']
     for field in inspect
@@ -111,11 +112,13 @@ def validate_appyter(appyter):
       '-v', f"{tmp_directory}:/data",
       '-it', f"maayanlab/appyters-{config['name']}",
       'appyter', 'nbconstruct',
-      f"--profile={config['appyter'].get('profile', 'default')}",
       f"--output=/data/{nbfile}",
       nbfile,
-    ])
-    assert p.wait() == 0, 'Expected 0 exitcode from appyter nbconstruct'
+    ], stdout=PIPE)
+    for line in p.stdout:
+      print(f"{appyter}: `appyter nbconstruct`: {line}")
+    p.stdout.close()
+    assert p.wait() == 0, '`appyter nbconstruct` command failed'
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
     #
     print(f"{appyter}: Executing default notebook with appyter...")
@@ -124,14 +127,13 @@ def validate_appyter(appyter):
       '-v', f"{tmp_directory}:/data",
       '-it', f"maayanlab/appyters-{config['name']}",
       'appyter', 'nbexecute',
-      f"--profile={config['appyter'].get('profile', 'default')}",
       f"--cwd=/data",
       f"/data/{nbfile}",
     ], stdout=PIPE)
     for msg in map(json.loads, p.stdout):
       assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
-      print(f"{appyter}: {json.dumps(msg)}")
-    assert p.returncode == 0, 'Expected 0 exitcode from appyter nbexecute'
+      print(f"{appyter}: `appyter nbexecute`: {json.dumps(msg)}")
+    assert p.wait() == 0, '`appyter nbexecute` command failed'
   #
   print(f"{appyter}: Success!")
 
