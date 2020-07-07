@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "name":"Enrichr_Scatterplot_Appyter",
+    "title": "Enrichr Scatterplot Appyter",
+    "version": "0.0.1",
+    "description": "An appyter that displays enrichment analysis results on a scatterplot of gene sets clustered by similarity from an Enrichr library.",
+    "authors": [
+      {
+        "name": "Skylar Litz",
+        "email": "litzskylar@gmail.com"
+      }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog",
+    "tags": [
+      "Enrichr", "scatterplot", "bokeh"
+    ],
+    "license": "Apache-2.0",
+    "appyter": {
+      "file": "Scatter-Appyter.ipynb",
+      "profile": "biojupies"
+    }
+  }
+  
