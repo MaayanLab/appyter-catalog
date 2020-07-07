@@ -153,7 +153,8 @@ if __name__ == '__main__':
       continue
     try:
       validate_appyter(appyter)
-    except Exception:
+    except Exception as e:
+      print(f"{appyter}: ERROR {str(e)}")
       traceback.print_exc()
       valid = False
   if valid:
