@@ -3,7 +3,7 @@
   "name": "tcgaEnrichrViewer",
   "title": "tcgaEnrichrViewer",
   "version": "0.0.1",
-  "description": "An appyter that processes data from the TCGA dataset and visualizes clusters of RNA-seq profiles, along with enrichment analysis from Enrichr.",
+  "description": "An appyter for the visualization and analysis of intra-cancer patient clusters based on RNA-Seq profiles and clinical data.",
   "authors": [
     {
       "name": "Nicole Moiseyev",
@@ -11,7 +11,7 @@
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
-  "tags": ["Enrichment Analysis", "TCGA"],
+  "tags": ["Enrichment Analysis", "TCGA", "RNA-Seq"],
   "license": "MIT",
   "appyter": {
     "file": "tcgaEnrichrViewer.ipynb",
