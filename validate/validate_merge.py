@@ -1,20 +1,21 @@
 import os
 import sys
 import json
+import click
 import tempfile
 import traceback
 import jsonschema
 import urllib.request
 from subprocess import Popen, PIPE
 
-def get_changed_appyters():
-  try:
-    # try to load files from stdin
+def get_changed_appyters(github_action):
+  if github_action:
+    # load files from stdin
     changed_files = [record['filename'] for record in json.load(sys.stdin)]
-  except:
-    # otherwise use git
-    p = Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE)
-    changed_files = list(map(bytes.decode, p.stdout))
+  else:
+    # use git
+    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE) as p:
+      changed_files = set(filter(None, map(str.strip, map(bytes.decode, p.stdout))))
   #
   appyters = {
     file.split('/', maxsplit=3)[1]
@@ -66,7 +67,7 @@ def validate_appyter(appyter):
     '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     '.',
   ], cwd=os.path.join('appyters', appyter), stdout=PIPE) as p:
-    for line in p.stdout:
+    for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
       print(f"{appyter}: `docker build .`: {line}")
     assert p.wait() == 0, '`docker build .` command failed'
   #
@@ -77,7 +78,7 @@ def validate_appyter(appyter):
     'appyter', 'nbinspect',
     nbfile,
   ], stdout=PIPE) as p:
-    nbinspect_output = p.stdout.read().decode()
+    nbinspect_output = p.stdout.read().decode().strip()
     print(f"{appyter}: `appyter nbinspect {nbfile}`: {nbinspect_output})")
     assert p.wait() == 0, f"`appyter nbinspect {nbfile}` command failed"
   #
@@ -123,7 +124,7 @@ def validate_appyter(appyter):
   ], stdin=PIPE, stdout=PIPE) as p:
     print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
-    for line in stdout:
+    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
       print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
@@ -144,22 +145,29 @@ def validate_appyter(appyter):
   #
   print(f"{appyter}: Success!")
 
-if __name__ == '__main__':
+@click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/master')
+@click.option('--github-action', default=False, type=bool, is_flag=True, help='Use for receiving json on stdin from github actions')
+def validate_merge(github_action=False):
   valid = True
-  for appyter in get_changed_appyters():
+  for appyter in get_changed_appyters(github_action):
     if not os.path.exists(os.path.join('appyters', appyter)):
       print(f"{appyter}: Directory no longer exists, ignoring")
       continue
     elif not os.path.isdir(os.path.join('appyters', appyter)):
       print(f"{appyter}: Is not a directory, ignoring")
       continue
+    #
     try:
       validate_appyter(appyter)
     except Exception as e:
       print(f"{appyter}: ERROR {str(e)}")
       traceback.print_exc()
       valid = False
+  #
   if valid:
     sys.exit(0)
   else:
     sys.exit(1)
+
+if __name__ == '__main__':
+  validate_merge()
