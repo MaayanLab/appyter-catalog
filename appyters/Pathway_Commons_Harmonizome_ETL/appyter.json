@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Pathway_Commons_Harmonizome_ETL",
-  "title": "Pathway Commons Harmonizome ETL",
+  "title": "Harmonizome ETL: Pathway Commons",
   "version": "0.0.1",
-  "description": "A Data Processor for the Pathway Commons Database",
+  "description": "An appyter to process data from Pathway Commons for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
