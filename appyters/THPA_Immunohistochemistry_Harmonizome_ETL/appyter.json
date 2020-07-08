@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "THPA_Immunohistochemistry_Harmonizome_ETL",
-  "title": "THPA (Immunohistochemistry) Harmonizome ETL",
+  "title": "Harmonizome ETL: The Human Protein Atlas (Immunihistochemistry)",
   "version": "0.0.1",
-  "description": "A Data Processor for The Human Protein Atlas Normal Tissue Immunihistochemistry Dataset",
+  "description": "An appyter to process data from The Human Protein Atlas for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,8 +14,7 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "THPA",
-    "The Human Protein Atlas"
+    "The Human Protein Atlas (Immunihistochemistry)"
   ],
   "license": "MIT",
   "appyter": {
