@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "PHGKB_Harmonizome_ETL",
-  "title": "PHGKB Harmonizome ETL",
+  "title": "Harmonizome ETL: Public Health Genomics and Precision Health Knowledge Base",
   "version": "0.0.1",
-  "description": "A Data Processor for the Public Health Genomics and Precision Health Knowledge Base",
+  "description": "An appyter to process data from the Public Health Genomics and Precision Health Knowledge Base for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,7 +14,7 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "PHGKB"
+    "Public Health Genomics and Precision Health Knowledge Base"
   ],
   "license": "MIT",
   "appyter": {
