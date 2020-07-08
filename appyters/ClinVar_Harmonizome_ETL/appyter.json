@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "ClinVar_Harmonizome_ETL",
-  "title": "ClinVar Harmonizome ETL",
+  "title": "Harmonizome ETL: ClinVar",
   "version": "0.0.1",
-  "description": "A Data Processor for the ClinVar Database",
+  "description": "An appyter to process data from ClinVar for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
