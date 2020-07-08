@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "TargetScanHuman_Harmonizome_ETL",
-  "title": "TargetScanHuman Harmonizome ETL",
+  "title": "Harmonizome ETL: TargetScanHuman",
   "version": "0.0.1",
-  "description": "A Data Processor for the Target Scan Human Prediction Dataset",
+  "description": "An appyter to process data from TargetScan for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
