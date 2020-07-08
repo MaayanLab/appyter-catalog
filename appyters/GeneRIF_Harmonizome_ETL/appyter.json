@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "GeneRIF_Harmonizome_ETL",
-  "title": "GeneRIF Harmonizome ETL",
+  "title": "Harmonizome ETL: GeneRIF",
   "version": "0.0.1",
-  "description": "A Data Processor for the GeneRIF Dataset",
+  "description": "An appyter to process data from Gene Reference into Function for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
