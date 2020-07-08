@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "BioGPS_Harmonizome_ETL",
-  "title": "BioGPS Harmonizome ETL",
+  "title": "Harmonizome ETL: BioGPS",
   "version": "0.0.1",
-  "description": "A Data Processor for the BioGPS Datasets",
+  "description": "An appyter to process data from BioGPS for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
