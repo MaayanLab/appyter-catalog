@@ -4,4 +4,4 @@ numpy
 requests
 matplotlib
 ipython
-bokeh==2.0.2
+bokeh

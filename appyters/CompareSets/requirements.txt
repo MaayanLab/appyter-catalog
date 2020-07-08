@@ -3,3 +3,6 @@ ipython
 venn
 matplotlib
 requests
+tabulate
+scipy
+upsetplot
