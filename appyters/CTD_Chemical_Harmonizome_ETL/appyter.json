@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "CTD_Chemical_Harmonizome_ETL",
-  "title": "CTD (Chemical) Harmonizome ETL",
+  "title": "Harmonizome ETL: Comparative Toxicogenomics Database (Chemical)",
   "version": "0.0.1",
-  "description": "A Data Processor for the Comparative Toxicogenomics Database",
+  "description": "An appyter to process data from the Comparative Toxicogenomics Database for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,8 +14,7 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "CTD",
-    "Comparative Toxicogenemoics Database"
+    "Comparative Toxicogenomics Database (Chemical)"
   ],
   "license": "MIT",
   "appyter": {
