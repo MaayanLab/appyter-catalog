@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "PHGKB_Harmonizome_ETL",
   "title": "Harmonizome ETL: Public Health Genomics and Precision Health Knowledge Base",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "An appyter to process data from the Public Health Genomics and Precision Health Knowledge Base for the Harmonizome.",
   "authors": [
     {
