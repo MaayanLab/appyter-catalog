@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "HPO_Harmonizome_ETL",
-  "title": "HPO Harmonizome ETL",
+  "title": "Harmonizome ETL: Human Phenotype Ontology",
   "version": "0.0.1",
-  "description": "A Data Processor for the Human Phenotype Ontology",
+  "description": "An appyter to process data from Human Phenotype Ontology for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,7 +14,6 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "HPO",
     "Human Phenotype Ontology"
   ],
   "license": "MIT",
