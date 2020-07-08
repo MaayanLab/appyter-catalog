@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "miRTarBase_Harmonizome_ETL",
-  "title": "miRTarBase Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for the miRTarBase Database",
+  "title": "Harmonizome ETL: miRTarBase",
+  "version": "0.1.0",
+  "description": "An appyter to process data from miRTarBase for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
