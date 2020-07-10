@@ -4,5 +4,5 @@ pandas
 numpy
 ipython
 matplotlib
-bokeh
+bokeh==2.0.2
 umap

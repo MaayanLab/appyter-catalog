@@ -1,10 +1,10 @@
 version: '3'
 services:
   proxy:
-    image: maayanlab/proxy:1.2.0
+    image: maayanlab/proxy:1.2.2
     environment:
 {%- for n, appyter in enumerate(appyters) %}
-      - nginx_proxy_{{ "{:03}".format(n) }}=/{{ appyter['name'] }}(/.*) http://{{ appyter['name'].lower() }}:80/{{ appyter['name'] }}$$1
+      - nginx_proxy_{{ "{:03}".format(n) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
 {%- endfor %}
       - nginx_server_name=${nginx_server_name}
       - nginx_ssl=${nginx_ssl}
@@ -65,6 +65,11 @@ services:
     image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
     environment:
       - PREFIX=/{{ appyter['name'] }}/
+      - PORT=443
+      - PROXY=true
+      - KEYFILE=/etc/letsencrypt/live/${nginx_server_name}/privkey.pem
+      - CERTFILE=/etc/letsencrypt/live/${nginx_server_name}/cert.pem
     volumes:
       - ./data/{{ appyter['name'].lower() }}/:/app/data
+      - ./data/letsencrypt/:/etc/letsencrypt/:ro
 {%- endfor %}
