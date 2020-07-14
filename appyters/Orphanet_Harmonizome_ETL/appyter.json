@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Orphanet_Harmonizome_ETL",
-  "title": "Orphanet Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for the Orphanet Genes and Rare Diseases Dataset",
+  "title": "Harmonizome ETL: Orphanet",
+  "version": "0.1.0",
+  "description": "An appyter to process data from Orphanet for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",

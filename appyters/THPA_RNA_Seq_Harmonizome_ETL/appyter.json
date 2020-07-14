@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "THPA_RNA_Seq_Harmonizome_ETL",
-  "title": "THPA (RNA-Seq) Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for The Human Protein Atlas RNA-Seq Datasets",
+  "title": "Harmonizome ETL: The Human Protein Atlas (RNA-Seq)",
+  "version": "0.1.0",
+  "description": "An appyter to process data from The Human Protein Atlas for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,7 +14,7 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "THPA"
+    "The Human Protein Atlas (RNA-Seq)"
   ],
   "license": "MIT",
   "appyter": {

@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "DrugBank_Harmonizome_ETL",
-  "title": "DrugBank Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for the DrugBank Protein Identifiers Datasets",
+  "title": "Harmonizome ETL: DrugBank",
+  "version": "0.1.0",
+  "description": "An appyter to process data from the DrugBank database for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
