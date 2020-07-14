@@ -32,7 +32,7 @@ RUN set -x \
 ADD deps/ /app/deps/
 RUN set -x \
   && echo "Installing .dep files from deps/*..." \
-  && dpkg -i /apps/deps/*.deb \
+  && dpkg -i /app/deps/*.deb \
   && apt-get -y update \
   && apt-get -y install -f \
   && rm -rf /var/lib/apt/lists/* \
