@@ -1,0 +1,16 @@
+{% extends "base.j2" %}
+
+{% block head %}
+{{ super() }}
+<head />
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script>
+var test = 0;
+</script>
+<script>
+var test = 1;
+</script>
+{% endblock %}

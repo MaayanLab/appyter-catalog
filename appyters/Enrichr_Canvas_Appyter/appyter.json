@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name":"Enrichr_Canvas_Appyter",
+  "title": "Enrichr Canvas Appyter",
+  "version": "0.0.2",
+  "description": "An appyter that creates a hexagonal canvas comparing a user-inputted gene list with gene sets in a selected Enrichr library.",
+  "authors": [
+    {
+      "name": "Skylar Litz",
+      "email": "litzskylar@gmail.com"
+    },
+    {
+      "name": "Megan L. Wojciechowicz",
+      "email": "megan.wojciechowicz@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Enrichr", "canvas", "d3", "javascript"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "Enrichr-Canvas-Appyter.ipynb",
+    "profile": "biojupies"
+  }
+}

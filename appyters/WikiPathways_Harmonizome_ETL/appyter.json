@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "WikiPathways_Harmonizome_ETL",
+  "title": "Harmonizome ETL: WikiPathways",
+  "version": "0.1.0",
+  "description": "An appyter to process data from WikiPathways for the Harmonizome.",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "WikiPathways"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "WikiPathways.ipynb",
+    "profile": "biojupies"
+  }
+}
