@@ -285,7 +285,7 @@ class Drugmonizome(object):
         """
         df_drugs = cls.read_drug_metadata()
         df_drugs = df_drugs.set_index('InChI_key')
-        return list(df_drugs.loc[inchi_keys]['Name'])
+        return list(df_drugs.reindex(inchi_keys)['Name'])
 
 # Utility functions
 # -------------------------------------------------------------------------
