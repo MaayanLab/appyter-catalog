@@ -8,3 +8,4 @@ matplotlib
 requests
 umap-learn
 seaborn
+tqdm
