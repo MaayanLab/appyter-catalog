@@ -139,6 +139,7 @@ def validate_appyter(appyter):
   with Popen([
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
+    '-e', 'PYTHONPATH=/app',
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
     f"--cwd=/data",
