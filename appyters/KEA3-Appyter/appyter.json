@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name":"KEA3-Appyter",
+  "title": "KEA3 Appyter",
+  "version": "0.0.1",
+  "description": "An appyter that retrieves and displays KEA3 results.",
+  "authors": [
+    {
+      "name": "Serena Zhang",
+      "email": "serena19@sas.upenn.edu"
+    }, 
+    {
+      "name": "Maxim Kuleshov",
+      "email": "kuleshov.max.v@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Kinase Enrichment Analysis", "KEA3"
+  ],
+  "license": "Apache-2.0",
+  "appyter": {
+    "file": "KEA3-Appyter.ipynb",
+    "profile": "biojupies"
+  }
+}

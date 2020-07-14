@@ -1,0 +1,5 @@
+git+git://github.com/Maayanlab/appyter.git
+json
+requests
+time
+tabulate
