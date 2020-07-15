@@ -15,7 +15,10 @@ appyters = [
   )
   for path in glob.glob(os.path.join(appyter_path, '*', 'appyter.json'))
 ]
-env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
+env = Environment(
+  extensions=['jinja2.ext.with_'],
+  loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
+)
 template = env.get_template('docker-compose.yml.j2')
 docker_compose = template.render(
   appyters=appyters,
