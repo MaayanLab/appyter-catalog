@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Gene_Network_Analysis",
+  "title": "Gene Network Analysis",
+  "version": "0.0.0",
+  "description": "An appyter for the analysis of gene network clusters using various algorithms.",
+  "authors": [
+    {
+      "name": "Nicole Moiseyev",
+      "email": "nicole.moiseyev@duke.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": ["Enrichment Analysis", "Genes", "Clsutering", "Enrichr"],
+  "license": "MIT",
+  "appyter": {
+    "file": "Gene_Network_Analysis.ipynb",
+    "profile": "biojupies"
+  }
+}
