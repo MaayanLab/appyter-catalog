@@ -1,6 +1,8 @@
 import os
 import json
 import glob
+from math import log10
+from itertools import count
 from jinja2 import Environment, FileSystemLoader
 
 version = '0.0.1'
@@ -17,8 +19,13 @@ env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__)
 template = env.get_template('docker-compose.yml.j2')
 docker_compose = template.render(
   appyters=appyters,
+  count=count,
   enumerate=enumerate,
+  int=int,
+  iter=iter,
   len=len,
+  log10=log10,
+  next=next,
   os=os,
   root_dir=root_dir,
   version=version,
