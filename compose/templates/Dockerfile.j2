@@ -84,13 +84,13 @@ RUN set -x \
   && echo "Overriding appyter templates..." \
   && python3 /app/merge_j2.py /app /app/override /app
 
-CMD [
-  "appyter",
+CMD [ \
+  "appyter", \
   {%- if 'profile' in config['appyter'] %}
-  "--profile={{ config['appyter']['profile'] }}",
+  "--profile={{ config['appyter']['profile'] }}", \
   {%- endif %}
   {%- if 'extras' in config['appyter'] %}
-  "--extras={{ ','.join(config['appyter']['extras']) }}",
+  "--extras={{ ','.join(config['appyter']['extras']) }}", \
   {%- endif %}
-  "{{ config['appyter']['file'] }}"
+  "{{ config['appyter']['file'] }}" \
 ]
