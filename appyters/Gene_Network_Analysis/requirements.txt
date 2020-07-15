@@ -1,0 +1,10 @@
+git+git://github.com/Maayanlab/appyter.git
+requests
+pandas
+numpy
+networkx
+unidecode
+plotly
+pyvis
+seaborn
+matplotlib
