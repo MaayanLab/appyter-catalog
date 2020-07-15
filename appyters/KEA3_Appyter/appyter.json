@@ -1,22 +1,26 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name":"KINOMEscan",
-  "title": "KINOMEscan and TAS Vectors Data Visualization",
-  "version": "0.0.5",
-  "description": "An appyter that creates bar charts to visualize KINOMEscan and TAS vectors data from HMS LINCS.",
+  "name":"KEA3_Appyter",
+  "title": "KEA3 Appyter",
+  "version": "0.0.1",
+  "description": "An appyter that retrieves and displays KEA3 results.",
   "authors": [
     {
       "name": "Serena Zhang",
       "email": "serena19@sas.upenn.edu"
+    }, 
+    {
+      "name": "Maxim Kuleshov",
+      "email": "kuleshov.max.v@gmail.com"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "KINOMEscan", "TAS vectors", "Protein kinases", "Drug binding"
+    "Kinase Enrichment Analysis", "KEA3"
   ],
   "license": "Apache-2.0",
   "appyter": {
-    "file": "KINOMEscan-Appyter.ipynb",
+    "file": "KEA3-Appyter.ipynb",
     "profile": "biojupies"
   }
 }
