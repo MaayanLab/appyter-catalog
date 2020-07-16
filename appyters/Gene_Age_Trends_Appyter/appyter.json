@@ -3,7 +3,7 @@
     "name":"Gene_Age_Trends_Appyter",
     "title": "Gene Expression vs Age Plot Generator",
     "version": "0.0.1",
-    "description": "An appyter that can display, given user input, the relationship between age and gene expression for a selected gene, alongside other statistical measures for the gene dataset.",
+    "description": "Generate Gene Expression vs Age Plots using cleaned RNA-seq data",
     "authors": [
       {
         "name": "Tahmid Ahamed",
