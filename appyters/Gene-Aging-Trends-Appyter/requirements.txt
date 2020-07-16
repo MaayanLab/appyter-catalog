@@ -1,0 +1,9 @@
+  git+git://github.com/Maayanlab/appyter.git
+numpy
+scikit-learn
+matplotlib
+umap-learn
+pandas
+pycombat
+seaborn
+scipy
