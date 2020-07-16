@@ -14,7 +14,7 @@
     "tags": [
       "Gene Expression, Age, Mouse,Human"
     ],
-    "license": "Apache-2.0",
+    "license": "MIT License",
     "appyter": {
       "file": "Age_Gene_Appyter.ipynb",
       "profile": "biojupies"
