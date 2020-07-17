@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Jensen_Lab_Harmonizome_ETL",
-  "title": "Jensen Lab Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for any of the Jensen Databases",
+  "title": "Harmonizome ETL: Jensen Lab",
+  "version": "0.1.0",
+  "description": "An appyter to process data from the Jensen Lab Databases for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",

@@ -4,6 +4,11 @@ install.packages("Matrix")
 install.packages("VGAM")
 install.packages("igraph")
 
+install.packages("usethis")
+install.packages("gh")
+
+install.packages("https://cran.r-project.org/src/contrib/Archive/XML/XML_3.98-1.20.tar.gz")
+
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 

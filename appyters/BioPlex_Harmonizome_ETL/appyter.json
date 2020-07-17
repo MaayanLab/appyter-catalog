@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "BioPlex_Harmonizome_ETL",
-  "title": "BioPlex Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for the BioPlex PPI Dataset",
+  "title": "Harmonizome ETL: BioPlex",
+  "version": "0.1.0",
+  "description": "An appyter to process data from the BioPlex Interactome for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",

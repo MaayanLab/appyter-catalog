@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "HMDB_Harmonizome_ETL",
-  "title": "HMDB Harmonizome ETL",
-  "version": "0.0.1",
-  "description": "A Data Processor for the Human Metabolome Database",
+  "title": "Harmonizome ETL: Human Metabolome Database",
+  "version": "0.1.0",
+  "description": "An appyter to process data from the Human Metabolome Database for the Harmonizome.",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -14,7 +14,6 @@
   "tags": [
     "Harmonizome",
     "Harmonizome ETL Script",
-    "HMDB",
     "Human Metabolome Database"
   ],
   "license": "MIT",

@@ -9,9 +9,10 @@
   // assemble appyter lookup table
   const appyterLookup = {}
   for (const appyter of appyterList) {
-    const {name, description, long_description, ..._} = appyter
+    const {name, description, long_description, authors, ..._} = appyter
     // modify appyters in-place
     Object.assign(appyter, {
+      authors_flat: authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', '),
       description: md.render(description || ''),
       long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
     })
@@ -24,8 +25,7 @@
   const search = new JsSearch.Search('name')
   search.addIndex('name')
   search.addIndex('title')
-  search.addIndex(['authors', 'name']) // TODO: this doesn't work
-  search.addIndex(['authors', 'email']) // TODO: this doesn't work
+  search.addIndex('authors_flat')
   search.addIndex('description')
   search.addIndex('long_description')
   search.addIndex('license')

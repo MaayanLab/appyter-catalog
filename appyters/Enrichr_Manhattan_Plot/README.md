@@ -15,4 +15,4 @@ For the static plot, and points that are above the significance line are labeled
 
 Dynamic plots have a "hover" feature where if you mouseover any point, it will display
 the gene set and p-value it represents. You can also pan, box zoom, reset the plot view,
-and save the plot.
+and save the plot as an svg.
