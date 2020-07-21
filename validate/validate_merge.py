@@ -102,6 +102,7 @@ def validate_appyter(appyter):
     for field in inspect
     if field['field'] == 'FileField'
   }
+  early_stopping = False
   for file_field in file_fields:
     field_examples = field_args[file_field].get('examples', {})
     default_file = default_args[file_field]
@@ -113,6 +114,7 @@ def validate_appyter(appyter):
         if response.status_code > 299:
           print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {response.status_code}.")
           print(f"{appyter}: WARNING,  Stopping early as download requires manual intervention.")
+          early_stopping = True
         else:
           with open(os.path.join(tmp_directory, default_file), 'wb') as fw:
             shutil.copyfileobj(response.raw, fw)
@@ -121,37 +123,38 @@ def validate_appyter(appyter):
     else:
       print(f"{appyter}: WARNING, no default file is provided")
   #
-  print(f"{appyter}: Constructing default notebook from appyter...")
-  with Popen([
-    'docker', 'run',
-    '-v', f"{tmp_directory}:/data",
-    "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
-    'appyter', 'nbconstruct',
-    f"--output=/data/{nbfile}",
-    nbfile,
-  ], stdin=PIPE, stdout=PIPE) as p:
-    print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
-    stdout, _ = p.communicate(json.dumps(default_args).encode())
-    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
-      print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
-    assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
-    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
-  #
-  print(f"{appyter}: Executing default notebook with appyter...")
-  with Popen([
-    'docker', 'run',
-    '-v', f"{tmp_directory}:/data",
-    '-e', 'PYTHONPATH=/app',
-    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
-    'appyter', 'nbexecute',
-    f"--cwd=/data",
-    f"/data/{nbfile}",
-  ], stdout=PIPE) as p:
-    for msg in map(json.loads, p.stdout):
-      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
-      print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
-    assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
-  #
+  if not early_stopping:
+    print(f"{appyter}: Constructing default notebook from appyter...")
+    with Popen([
+      'docker', 'run',
+      '-v', f"{tmp_directory}:/data",
+      "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+      'appyter', 'nbconstruct',
+      f"--output=/data/{nbfile}",
+      nbfile,
+    ], stdin=PIPE, stdout=PIPE) as p:
+      print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
+      stdout, _ = p.communicate(json.dumps(default_args).encode())
+      for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
+        print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
+      assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
+      assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
+    #
+    print(f"{appyter}: Executing default notebook with appyter...")
+    with Popen([
+      'docker', 'run',
+      '-v', f"{tmp_directory}:/data",
+      '-e', 'PYTHONPATH=/app',
+      f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+      'appyter', 'nbexecute',
+      f"--cwd=/data",
+      f"/data/{nbfile}",
+    ], stdout=PIPE) as p:
+      for msg in map(json.loads, p.stdout):
+        assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+        print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
+      assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
+    #
   print(f"{appyter}: Success!")
 
 @click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/master')
