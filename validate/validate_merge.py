@@ -2,10 +2,11 @@ import os
 import sys
 import json
 import click
+import shutil
+import requests
 import tempfile
 import traceback
 import jsonschema
-import urllib.request, urllib.error
 from subprocess import Popen, PIPE
 
 def get_changed_appyters(github_action):
@@ -107,13 +108,14 @@ def validate_appyter(appyter):
     if default_file:
       if default_file in field_examples:
         print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
-        try:
-          urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
-        except urllib.error.HTTPError as e:
-          assert e.getcode() != 404, f"File not found on remote, reported 404"
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+        response = requests.get(field_examples[default_file], stream=True)
+        assert response.status_code != 404, f"File not found on remote, reported 404"
+        if response.status_code > 299:
+          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {response.status_code}.")
           print(f"{appyter}: WARNING,  Stopping early as download requires manual intervention.")
-          return
+        else:
+          with open(os.path.join(tmp_directory, default_file), 'wb') as fw:
+            shutil.copyfileobj(response.raw, fw)
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
