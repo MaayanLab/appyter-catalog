@@ -1,4 +1,5 @@
 git+git://github.com/Maayanlab/appyter.git
+dash
 numpy
 pandas
 fisher
