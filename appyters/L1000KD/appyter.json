@@ -18,7 +18,7 @@
       "Gene Singatures",
       "Visualization"
     ],
-    "license": "Apache-2.0",
+    "license": "MIT",
     "appyter": {
       "file": "L1000KD.ipynb",
       "profile": "biojupies"
