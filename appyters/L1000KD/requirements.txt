@@ -1,0 +1,11 @@
+git+git://github.com/Maayanlab/appyter.git
+numpy
+pandas
+fisher
+scripy
+react_scatter_board
+plotly
+json
+requests
+matplotlib
+ipython
