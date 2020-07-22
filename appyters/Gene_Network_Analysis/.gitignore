@@ -7,3 +7,6 @@ iREF.sig
 LoadCorrelation.R
 ppi_edges_list.csv
 ULK4_293_coIP_hits.txt
+/gene_correlation_data
+/gene_lists
+/PPI_databases
