@@ -6,3 +6,5 @@ ipython
 matplotlib
 bokeh==2.0.2
 umap
+requests
+seaborn
