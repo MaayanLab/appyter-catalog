@@ -10,10 +10,23 @@
 
 {% block body %}
 <div class="container">
+<div style="border-bottom: 2px solid #77777780;padding:1rem 0">
 <center>
 <h1 style="padding:2rem 0 0 0; vertical-align:middle"><img src="{{ url_for('static', filename='cluster-icon.svg') }}" style="height:45px;padding:0 10px 10px 0"/>Patient Cohorts RNA-Seq Viewer</h1>
-<p> An appyter for the visualization and analysis of intra-cancer patient clusters based on RNA-Seq profiles and clinical data </p>
+<p style="font-size:1.2rem"> An appyter for the visualization and analysis of TCGA intra-cancer patient clusters based on RNA-Seq profiles and clinical data </p>
 </center>
 </div>
+<br>
+<p> Upload your dataset files or select a cancer type from the dropdown to analyze a TCGA cohort. </p>
+</div>
+
+
 {{ super() }}
+{% endblock %}
+
+
+{% block script %}
+{{ super() }}
+<script>window.MathJax = { MathML: { extensions: ["mml3.js", "content-mathml.js"]}}; console.log("hello");</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=MML_HTMLorMML"></script>
 {% endblock %}

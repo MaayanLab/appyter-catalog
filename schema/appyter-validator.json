@@ -74,11 +74,17 @@
         "profile": {
           "description": "The pre-made profile to base the appyter off of",
           "type": "string"
+        },
+        "extras": {
+          "description": "Any extras to enable in your appyter",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
-        "file",
-        "profile"
+        "file"
       ]
     }
   },

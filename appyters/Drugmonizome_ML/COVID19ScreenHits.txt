@@ -1,0 +1,195 @@
+Remdesivir
+Clofazimine
+Acitretin
+almitrine
+Gilteritinib
+Hexachlorophene
+lopinavir
+mefloquine
+Niclosamide
+tioguanine
+8-(3-Chlorostyryl)caffeine
+Abemaciclib
+CHEMBL4303661
+adoprazine
+AI-10-49
+AL 3152
+alisporivir
+Aloxistatin
+Alprostadil
+alvocidib
+CHEMBL209569
+AMG-9810
+Amiodarone
+Amodiaquine hydrochloride
+amuvatinib
+Anidulafungin (LY303366)
+Apilimod
+apixaban
+AQ-13
+Arbidol
+Astemizole
+avasimibe
+avatrombopag
+Azithromycine
+Bazedoxifene
+Berbamine hydrochloride
+Bosutinib
+BP-897
+brexpiprazole
+bupranolol
+BYL719
+calcifediol
+Calcipotriene
+camostat
+carazolol
+carboxyamidotriazole
+carvedilol
+CBIPES
+CC-223
+celiprolol
+Cepharanthine
+cetylpyridinium chloride
+chlormidazole
+Chloroquine
+Ciclesonide
+Clemizole
+cloconazole
+Clomiphene citrate
+cloperastine
+cloranolol
+CX-4945
+cycloheximide
+Cyclosporine
+dapivirine
+DCPIB
+Dexpropranolol
+Digitoxin
+Digoxin
+Dihydrogambogic acid
+Dolutegravir
+doxercalciferol
+Droloxifene
+Dronedarone HCL
+drotaverine
+Ebastine
+Elopiprazole
+Eltrombopag
+emetine
+Entecavir
+ethaverine
+etifoxine
+Everolimus
+Fedratinib
+flunarizine
+GS-441524
+GSK2606414
+Hanfangchin A
+harringtonine
+hematoporphyrin
+homoharringtonine
+Hydroxychloroquine
+Hydroxyprogesterone caproate
+hydroxystilbamidine
+INT-747
+IPAG
+IPI-145
+Isoosajin
+Isopomiferin
+Ivacaftor
+JTE-013
+ketoconazole
+KW8232
+Lactoferrin
+LDE225
+LDK378
+Levobetaxolol
+LGD-1550
+LGK-974
+lidoflazine
+Lomitapide
+lonafarnib
+Loperamide
+loratadine
+loteprednol etabonate
+Lusutrombopag
+LY2228820
+MDL 28170
+Mequitazine
+methylene blue
+Metoclopramide
+mibampator
+CHEMBL4303649
+GSK 369796
+nafamostat
+Nebivolol HCl
+Nilotinib
+Nitazoxanide
+NSC319726
+octenidine
+Omeprazole
+ONO 5334
+Opipramol dihydrochloride
+Osajin
+Osimertinib mesylate
+Ouabain
+oxiconazole
+Oxprenolol hydrochloride
+Oxybenzone
+Oxyclozanide
+Pacritinib
+Pagoclone
+papaverine
+paricalcitol
+penbutolol
+Penfluridol
+Perhexiline maleate
+pevonedistat
+pexidartinib
+PF-670462
+PH-797804
+Phenazopyridine
+polidocanol
+Ponatinib
+posaconazole
+Proscillaridin
+Quinidine hydrochloride monohydrate
+Rapamycin
+ravuconazole
+TTNPB
+regorafenib
+S1RA
+Salinomycin sodium
+SB-612111
+SB-616234A
+SDZ-62-434
+SL-11128
+sorafenib
+Sulfadoxine
+Tamibarotene
+Tazarotene
+Temsirolimus
+Tetrandrine
+thimerosal
+thioguanosine
+Thioridazine hydrochloride
+Tilorone
+Toremifene citrate
+Tretinoin
+Triclocarban
+trihexyphenidyl
+Triparanol
+tyrphostin
+vatalanib
+VBY-825
+Verapamil (hydrochloride)
+Vincristine
+Vismodegib
+VLX600
+CHEMBL4303559
+Z-Leu-Val-Gly-diazomethylketone
+Z-FA-FMK
+Zaleplon
+ZK-93423
+ZK-93426
+Zotarolimus

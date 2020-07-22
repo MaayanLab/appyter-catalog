@@ -10,11 +10,11 @@ Currently, because this application deals with several independent appyters, we 
 # Download the catalog locally
 git clone git@github.com:MaayanLab/appyter-catalog.git
 
-# Start the server (this has several dependent steps including constructing dockerfiles, docker-compose and building it all)
-make start
+# Run only no build
+make docker-compose.yml && docker-compose pull && docker-compose up -d --remove-orphans
 
-# Update the server with latest github (WARNING: this will force delete anything not tracked in your current directory, then restart the application)
-make update
+# Build and run
+make build && docker-compose up -d --remove-orphans
 ```
 
 ## Details

@@ -27,6 +27,19 @@ RUN set -x \
 
 {%- endif %}
 
+{%- if os.path.isdir(os.path.join(appyter_path, 'deps')) %}
+
+ADD deps/ /app/deps/
+RUN set -x \
+  && echo "Installing .dep files from deps/*..." \
+  && dpkg -i /app/deps/*.deb || true \
+  && apt-get -y update \
+  && apt-get -y install -f \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -r /app/deps/
+
+{%- endif %}
+
 {%- if os.path.isfile(os.path.join(appyter_path, 'setup.R')) %}
 
 ADD setup.R /app/setup.R
@@ -64,7 +77,6 @@ ENV PREFIX "/"
 ENV HOST "0.0.0.0"
 ENV PORT "80"
 ENV DEBUG "false"
-ENV PROXY "true"
 
 COPY . /app
 
@@ -72,4 +84,13 @@ RUN set -x \
   && echo "Overriding appyter templates..." \
   && python3 /app/merge_j2.py /app /app/override /app
 
-CMD [ "appyter", "--profile={{ config['appyter'].get('profile', 'default') }}", "{{ config['appyter']['file'] }}" ]
+CMD [ \
+  "appyter", \
+  {%- if 'profile' in config['appyter'] %}
+  "--profile={{ config['appyter']['profile'] }}", \
+  {%- endif %}
+  {%- if 'extras' in config['appyter'] %}
+  "--extras={{ ','.join(config['appyter']['extras']) }}", \
+  {%- endif %}
+  "{{ config['appyter']['file'] }}" \
+]
