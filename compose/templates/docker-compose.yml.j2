@@ -3,16 +3,19 @@ services:
   proxy:
     image: maayanlab/proxy:1.2.2
     environment:
-{%- for n, appyter in enumerate(appyters) %}
-      - nginx_proxy_{{ "{:03}".format(n) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
+{%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
+{%- for appyter in appyters %}
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
 {%- endfor %}
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) http://minio:9000$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://app:80$$1
+{%- endwith %}
+      - nginx_redirect_00=(/minio(/(.*))) http://$$host:9000$$1
       - nginx_server_name=${nginx_server_name}
       - nginx_ssl=${nginx_ssl}
       - nginx_ssl_letsencrypt=${nginx_ssl}
       - letsencrypt_email=${letsencrypt_email}
-      - nginx_proxy_{{ "{:03}".format(len(appyters)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
-      - nginx_proxy_{{ "{:03}".format(len(appyters)+1) }}=(/((minio|storage)(/(.*)))) http://minio:9000$$2
-      - nginx_proxy_{{ "{:03}".format(len(appyters)+2) }}=(/.*) http://app:80$$1
     ports:
       - 80:80
       - 443:443
@@ -49,6 +52,8 @@ services:
       mkdir -p /data/storage;
       minio server /data;
       exit 0
+    ports:
+      - 9000:9000
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
