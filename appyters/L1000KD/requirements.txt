@@ -3,7 +3,7 @@ numpy
 pandas
 fisher
 scipy
-react_scatter_board
+git+git://github.com/maayanlab/react-scatter-board
 plotly
 json
 requests
