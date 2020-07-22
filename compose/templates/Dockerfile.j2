@@ -90,7 +90,9 @@ CMD [ \
   "--profile={{ config['appyter']['profile'] }}", \
   {%- endif %}
   {%- if 'extras' in config['appyter'] %}
-  "--extras={{ ','.join(config['appyter']['extras']) }}", \
+  {%- for extra in config['appyter']['extras'] %}
+  "--extras={{ extra }}", \
+  {%- endfor %}
   {%- endif %}
   "{{ config['appyter']['file'] }}" \
 ]
