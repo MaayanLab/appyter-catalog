@@ -5,7 +5,6 @@ fisher
 scipy
 git+git://github.com/maayanlab/react-scatter-board
 plotly
-json
 requests
 matplotlib
 ipython
