@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name":"Enrichr_Scatterplot_Appyter",
     "title": "Enrichr Scatterplot Appyter",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "An appyter that displays enrichment analysis results on a scatterplot of gene sets from an Enrichr library clustered by similarity.",
     "authors": [
       {

@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Patient_Cohorts_RNASeq_Viewer",
   "title": "Patient Cohorts RNA-Seq Viewer",
-  "version": "0.0.4",
-  "description": "An appyter for the visualization and analysis of intra-cancer patient clusters based on RNA-Seq profiles and clinical data.",
+  "version": "0.0.5",
+  "description": "An appyter for the visualization and analysis of TCGA intra-cancer patient clusters based on RNA-Seq profiles and clinical data",
   "authors": [
     {
       "name": "Nicole Moiseyev",
