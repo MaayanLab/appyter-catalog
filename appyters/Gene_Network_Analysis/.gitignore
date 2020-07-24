@@ -1,12 +1,5 @@
 BioGRID.sig
-gene_edges_list.csv
-graph.html
-human_correlation_feather
-human_correlation.rda
-iREF.sig
-LoadCorrelation.R
-ppi_edges_list.csv
-ULK4_293_coIP_hits.txt
-/gene_correlation_data
-/gene_lists
-/PPI_databases
+human_correlation_archs4.f
+top_500_correlation.csv
+string_interactions.tsv
+network_visualizations/

@@ -3,3 +3,4 @@ requests
 pandas
 numpy
 networkx
+unidecode
