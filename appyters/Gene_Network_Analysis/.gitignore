@@ -3,3 +3,4 @@ human_correlation_archs4.f
 top_500_correlation.csv
 string_interactions.tsv
 network_visualizations/
+top_5_correlation.csv
