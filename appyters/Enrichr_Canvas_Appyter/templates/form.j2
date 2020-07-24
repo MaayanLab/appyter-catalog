@@ -1,0 +1,24 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='canvas-icon.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1> Create a Hexagonal Canvas </h1>
+            <p class="my-0"> Create an interactive visualizion of your input gene list compared to a selected Enrichr library. </p>
+        </div>
+    </div>
+</div>
+{{ super() }}
+{% endblock %}

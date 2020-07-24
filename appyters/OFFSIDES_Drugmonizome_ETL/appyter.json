@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "OFFSIDES_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: OFFSIDES",
+  "version": "0.1.0",
+  "description": "An appyter to process predicted drug-side effect interactions from OFFSIDES.",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "OFFSIDES"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "OFFSIDES.ipynb",
+    "profile": "biojupies"
+  }
+}
