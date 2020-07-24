@@ -1,0 +1,7 @@
+git+git://github.com/Maayanlab/appyter.git
+git+git://github.com/MaayanLab/clustergrammer-widget.git
+ipython
+jupyter
+pandas
+numpy
+scipy
