@@ -15,6 +15,10 @@
   "license": "MIT",
   "appyter": {
     "file": "Patient_Cohorts_RNASeq_Viewer.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
   }
 }
