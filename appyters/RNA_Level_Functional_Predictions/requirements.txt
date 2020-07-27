@@ -1,5 +1,5 @@
+git+https://github.com/MaayanLab/appyter
 appnope==0.1.0
-appyter==0.6.12
 async-generator==1.10
 attrs==19.3.0
 backcall==0.2.0
