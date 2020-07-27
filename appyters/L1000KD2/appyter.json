@@ -2,9 +2,9 @@
 {
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name": "L1000KD2",
-    "title": "L1000 Knock-Down Display",
+    "title": "L1000KD2",
     "version": "0.0.3",
-    "description": "An appyter that lets you explore a dataset of 24,000 knockdown gene signatures.",
+    "description": "An appyter that lets you visualize and analyze a dataset of 24,187 shRNA knock-down gene signatures.",
     "authors": [
       {
         "name": "Lucas Goldman",
@@ -13,7 +13,7 @@
     ],
     "url": "https://github.com/MaayanLab/appyter-catalog",
     "tags": [
-      "Gene Knockdown",
+      "Gene Knock-Down",
       "L1000",
       "Gene Singatures",
       "Visualization"
