@@ -39,7 +39,7 @@ jupyter-console==6.1.0
 jupyter-core==4.6.3
 kiwisolver==1.2.0
 lxml==4.5.2
-maayanlab-bioinformatics==0.1.1
+git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
 MarkupSafe==1.1.1
 matplotlib==3.2.2
 mistune==0.8.4
