@@ -2,6 +2,7 @@ version: '3'
 services:
   proxy:
     image: maayanlab/proxy:1.2.2
+    restart: unless-stopped
     environment:
 {%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
 {%- for appyter in appyters %}
@@ -23,9 +24,11 @@ services:
       - ./data/letsencrypt/:/etc/letsencrypt/
   app:
     build: app
+    restart: unless-stopped
     image: maayanlab/appyters:{{ version }}
   postgrest:
     image: postgrest/postgrest
+    restart: unless-stopped
     environment:
       PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
       PGRST_DB_SCHEMA: api
@@ -34,6 +37,7 @@ services:
   postgres:
     build: ./postgres
     image: maayanlab/appyters-postgres
+    restart: unless-stopped
     ports:
       - 5432:5432
     environment:
@@ -44,6 +48,7 @@ services:
       - ./data/postgres/:/var/lib/postgresql/data
   minio:
     image: minio/minio
+    restart: unless-stopped
     entrypoint:
     - /bin/sh
     command:
@@ -68,6 +73,7 @@ services:
       args:
         - appyter_version=${appyter_version}
     image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    restart: unless-stopped
     environment:
       - PREFIX=/{{ appyter['name'] }}/
       - PORT=443
