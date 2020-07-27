@@ -21,6 +21,10 @@
   "license": "Apache-2.0",
   "appyter": {
     "file": "KEA3-Appyter.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies", 
+    "extras":[
+      "toc",
+      "toggle-code"
+    ]
   }
 }
