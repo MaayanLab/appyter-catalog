@@ -5,7 +5,7 @@ pandas
 numpy 
 tqdm
 scipy
-urllib
+urllib3
 sklearn
 matplotlib
 IPython
