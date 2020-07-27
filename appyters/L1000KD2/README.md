@@ -1,6 +1,6 @@
-# L1000FWD-KD
+# L1000 Knock-Down Display
 
-The L1000KD is a appyter that allows the user to explore 24,000 gene expression signatures resulting from shRNA gene knockdown. 
+The L1000KD2 is a appyter that allows the user to explore 24,000 gene expression signatures resulting from shRNA gene knockdown. 
 
 When the user enters the appyter, they have the choice to input the name of a disease, small molecule or gene, or they are allowed to input their own gene signature; if the user chooses the former, a gene signature of the input is retrieved. After this selection, the inputted signature is compared to all 24,000 signatures, and the user is shown the most similar and opposite gene knockdown signatures, and are given a similarity score, z-score, and p-value for each relevant signature. Next, enrichment analysis is performed on a gene set of the knockdown genes in the 50 most similar signatures. 
 
