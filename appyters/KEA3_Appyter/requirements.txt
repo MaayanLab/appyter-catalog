@@ -2,3 +2,4 @@ git+git://github.com/Maayanlab/appyter.git
 requests
 tabulate
 kaleido
+plotly
