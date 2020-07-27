@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "DrugCentral_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: DrugCentral",
+  "version": "0.1.0",
+  "description": "An appyter to process drug-protein associations from the DrugCentral database.",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "DrugCentral"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "DrugCentral.ipynb",
+    "profile": "biojupies"
+  }
+}
