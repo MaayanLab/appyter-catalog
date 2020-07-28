@@ -11,3 +11,4 @@ matplotlib
 IPython
 requests
 pyarrow
+s3fs
