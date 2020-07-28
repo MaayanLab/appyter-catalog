@@ -4,6 +4,7 @@
   "title": "My Example Appyter",
   "version": "0.0.3",
   "description": "An awesome appyter that I created.",
+  "image": "screenshot.png",
   "authors": [
     {
       "name": "Daniel J. B. Clarke",

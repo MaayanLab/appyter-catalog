@@ -1,5 +1,16 @@
 {% extends "biojupies/base.j2" %}
 
+{% block head %}
+{{ super() }}
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-6277639-47"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-6277639-47');
+</script>
+{% endblock head %}
+
 {% block script %}
 {{ super() }}
 <script>
