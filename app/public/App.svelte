@@ -205,7 +205,8 @@
                   `background-image: url('${localize_appyter_image(appyter)}')`
                 ) : undefined,
                 `background-repeat: no-repeat`,
-                `background-size: center`,
+                `background-size: cover`,
+                `background-position: center`,
                 `width: 100%`,
                 `min-height: 200px`,
               ].filter((el) => el !== undefined).join('; ')}
