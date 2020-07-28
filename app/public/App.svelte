@@ -4,7 +4,6 @@
   import Masonry from './Masonry'
 
   import mdIt from 'markdown-it'
-  const md = mdIt()
 
   // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   function hashCode(str) {
@@ -36,6 +35,17 @@
   const appyterLookup = {}
   for (const appyter of appyterList) {
     const {name, description, long_description, authors, ..._} = appyter
+    const md = mdIt()
+    const normalizeLink = md.normalizeLink
+    md.normalizeLink = function (url) {
+      if (/^https?:\/\//.exec(url) !== null) {
+        return normalizeLink(url)
+      } else if (/^\.\//.exec(url) !== null) {
+        return normalizeLink(`./${name}/${url.slice(2)}`)
+      } else {
+        return normalizeLink(`${name}/${url}`)
+      }
+    }
     // modify appyters in-place
     Object.assign(appyter, {
       authors_flat: authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', '),

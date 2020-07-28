@@ -1,6 +1,6 @@
 # Example
 
-![Screenshot](example/static/screenshot.png)
+![Screenshot](./static/screenshot.png)
 
 This is an example appyter in the catalog. Please reference it when submitting your own appyter.
 
