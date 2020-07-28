@@ -10,3 +10,4 @@ sklearn
 matplotlib
 IPython
 requests
+pyarrow
