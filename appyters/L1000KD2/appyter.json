@@ -5,6 +5,7 @@
     "title": "L1000KD2",
     "version": "0.0.3",
     "description": "An appyter that lets you visualize and analyze a dataset of 24,187 shRNA knock-down gene signatures.",
+    "image": "UMAP-Visualization.png",
     "authors": [
       {
         "name": "Lucas Goldman",
