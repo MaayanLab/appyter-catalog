@@ -53,10 +53,10 @@ def validate_appyter(appyter):
   #
   if 'image' in config:
     image = config['image']
-    if not re.match(r'^https?://', image):
+    if re.match(r'^https?://', image):
       image_name = os.path.basename(image)
       image_path = os.path.join(tmp_directory, image_name)
-      print(f"{appyter}: WARNING it is recommended to use a relative path instead of an image")
+      print(f"{appyter}: WARNING it is recommended to use a relative path instead of a url")
       response = requests.get(config['image'], stream=True)
       assert response.status_code > 299, f"Could not download image {image}, received error {response.status_code}"
       with open(os.path.join(tmp_directory, image_name), 'wb') as fw:
