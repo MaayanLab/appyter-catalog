@@ -1,8 +1,34 @@
 <script>
+  const base_url = window.location.origin
+
   import Masonry from './Masonry'
 
   import mdIt from 'markdown-it'
   const md = mdIt()
+
+  // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
+  function hashCode(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+  } 
+
+  function intToRGB(i){
+      var c = (i & 0x00FFFFFF)
+          .toString(16)
+          .toUpperCase();
+      return '#' + ("00000".substring(0, 6 - c.length) + c);
+  }
+
+  function localize_appyter_image({ name, image }) {
+    if (/^https?:\/\//.exec(image) !== null) {
+      return image
+    } else {
+      return `${base_url}/${name}/static/${image}`
+    }
+  }
 
   // store appyters as list and lookup table based on name slugs
   import appyterList from './appyters.json'
@@ -15,6 +41,7 @@
       authors_flat: authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', '),
       description: md.render(description || ''),
       long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
+      color: intToRGB(hashCode(name)),
     })
     // save a reference in the lookup table
     appyterLookup[name] = appyter
@@ -34,7 +61,6 @@
   search.addDocuments(appyterList)
 
   // get appyter hits
-  const base_url = window.location.origin
   async function get_pagehits() {
     const response = await fetch(
       `${base_url}/postgrest/pagehits?url=like.${encodeURIComponent(`${base_url}%`)}`
@@ -171,13 +197,27 @@
       {#each searchAppyters(searchString) as appyter}
         <div>
           <div class="card">
+            <div 
+              class="card-img-top"
+              style={[
+                `background-color: ${appyter.color}`,
+                appyter.image !== undefined ? (
+                  `background-url: ${localize_appyter_image(appyter)}`
+                ) : undefined,
+                `background-repeat: no-repeat`,
+                `background-size: contain`,
+                `width: 100%`,
+                `min-height: 200px`,
+              ].filter((el) => el !== undefined).join('; ')}
+            >
+            </div>
             <div class="card-body">
               <h3 class="card-title">{appyter.title}</h3>
               <div class="d-flex flex-row flex-nowrap pt-1 pb-2">
                 <div class="d-flex flex-column pr-2">
                 {#if appyter.views }
                   <div class="text-grey text-nowrap">
-                  Views: {appyter.views}
+                    Views: {appyter.views}
                   </div>
                 {/if}
                 {#if appyter.runs }
@@ -187,16 +227,16 @@
                 {/if}
                 </div>
                 <div class="d-flex flex-column pl-2">
-                {#if appyter.form_views }
+                  {#if appyter.form_views }
                     <div class="text-grey text-nowrap">
-                  Starts: {appyter.form_views}
+                    Starts: {appyter.form_views}
                     </div>
-                {/if}
-                {#if appyter.persistent_views }
+                  {/if}
+                  {#if appyter.persistent_views }
                     <div class="text-grey text-nowrap">
-                  Retrievals: {appyter.persistent_views}
+                    Retrievals: {appyter.persistent_views}
                     </div>
-                {/if}
+                  {/if}
                 </div>
               </div>
               <p class="card-text">{@html appyter.description}</p>
