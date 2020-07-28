@@ -116,17 +116,23 @@
   min-height: 100vh;
   flex-direction: column;
 }
+
 .content {
   flex: 1;
 }
 
 /* card shadow on hover */
 .card {
-  box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
   transition: 0.2s;
 }
 .card:hover {
   box-shadow: 0 6px 16px 0 rgba(0,0,0,0.2);
+}
+
+:global(body) {
+  background-color: #f5f5f5;
 }
 </style>
 
@@ -166,38 +172,41 @@
         <div>
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{appyter.title}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">
+              <h3 class="card-title">{appyter.title}</h3>
+              <div class="d-flex flex-row flex-nowrap pt-1 pb-2">
+                <div class="d-flex flex-column pr-2">
+                {#if appyter.views }
+                  <div class="text-grey text-nowrap">
+                  Views: {appyter.views}
+                  </div>
+                {/if}
+                {#if appyter.runs }
+                  <div class="text-grey text-nowrap">
+                  Runs: {appyter.runs}
+                  </div>
+                {/if}
+                </div>
+                <div class="d-flex flex-column pl-2">
+                {#if appyter.form_views }
+                    <div class="text-grey text-nowrap">
+                  Starts: {appyter.form_views}
+                    </div>
+                {/if}
+                {#if appyter.persistent_views }
+                    <div class="text-grey text-nowrap">
+                  Retrievals: {appyter.persistent_views}
+                    </div>
+                {/if}
+                </div>
+              </div>
+              <p class="card-text">{@html appyter.description}</p>
+              <div class="pb-4">
                 <span class="badge badge-success">v{appyter.version}</span>
                 &nbsp;<span class="badge badge-secondary">{appyter.license}</span>
                 {#each appyter.tags as tag}
                   &nbsp;<span class="badge badge-primary">{tag}</span>
                 {/each}
-              </h6>
-              <h6 style="color: grey">
-                {#if appyter.views }
-                  &nbsp;
-                  Views: {appyter.views}
-                  &nbsp;
-                {/if}
-                {#if appyter.form_views }
-                  &nbsp;
-                  Starts: {appyter.form_views}
-                  &nbsp;
-                {/if}
-                <br />
-                {#if appyter.runs }
-                  &nbsp;
-                  Runs: {appyter.runs}
-                  &nbsp;
-                {/if}
-                {#if appyter.persistent_views }
-                  &nbsp;
-                  Retrievals: {appyter.persistent_views}
-                  &nbsp;
-                {/if}
-              </h6>
-              <p class="card-text">{@html appyter.description}</p>
+              </div>
               <a href="#{appyter.name}" class="btn btn-primary btn-sm stretched-link">
                 Select
               </a>
