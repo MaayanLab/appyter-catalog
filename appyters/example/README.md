@@ -1,5 +1,7 @@
 # Example
 
+![Screenshot](example/static/screenshot.png)
+
 This is an example appyter in the catalog. Please reference it when submitting your own appyter.
 
 - `{name}/{name}.ipynb`: The appyter iteself
