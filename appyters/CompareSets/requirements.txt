@@ -6,3 +6,5 @@ requests
 tabulate
 scipy
 upsetplot
+plotly
+supervenn
