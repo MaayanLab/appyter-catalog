@@ -4,6 +4,7 @@
   "title": "KINOMEscan and TAS Vectors Data Visualization",
   "version": "0.0.7",
   "description": "An appyter that creates bar charts to visualize KINOMEscan and TAS Vectors data from HMS LINCS.",
+  "image": "Appyter_Screenshot.png"
   "authors": [
     {
       "name": "Serena Zhang",
