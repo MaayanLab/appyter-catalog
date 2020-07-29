@@ -1,4 +1,5 @@
 from appyter.fields import Field 
+import json
 
 class AutocompleteField(Field):
     """
@@ -16,4 +17,8 @@ class AutocompleteField(Field):
     
     def constraint(self):
         import re 
-        return self.raw_value is not None and self.raw_value
+        with open('static/TCGA.json') as f:
+            data = json.load(f)
+            key = list(data.keys())[0]
+            values = data[key]
+        return self.raw_value is not None and self.raw_value in values
