@@ -280,6 +280,26 @@ class Drugmonizome(object):
         return list(df_hits['InChI_key'])
     
     @classmethod
+    def map_names_to_inchi_keys(cls, hits):
+        """Given list of drug names, finds matching InChI keys in Drugmonizome
+           and returns dictionary mapping names to associated InChI keys
+        """
+        df_drugs = cls.read_drug_metadata()
+        name_to_inchis = {}
+        for i in range(len(df_drugs)):
+            compound = df_drugs.iloc[i]
+            if isinstance(compound.Synonyms, list):
+                names = [compound.Name] + compound.Synonyms
+            else:
+                names = [compound.Name]
+            for name in names:
+                name = name.lower()
+                if name not in name_to_inchis:
+                    name_to_inchis[name] = set()
+                name_to_inchis[name].add(compound.InChI_key)
+        return {hit: name_to_inchis[hit] for hit in hits if hit in name_to_inchis}
+    
+    @classmethod
     def get_drug_names(cls, inchi_keys):
         """Given list of InChI keys, finds matching drug names in Drugmonizome
         """
