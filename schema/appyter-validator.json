@@ -67,6 +67,10 @@
       "description": "A license identified by https://spdx.org/licenses/",
       "type": "string"
     },
+    "public": {
+      "description": "Whether or not this should be visible on the catalog (defaults to true)",
+      "type": "boolean"
+    },
     "appyter": {
       "description": "Appyter information and configuration",
       "type": "object",
