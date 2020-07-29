@@ -47,6 +47,10 @@
         }
       }
     },
+    "image": {
+      "description": "A relative path (preferred) or url to a thumbnail for the appyter. Size: 1280x720",
+      "type": "string"
+    },
     "url": {
       "description": "A url to the source code or website of the appyter",
       "type": "string",

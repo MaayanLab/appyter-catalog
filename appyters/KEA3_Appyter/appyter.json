@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name":"KEA3_Appyter",
   "title": "KEA3 Appyter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An appyter that retrieves and displays KEA3 results.",
   "authors": [
     {
@@ -21,6 +21,10 @@
   "license": "Apache-2.0",
   "appyter": {
     "file": "KEA3-Appyter.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies", 
+    "extras":[
+      "toc",
+      "toggle-code"
+    ]
   }
 }
