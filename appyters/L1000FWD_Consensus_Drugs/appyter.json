@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name":"L1000FWD_Top_Drugs",
-  "title": "L1000FWD Top Drugs",
+  "name":"L1000FWD_Consensus_Drugs",
+  "title": "L1000FWD Consensus Drugs",
   "version": "0.0.2",
-  "description": "Returns top mimicker and reverser drugs from a set of up and down genesets",
+  "description": "Returns Consensus mimicker and reverser drugs from a set of up and down genesets",
   "image": "screenshot.png",
   "authors": [
     {
