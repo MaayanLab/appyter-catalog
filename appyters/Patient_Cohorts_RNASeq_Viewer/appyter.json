@@ -13,6 +13,7 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": ["Enrichment Analysis", "TCGA", "RNA-Seq"],
   "license": "MIT",
+  "image":  "main-image.png",
   "appyter": {
     "file": "Patient_Cohorts_RNASeq_Viewer.ipynb",
     "profile": "biojupies",
