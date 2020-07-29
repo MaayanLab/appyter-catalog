@@ -60,6 +60,7 @@ def validate_appyter(appyter):
       response = requests.get(config['image'], stream=True)
       assert response.status_code > 299, f"Could not download image {image}, received error {response.status_code}"
       with open(os.path.join(tmp_directory, image_name), 'wb') as fw:
+        response.raw.decode_content = True
         shutil.copyfileobj(response.raw, fw)
     else:
       image_path = f"appyters/{appyter}/static/{image}"
@@ -139,6 +140,7 @@ def validate_appyter(appyter):
           early_stopping = True
         else:
           with open(os.path.join(tmp_directory, default_file), 'wb') as fw:
+            response.raw.decode_content = True
             shutil.copyfileobj(response.raw, fw)
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
