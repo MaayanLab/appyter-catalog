@@ -6,4 +6,4 @@ When the user enters the appyter, they have the choice to input the name of a di
 
 Users are also presented with an interactive UMAP dimensional reduction visualization of all of the genes. Users can choose to color this by the name of the knockdown gene, chromosome the gene is on, KEGG pathway, GO pathway, cell line, etc. Users are encouraged to zoom in on specific clusters and examine the contents for potential gene-gene relationships. 
 
-Overall, using a dataset of gene knockdown signatures allows users to investigate the unique functions of individual genes. The L1000KD appyter presents a novel platform to gain insight into gene-to-gene, small molecule-gene, and disease-gene relationships and has promise for generating real-world hypotheses in minutes.
+Overall, using a dataset of gene knockdown signatures allows users to investigate the unique functions of individual genes. The L1000KD2 appyter presents a novel platform to gain insight into gene-to-gene, small molecule-gene, and disease-gene relationships and has promise for generating real-world hypotheses in minutes.
