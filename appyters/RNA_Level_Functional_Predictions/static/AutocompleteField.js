@@ -1,5 +1,21 @@
 // Adapted from W3schools
 
+var currentScript = document.currentScript;
+var name = currentScript.getAttribute('name');
+var file_path = currentScript.getAttribute('file_path');
+
+function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
 function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
@@ -97,14 +113,13 @@ function autocomplete(inp, arr) {
   
   /*execute a function when someone clicks in the document:*/
   document.addEventListener("click", function (e) {
-      closeAllLists(e.target);
-  });
-}
+      closeAllLists(e.target); }); }
 
-var rna = [];
-var keys = Object.keys(data);
-for (var k in keys) {
-    rna = rna.concat( data[keys[k]] );
-}
-
-autocomplete(document.getElementById("myInput"), rna);
+readTextFile("static/" + file_path, function(text){
+    var data = JSON.parse(text);
+    var lst = [];
+    var keys = Object.keys(data);
+    for (var k in keys) {
+        lst = lst.concat( data[keys[k]] );
+    autocomplete(document.getElementById(name), lst); 
+} });

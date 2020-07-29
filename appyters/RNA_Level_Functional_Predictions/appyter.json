@@ -3,7 +3,8 @@
   "name": "RNA_Level_Functional_Predictions",
   "title": "RNA level functional predictions",
   "version": "0.0.3",
-  "description": "",
+  "description": 
+    "An appyter to predict functions of coding and noncoding RNA from the TCGA dataset and Enrichr gene set libraries.",
   "authors": [
     {
       "name": "Christine Yoon",
@@ -12,7 +13,14 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "example"
+      "gene network analysis",
+      "ncRNA",
+      "TCGA",
+      "ARCHS4",
+      "RNA-seq",
+      "gene correlation network",
+      "gene predictions",
+      "bioinformatics"
   ],
   "license": "Apache-2.0",
   "appyter": {
