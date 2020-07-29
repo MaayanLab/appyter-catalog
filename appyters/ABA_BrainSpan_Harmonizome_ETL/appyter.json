@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "ABA_BrainSpan_Harmonizome_ETL",
+  "title": "Harmonizome ETL: BrainSpan Atlas",
+  "version": "0.1.0",
+  "description": "An appyter to process data from the BrainSpan Atlas for the Harmonizome.",
+  "authors": [
+    {
+      "name": "Charles R. Dai",
+      "email": "charles.r.dai@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Harmonizome",
+    "Harmonizome ETL Script",
+    "BrainSpan Atlas"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "ABA BrainSpan.ipynb",
+    "profile": "biojupies"
+  }
+}

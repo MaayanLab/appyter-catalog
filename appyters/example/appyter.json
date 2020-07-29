@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "example",
   "title": "My Example Appyter",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An awesome appyter that I created.",
+  "image": "screenshot.png",
   "authors": [
     {
       "name": "Daniel J. B. Clarke",
@@ -17,6 +18,7 @@
   "license": "Apache-2.0",
   "appyter": {
     "file": "example.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": ["toc", "hide-code", "toggle-code"]
   }
 }

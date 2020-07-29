@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "DrugBank_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: DrugBank",
+  "version": "0.2.0",
+  "description": "An appyter to process drug-protein associations from the DrugBank database.",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "DrugBank"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "DrugBank.ipynb",
+    "profile": "biojupies"
+  }
+}

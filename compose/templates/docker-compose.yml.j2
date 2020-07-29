@@ -1,0 +1,86 @@
+version: '3'
+services:
+  proxy:
+    image: maayanlab/proxy:1.2.2
+    restart: unless-stopped
+    environment:
+{%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
+{%- for appyter in appyters %}
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
+{%- endfor %}
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) http://minio:9000$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://app:80$$1
+{%- endwith %}
+      - nginx_redirect_00=(/minio(/(.*))) http://$$host:9000$$1
+      - nginx_server_name=${nginx_server_name}
+      - nginx_ssl=${nginx_ssl}
+      - nginx_ssl_letsencrypt=${nginx_ssl}
+      - letsencrypt_email=${letsencrypt_email}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/letsencrypt/:/etc/letsencrypt/
+  app:
+    build: app
+    restart: unless-stopped
+    image: maayanlab/appyters:{{ version }}
+  postgrest:
+    image: postgrest/postgrest
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: guest
+      PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
+  postgres:
+    build: ./postgres
+    image: maayanlab/appyters-postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: appyters
+      POSTGRES_USER: appyters
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres/:/var/lib/postgresql/data
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    entrypoint:
+    - /bin/sh
+    command:
+    - -c
+    - >
+      mkdir -p /data/storage;
+      minio server /data;
+      exit 0
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - ./data/minio/.minio:/root/.minio
+      - ./data/minio/:/data
+{%- for appyter in appyters %}
+  {{ appyter['name'].lower() }}:
+    build:
+      context: {{ os.path.relpath(appyter['path'], root_dir) }}
+      dockerfile: Dockerfile
+      args:
+        - appyter_version=${appyter_version}
+    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    restart: unless-stopped
+    environment:
+      - PREFIX=/{{ appyter['name'] }}/
+      - PORT=443
+      - PROXY=true
+      - KEYFILE=/etc/letsencrypt/live/${nginx_server_name}/privkey.pem
+      - CERTFILE=/etc/letsencrypt/live/${nginx_server_name}/cert.pem
+    volumes:
+      - ./data/{{ appyter['name'].lower() }}/:/app/data
+      - ./data/letsencrypt/:/etc/letsencrypt/:ro
+{%- endfor %}
