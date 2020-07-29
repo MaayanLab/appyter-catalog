@@ -4,6 +4,7 @@
   "title": "Single cell RNA-seq analysis pipeline",
   "version": "0.0.1",
   "description": "scRNA-seq analysis pipeline enables users to analyze and visualize scRNA-seq datasets with state-of-the-art algorithms and visualization methods.",
+  "image": "scRNA_seq_appyter_logo.png",
   "authors": [
     {
       "name": "Minji Jeon",
