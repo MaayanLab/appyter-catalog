@@ -19,6 +19,5 @@ class AutocompleteField(Field):
         import re 
         with open('static/TCGA.json') as f:
             data = json.load(f)
-            key = list(data.keys())[0]
-            values = data[key]
+            values = data["genes"]
         return self.raw_value is not None and self.raw_value in values
