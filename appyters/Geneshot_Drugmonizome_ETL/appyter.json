@@ -4,6 +4,7 @@
   "title": "Drugmonizome ETL: Geneshot",
   "version": "0.0.1",
   "description": "An appyter to retrieve associated and predicted genes for small molecules using the Geneshot API.",
+  "image": "Drugmonizome_ETL.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
