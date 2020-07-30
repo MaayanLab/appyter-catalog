@@ -5,15 +5,10 @@ var name = currentScript.getAttribute('name');
 var file_path = currentScript.getAttribute('file_path');
 
 function readTextFile(file, callback) {
-    var rawFile = new XMLHttpRequest();
-    rawFile.overrideMimeType("application/json");
-    rawFile.open("GET", file, true);
-    rawFile.onreadystatechange = function() {
-        if (rawFile.readyState === 4 && rawFile.status == "200") {
-            callback(rawFile.responseText);
-        }
-    }
-    rawFile.send(null);
+    fetch(file, headers={'Accepts':'application/json'})
+    .then(function(response){
+        return response.json() })
+    .then(callback)
 }
 
 function autocomplete(inp, arr) {
