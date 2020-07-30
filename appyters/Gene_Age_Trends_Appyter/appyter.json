@@ -4,7 +4,7 @@
     "title": "Gene Expression vs Age Plot Generator",
     "version": "0.0.3",
     "description": "Generate Gene Expression vs Age Plots using cleaned RNA-seq data",
-    "image" : "appyterscreenshot",
+    "image" : "appyterscreenshot.png",
     "authors": [
       {
         "name": "Tahmid Ahamed",
