@@ -16,6 +16,7 @@
     "example"
   ],
   "license": "Apache-2.0",
+  "public": false,
   "appyter": {
     "file": "example.ipynb",
     "profile": "biojupies",
