@@ -4,6 +4,7 @@
   "title": "Drugmonizome ETL: DrugRepurposingHub",
   "version": "0.2.0",
   "description": "An appyter to process drug-target and drug-mechanism of action associations from the Drug Repurposing Hub.",
+  "image": "Drugmonizome_ETL.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
