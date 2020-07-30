@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "STITCH_Drugmonizome_ETL",
   "title": "Drugmonizome ETL: STITCH",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "An appyter to process drug-protein associations from STITCH.",
+  "image": "Drugmonizome_ETL.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
