@@ -8,3 +8,4 @@ venv
 *-checkpoint.ipynb
 .ipynb_checkpoints
 data/
+\.tmp/
