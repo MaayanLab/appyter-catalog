@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name":"Enrichr_Manhattan_Plot",
   "title": "Enrichr Manhattan Plot Appyter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An appyter that creates a static and a dynamic manhattan plot comparing a user-inputted gene list with gene sets in Enrichr libraries.",
+  "image": "featured-image.png",
   "authors": [
     {
       "name": "Skylar Litz",
@@ -17,6 +18,7 @@
   "license": "Apache-2.0",
   "appyter": {
     "file": "Enrichr_Manhattan_Plot.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": ["toc", "toggle-code"]
   }
 }

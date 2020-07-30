@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Geneshot_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: Geneshot",
+  "version": "0.0.2",
+  "description": "An appyter to retrieve associated and predicted genes for small molecules using the Geneshot API.",
+  "image": "Drugmonizome_ETL.png",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "Geneshot"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "Geneshot.ipynb",
+    "profile": "biojupies"
+  }
+}
