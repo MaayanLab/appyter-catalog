@@ -1,13 +1,21 @@
 // Adapted from W3schools
 
-var currentScript = document.currentScript;
-var name = currentScript.getAttribute('name');
-var file_path = currentScript.getAttribute('file_path');
+function runall(name, file_path){
+    
+function readJSONFromURL(file_path) {
+    $.getJSON(file_path, function(data) {
+        var lst = [];
+        var keys = Object.keys(data);
+        for (var k in keys) {
+            lst = lst.concat(data[keys[k]]);
+        } 
+        autocomplete(document.getElementById(name), lst); 
+    });
+}
 
 function readTextFile(file, callback) {
-    fetch(file, headers={'Accepts':'application/json'})
-    .then(function(response){
-        return response.json() })
+  fetch(file, { headers: {'Accept': 'application/json'} })
+    .then(function (response) { return response.json() })
     .then(callback)
 }
 
@@ -110,11 +118,6 @@ function autocomplete(inp, arr) {
   document.addEventListener("click", function (e) {
       closeAllLists(e.target); }); }
 
-readTextFile("static/" + file_path, function(text){
-    var data = JSON.parse(text);
-    var lst = [];
-    var keys = Object.keys(data);
-    for (var k in keys) {
-        lst = lst.concat( data[keys[k]] );
-    autocomplete(document.getElementById(name), lst); 
-} });
+    readJSONFromURL(file_path);
+
+};

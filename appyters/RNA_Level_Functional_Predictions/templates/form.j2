@@ -72,5 +72,16 @@ input[type=submit] {
 
 {% block script %}
 {{ super() }}  
-<script src="{{ url_for('static', filename='AutocompleteField.js') }}" name="gene_input" file_path="TCGA.json"> </script>
+<script src="{{ url_for('static', filename='AutocompleteField.js') }}" > </script>
+<script>
+require(['jquery'], function ($) {
+  $(document).ready(function() {
+    $('.autocomplete').each(function () { // this runs for *all* auto complete fields
+      var name = $(this).attr('name');
+      var file_path = $(this).attr('data-target'); 
+      runall(name, file_path);
+    })
+  })
+})
+</script>
 {% endblock %}
