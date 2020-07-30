@@ -4,7 +4,7 @@
   "title": "Bulk RNA-seq analysis pipeline",
   "version": "0.0.2",
   "description": "Bulk RNA-seq analysis pipeline enables you to analyze and visualize datasets with state-of-the-art algorithms and visualization methods.",
-  "image": "bulk_RNAseq_appyter_logo.png",
+  "image": "screenshot.png",
   "authors": [
     {
       "name": "Minji Jeon",
