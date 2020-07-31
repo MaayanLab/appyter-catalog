@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Orphanet_Harmonizome_ETL",
   "title": "Harmonizome ETL: Orphanet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An appyter to process data from Orphanet for the Harmonizome.",
   "image": "ETL_Logo.png",
   "authors": [
