@@ -1,4 +1,4 @@
-# tcgaDataLoader
+# TCGA Data Loader
 
 ![TCGA](./static/TCGA-thumbnail.png)
 
