@@ -1,6 +1,6 @@
 // Adapted from W3schools
 
-function runall(name, file_path){
+function runall($, name, file_path){
     
 function readJSONFromURL(file_path) {
     $.getJSON(file_path, function(data) {
@@ -11,13 +11,7 @@ function readJSONFromURL(file_path) {
         } 
         autocomplete(document.getElementById(name), lst); 
     });
-}
-
-function readTextFile(file, callback) {
-  fetch(file, { headers: {'Accept': 'application/json'} })
-    .then(function (response) { return response.json() })
-    .then(callback)
-}
+} 
 
 function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,

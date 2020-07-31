@@ -79,7 +79,7 @@ require(['jquery'], function ($) {
     $('.autocomplete').each(function () { // this runs for *all* auto complete fields
       var name = $(this).attr('name');
       var file_path = $(this).attr('data-target'); 
-      runall(name, file_path);
+      runall($, name, file_path);
     })
   })
 })
