@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "GWAS_Catalog_Harmonizome_ETL",
   "title": "Harmonizome ETL: GWAS Catalog",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An appyter to process data from the GWAS Catalog for the Harmonizome.",
   "image": "ETL_Logo.png",
   "authors": [

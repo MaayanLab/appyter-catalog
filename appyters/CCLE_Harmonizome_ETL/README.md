@@ -1,6 +1,6 @@
 # Harmonizome ETL: Cancer Cell Line Encyclopedia
 
-[the Cancer Cell Line Encyclopedia](https://portals.broadinstitute.org/ccle) (CCLE) is a project to conduct a detailed genetic and pharmacologic characterization of a large panel of human cancer models. It provides public access ot genomic data, analysis and visualization for over 1100 cancer cell lines.
+[The Cancer Cell Line Encyclopedia](https://portals.broadinstitute.org/ccle) (CCLE) is a project to conduct a detailed genetic and pharmacologic characterization of a large panel of human cancer models. It provides public access ot genomic data, analysis and visualization for over 1100 cancer cell lines.
 
 This appyter takes data from the CCLE RNA-Seq gene expression dataset and outputs files that are usable for the Harmonizome. It pre-processes the raw data  in order to construct an expression matrix with gene names as rows and cell lines as column attributes. It then draws from the current NCBI database to map the gene names to a set of approved gene symbols, so that synonymous genes are mapped to the same symbol. 
 
