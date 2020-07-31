@@ -5,6 +5,7 @@
   "version": "0.0.3",
   "description": 
     "An appyter to predict functions of coding and noncoding RNA from the TCGA dataset and Enrichr gene set libraries.",
+    "image": 'ncRNA chart.png',
   "authors": [
     {
       "name": "Christine Yoon",
@@ -23,6 +24,7 @@
       "bioinformatics"
   ],
   "license": "Apache-2.0",
+  "public": true,
   "appyter": {
     "file": "rna_predictions.ipynb",
     "profile": "biojupies",
