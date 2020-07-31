@@ -1,6 +1,6 @@
 # Enrichr Compressed Bar Chart Figure 
 
-![Screenshot](Enrichr_compressed_bar_chart_figure/static/screenshot.png)
+![Screenshot](./static/screenshot.png)
 
 This appyter creates a publishable figure summarizing enrichment analysis results from Enrichr (https://amp.pharm.mssm.edu/Enrichr/).
 
