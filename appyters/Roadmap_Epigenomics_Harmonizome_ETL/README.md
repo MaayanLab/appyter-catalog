@@ -1,6 +1,6 @@
 # Harmonizome ETL: Roadmap Epigenomics
 
-[the Roadmap Epigenomics Project](http://www.roadmapepigenomics.org/) is a resource for human epigenomic data. It leverages experimental pipelines to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and tissues.
+[The Roadmap Epigenomics Project](http://www.roadmapepigenomics.org/) is a resource for human epigenomic data. It leverages experimental pipelines to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and tissues.
 
 This appyter takes data from the RNA-Seq dataset for protein-coding exons and outputs files that are usable for the Harmonizome. It pre-processes the raw data  in order to construct an expression matrix with gene names as rows and cell lines as column attributes. It then draws from the current NCBI database to map the gene names to a set of approved gene symbols, so that synonymous genes are mapped to the same symbol. 
 
