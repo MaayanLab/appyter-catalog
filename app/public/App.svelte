@@ -218,7 +218,7 @@
                 `background-size: cover`,
                 `background-position: center`,
                 `width: 100%`,
-                `min-height: 200px`,
+                `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
               ].filter((el) => el !== undefined).join('; ')}
             >
             </div>
