@@ -1,4 +1,6 @@
-# Patient_Cohorts_RNASeq_Viewer
+# Patient Cohorts RNA-Seq Viewer
+
+![Preview image](Patient_Cohorts_RNASeq_Viewer/static/main-image.png)
 
 [The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) dataset contains multiomics profiling and clinical data from over 10,000 tumors collected from patients spanning several cancer types. Specifically, TCGA has bulk RNA-sequencing (RNA-Seq) profiling of tumors, which can provide insights into mechanisms and classify tumors by subtype.
 

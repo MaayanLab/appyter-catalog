@@ -1,6 +1,0 @@
-git+git://github.com/Maayanlab/appyter.git
-ipython
-jupyter
-pandas
-numpy
-scipy

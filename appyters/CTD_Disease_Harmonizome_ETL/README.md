@@ -1,6 +1,6 @@
 # Harmonizome ETL: Comparative Toxicogenomics Database (Disease)
 
-[the Comparative Toxicogenomics Database](http://ctdbase.org/) (CTD) is a curated database of the effects that environmental exposures have on human health. It provides information on chemical-gene/protein interactions, chemical-gene, and gene-disease relationships.
+[The Comparative Toxicogenomics Database](http://ctdbase.org/) (CTD) is a curated database of the effects that environmental exposures have on human health. It provides information on chemical-gene/protein interactions, chemical-gene, and gene-disease relationships.
 
 This appyter takes data from the Gene-Disease Associations dataset and outputs files that are usable for the Harmonizome. It pre-processes the raw data  in order to construct an expression matrix with gene names as rows and disease names as column attributes. It then draws from the current NCBI database to map the gene names to a set of approved gene symbols, so that synonymous genes are mapped to the same symbol. 
 
