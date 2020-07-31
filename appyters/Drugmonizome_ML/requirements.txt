@@ -9,3 +9,4 @@ requests
 umap-learn
 seaborn
 tqdm
+plotly

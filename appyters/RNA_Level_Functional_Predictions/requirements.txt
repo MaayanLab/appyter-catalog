@@ -12,3 +12,5 @@ IPython
 requests
 pyarrow
 s3fs
+import base64
+import json
