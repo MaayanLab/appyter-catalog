@@ -5,3 +5,4 @@ requests
 matplotlib
 seaborn
 ipython
+xlrd
