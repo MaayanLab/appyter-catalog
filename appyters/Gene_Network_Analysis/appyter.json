@@ -13,6 +13,7 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": ["Enrichment Analysis", "Genes", "Clsutering", "Enrichr"],
   "license": "MIT",
+  "image": "thumbnail.png",
   "appyter": {
     "file": "Gene_Network_Analysis.ipynb",
     "profile": "biojupies"
