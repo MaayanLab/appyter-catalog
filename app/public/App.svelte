@@ -1,8 +1,12 @@
 <script>
-  import { hash } from './stores'
-  import Masonry from './Masonry'
+	import { fade } from 'svelte/transition'
+  import { onMount } from 'svelte'
+  import * as JsSearch from 'js-search'
   import mdIt from 'markdown-it'
 
+  import { hash } from './stores'
+  import Masonry from './Masonry'
+  
   const base_url = window.location.origin
 
   // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
@@ -69,7 +73,6 @@
   appyterList = appyterList.filter(appyter => appyter.public !== false)
 
   // index documents for search
-  import * as JsSearch from 'js-search'
   const search = new JsSearch.Search('name')
   search.addIndex('name')
   search.addIndex('title')
@@ -148,7 +151,6 @@
   }
 
   // things to do on window load
-  import { onMount } from 'svelte'
   onMount(() => {
     get_pagehits()
   })
@@ -170,10 +172,13 @@
 .card {
   border-radius: 6px;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-  transition: 0.2s;
+  transition-timing-function: ease-in;
+  transition: box-shadow 1s, transform 1s;
 }
 .card:hover {
-  box-shadow: 0 6px 16px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  transition-timing-function: ease-out;
+  transition: box-shadow 1s;
 }
 
 :global(body) {
@@ -214,7 +219,10 @@
     </div>
     <Masonry>
       {#each searchAppyters(searchString) as appyter}
-        <div>
+        <div
+          in:fade="{{duration: 250}}"
+          out:fade="{{duration: 250}}"
+        >
           <div class="card">
             <div 
               class="card-img-top"
