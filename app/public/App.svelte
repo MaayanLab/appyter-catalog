@@ -30,7 +30,7 @@
   }
 
   // store appyters as list and lookup table based on name slugs
-  import appyterList from './appyters.json'
+  let appyterList = require('./appyters.json')
   // assemble appyter lookup table
   const appyterLookup = {}
   for (const appyter of appyterList) {
@@ -56,6 +56,7 @@
     // save a reference in the lookup table
     appyterLookup[name] = appyter
   }
+  appyterList = appyterList.filter(appyter => appyter.public !== false)
 
   // index documents for search
   import * as JsSearch from 'js-search'
