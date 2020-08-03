@@ -41,9 +41,9 @@
       if (/^https?:\/\//.exec(url) !== null) {
         return normalizeLink(url)
       } else if (/^\.\//.exec(url) !== null) {
-        return normalizeLink(`./${name}/${url.slice(2)}`)
+        return normalizeLink(`${base_url}/${name}/${url.slice(2)}`)
       } else {
-        return normalizeLink(`${name}/${url}`)
+        return normalizeLink(`${base_url}/${name}/${url}`)
       }
     }
     // modify appyters in-place
@@ -293,7 +293,7 @@
         </p>
         {@html appyter.long_description}
         <p>&nbsp;</p>
-        <a href="./{appyter.name}/" class="btn btn-primary">Start Appyter</a>
+        <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
       </div>
     </div>
   {/if}
