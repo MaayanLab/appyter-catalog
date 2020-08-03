@@ -1,0 +1,11 @@
+git+git://github.com/Maayanlab/appyter.git
+dash
+numpy
+pandas
+fisher
+scipy
+git+git://github.com/maayanlab/react-scatter-board
+plotly
+requests
+matplotlib
+ipython

@@ -67,7 +67,7 @@ class DrugNameConverter:
         return all_inchi_keys
 
     @classmethod
-    def batch_to_inchi_keys(cls, names, num_cores=None, verbose=1, **kwargs):
+    def batch_to_inchi_keys(cls, names, num_cores=3, verbose=1, **kwargs):
         """
         Queries PubChem API for a list of drug names and returns a dictionary mapping each name
         to a set of corresponding InChI Keys. Uses multi-threading to parallelize requests.

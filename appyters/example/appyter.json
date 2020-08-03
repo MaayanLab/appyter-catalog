@@ -4,6 +4,7 @@
   "title": "My Example Appyter",
   "version": "0.0.3",
   "description": "An awesome appyter that I created.",
+  "image": "screenshot.png",
   "authors": [
     {
       "name": "Daniel J. B. Clarke",
@@ -15,9 +16,10 @@
     "example"
   ],
   "license": "Apache-2.0",
+  "public": false,
   "appyter": {
     "file": "example.ipynb",
     "profile": "biojupies",
-    "extras": ["toc"]
+    "extras": ["toc", "hide-code", "toggle-code"]
   }
 }

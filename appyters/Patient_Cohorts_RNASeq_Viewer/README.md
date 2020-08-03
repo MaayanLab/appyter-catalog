@@ -1,15 +1,17 @@
-# Patient_Cohorts_RNASeq_Viewer
+# Patient Cohorts RNA-Seq Viewer
 
-[The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) is a massive database containing laboratory analysis and clinical data for over 10,000 cancer patients spanning several hundred cancer subtypes. Specifically, TCGA offers extensive bulk RNA-sequencing (RNA-Seq) data, which can provide insight into the particular genes implicated in specific cancer subtypes.
+![Thumbnail](./static/main-image.png)
 
-By default, this appyter uses TCGA data. Users can optionally also upload their own datasets.
+[The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) dataset contains multiomics profiling and clinical data from over 10,000 tumors collected from patients spanning several cancer types. Specifically, TCGA has bulk RNA-sequencing (RNA-Seq) profiling of tumors, which can provide insights into mechanisms and classify tumors by subtype.
 
-The appyter analyzes RNA-Seq data for cancers with over 150 cases in TCGA (or user-provided cohorts), producing clusters of patient subtypes and determining which clinical features and genes are most associated with each cluster.
+By default, this appyter provides analysis and visualization of TCGA datasets. Users can optionally upload their own datasets.
 
-For TCGA data, each column in the RNA-Seq dataset corresponds to a row in the clinical dataset; both are referenced by the same identifier (here the `case_id` as provided by TCGA).
+The appyter provides analysis for RNA-Seq TCGA data for cancers with over 150 cases. The report automatically identifies clusters of patient and determines which clinical features and genes are most associated with each cluster.
 
-The RNA-Seq data loaded from TCGA is in the form of raw counts mapped to genes with the [htseq-count](https://htseq.readthedocs.io/en/release_0.9.0/count.html) analysis package; the same format should be obeyed for user-uploaded files. We then filter for the most variable genes, normalize those counts, and reduce the dimensionality of the dataset further with PCA and UMAP.
+For the TCGA data, each column in the RNA-Seq dataset corresponds to a row in the clinical dataset; both are referenced by the same identifier (here the case_id as provided by TCGA).
 
-To determine the ideal number of clusters, we probe a range and select the number based on a modified silhouette score that prioritizes more clusters (so we do not miss out on small clusters).
+The RNA-Seq data loaded from TCGA is in the form of raw counts mapped to genes with the [htseq-count](https://htseq.readthedocs.io/en/release_0.9.0/count.html) analysis package; the same format should be followed for user-uploaded files. The analysis filters out lowly expressed genes, identifies the most variable genes, normalize the counts, and reduces the dimensionality of the dataset further with PCA and UMAP.
 
-We identify the top genes for each cluster, using these for Enrichment analysis and treatment suggestion based on the drugs used for perturbation to produce signatures in the L1000 dataset that are most opposite to each cluster.
+To determine the ideal number of clusters, the analysis tests a range of possible K clusters, and selects the optimal number based on a modified silhouette score that prioritizes more clusters to avoid missing out small clusters.
+
+The appyter also identifies the top genes for each cluster, using these for enrichment analysis and suggestion for drugs and small molecules based on the drugs that mimic or reverse the signatures obtained for each cluster. Such drug suggestions are based on the L1000 dataset, using the L1000FWD API. It should be noted that these are speculative predictions and should not be applied to patients before carefully tested in cell based assays and animal models.
