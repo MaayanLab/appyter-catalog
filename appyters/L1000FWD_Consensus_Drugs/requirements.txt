@@ -1,6 +1,8 @@
 git+git://github.com/Maayanlab/appyter.git
 ipython
 jupyter
-pandas
+pandas==1.0.3
 numpy
 scipy
+seaborn
+requests
