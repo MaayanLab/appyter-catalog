@@ -1,9 +1,9 @@
 <script>
-  const base_url = window.location.origin
-
+  import { hash } from './stores'
   import Masonry from './Masonry'
-
   import mdIt from 'markdown-it'
+
+  const base_url = window.location.origin
 
   // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   function hashCode(str) {
@@ -142,12 +142,10 @@
 
   // sync appyter variable and url hash
   let appyter
-  const updatehash = () => {
-    appyter = appyterLookup[`${window.location.hash || '#'}`.slice(1)]
+  $: {
+    appyter = appyterLookup[$hash]
     pagehit(appyter)
   }
-  window.onhashchange = updatehash
-  updatehash()
 
   // things to do on window load
   import { onMount } from 'svelte'
