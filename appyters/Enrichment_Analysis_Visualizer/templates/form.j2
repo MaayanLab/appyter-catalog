@@ -1,0 +1,24 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='enrichment-icon.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1> Visualize Your Enrichr Results </h1>
+            <p class="my-0"> Create a variety of visualizations for enrichment analysis data for one selected Enrichr library. </p>
+        </div>
+    </div>
+</div>
+{{ super() }}
+{% endblock %}

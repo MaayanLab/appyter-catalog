@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "ATC_Code_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: ATC Codes",
+  "version": "0.0.3",
+  "description": "An appyter to process small molecule ATC code relationships.",
+  "image": "Drugmonizome_ETL.png",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "ATC Codes"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "ATC_codes.ipynb",
+    "profile": "biojupies"
+  }
+}

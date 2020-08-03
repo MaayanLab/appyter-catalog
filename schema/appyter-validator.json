@@ -47,6 +47,10 @@
         }
       }
     },
+    "image": {
+      "description": "A relative path (preferred) or url to a thumbnail for the appyter. Size: 1280x720",
+      "type": "string"
+    },
     "url": {
       "description": "A url to the source code or website of the appyter",
       "type": "string",
@@ -63,6 +67,10 @@
       "description": "A license identified by https://spdx.org/licenses/",
       "type": "string"
     },
+    "public": {
+      "description": "Whether or not this should be visible on the catalog (defaults to true)",
+      "type": "boolean"
+    },
     "appyter": {
       "description": "Appyter information and configuration",
       "type": "object",
@@ -74,11 +82,17 @@
         "profile": {
           "description": "The pre-made profile to base the appyter off of",
           "type": "string"
+        },
+        "extras": {
+          "description": "Any extras to enable in your appyter",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
-        "file",
-        "profile"
+        "file"
       ]
     }
   },

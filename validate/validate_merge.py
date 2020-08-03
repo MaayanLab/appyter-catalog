@@ -1,12 +1,18 @@
 import os
+import re
 import sys
 import json
 import click
-import tempfile
 import traceback
 import jsonschema
 import urllib.request, urllib.error
+from PIL import Image
 from subprocess import Popen, PIPE
+
+# remove user agent from urllib.request requests
+_opener = urllib.request.build_opener()
+_opener.addheaders = [('Accept', '*/*')]
+urllib.request.install_opener(_opener)
 
 def get_changed_appyters(github_action):
   if github_action:
@@ -29,6 +35,10 @@ def get_changed_appyters(github_action):
   return appyters
 
 def validate_appyter(appyter):
+  print(f"{appyter}: Preparing temporary directory...")
+  tmp_directory = os.path.realpath('.tmp')
+  os.makedirs(tmp_directory, exist_ok=True)
+  #
   print(f"{appyter}: Checking for existing of files...")
   assert os.path.isfile(os.path.join('appyters', appyter, 'README.md')), f"Missing appyters/{appyter}/README.md"
   assert os.path.isfile(os.path.join('appyters', appyter, 'appyter.json')), f"Missing appyters/{appyter}/appyter.json"
@@ -43,6 +53,22 @@ def validate_appyter(appyter):
   #
   name = config['name']
   assert name == appyter, f"The directory should be named like `name`"
+  #
+  if 'image' in config:
+    image = config['image']
+    if re.match(r'^https?://', image):
+      image_name = os.path.basename(image)
+      image_path = os.path.join(tmp_directory, image_name)
+      print(f"{appyter}: WARNING it is recommended to use a relative path instead of a url")
+      _, response = urllib.request.urlretrieve(config['image'], filename=os.path.join(tmp_directory, image_name))
+      assert response.get_content_maintype() == 'image', 'Expected image content'
+    else:
+      image_path = f"appyters/{appyter}/static/{image}"
+    #
+    with Image.open(image_path, 'r') as img:
+      assert img.size == (1280, 720), "Image should be 1280x720 px"
+  else:
+    print(f"{appyter}: WARNING `{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
   #
@@ -90,8 +116,6 @@ def validate_appyter(appyter):
   assert len(field_args) == len(inspect), "Some of your fields weren't captured, there might be duplicate `name`s"
   #
   print(f"{appyter}: Preparing defaults...")
-  tmp_directory = os.path.realpath('.tmp')
-  os.makedirs(tmp_directory, exist_ok=True)
   default_args = {
     field_name: field.get('default')
     for field_name, field in field_args.items()
@@ -101,6 +125,7 @@ def validate_appyter(appyter):
     for field in inspect
     if field['field'] == 'FileField'
   }
+  early_stopping = False
   for file_field in file_fields:
     field_examples = field_args[file_field].get('examples', {})
     default_file = default_args[file_field]
@@ -108,17 +133,23 @@ def validate_appyter(appyter):
       if default_file in field_examples:
         print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
         try:
-          urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
+          _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
+          assert response.get_content_type() != 'text/html', 'Expected data, got html'
+        except AssertionError as e:
+          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+          early_stopping = True
         except urllib.error.HTTPError as e:
           assert e.getcode() != 404, f"File not found on remote, reported 404"
           print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
-          print(f"{appyter}: WARNING,  Stopping early as download requires manual intervention.")
-          return
+          early_stopping = True
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
       print(f"{appyter}: WARNING, no default file is provided")
   #
+  if early_stopping:
+    print(f"{appyter}: WARNING, Stopping early as a download requires manual intervention.")
+    return
   print(f"{appyter}: Constructing default notebook from appyter...")
   with Popen([
     'docker', 'run',

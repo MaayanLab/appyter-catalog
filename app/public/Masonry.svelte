@@ -2,12 +2,12 @@
   import Macy from 'macy'
   import { onMount, afterUpdate } from 'svelte'
 
-  const id = 'macy-' + Math.random().toString(36).substr(2, 9)
   let masonry
+  let container
 
   onMount(() => {
     masonry = new Macy({
-      container: '#' + id,
+      container,
       trueOrder: true,
       waitForImages: false,
       useOwnImageLoader: false,
@@ -15,20 +15,24 @@
       mobileFirst: true,
       columns: 1,
       margin: {
-          y: 16,
-          x: '2%',
+        y: 16,
+        x: '2%',
       },
       breakAt: {
-          940: 3,
-          520: 2,
-          400: 1
+        1200: 3,
+        992: 2,
+        576: 1
       },
     })
   })
 
-  afterUpdate(() => masonry.reInit())
+  afterUpdate(() => {
+    if (masonry !== undefined) {
+      masonry.recalculate(true)
+    }
+  })
 </script>
 
-<div id={id}>
+<div bind:this={container}>
   <slot></slot>
 </div>
