@@ -34,7 +34,7 @@
   // assemble appyter lookup table
   const appyterLookup = {}
   for (const appyter of appyterList) {
-    const {name, description, long_description, authors, ..._} = appyter
+    let {name, description, long_description, authors, ..._} = appyter
     const md = mdIt()
     const normalizeLink = md.normalizeLink
     md.normalizeLink = function (url) {
@@ -46,12 +46,22 @@
         return normalizeLink(`${base_url}/${name}/${url}`)
       }
     }
+    const authors_flat = authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', ')
+    const description_html = md.render(description || '')
+    // A bit roundabout but seemingly the easiest way to add img-fluid class to all markdown-rendered img tags
+    let long_description_html = document.createElement('div')
+    long_description_html.innerHTML = md.render((long_description || description).split('\n').slice(1).join('\n'))
+    for (const img of long_description_html.querySelectorAll('img')) {
+      img.classList.add('img-fluid')
+    }
+    long_description_html = long_description_html.innerHTML
+    const color = intToRGB(hashCode(name))
     // modify appyters in-place
     Object.assign(appyter, {
-      authors_flat: authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', '),
-      description: md.render(description || ''),
-      long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
-      color: intToRGB(hashCode(name)),
+      authors_flat,
+      description_html,
+      long_description_html,
+      color,
     })
     // save a reference in the lookup table
     appyterLookup[name] = appyter
@@ -180,7 +190,7 @@
         <a href=".">
           <img
             src="{require('./images/appyters_logo.svg')}"
-            style="width: 100%; padding: 10px;"
+            class="img-fluid w-100 p-2"
             alt="Appyters"
           />
         </a>
@@ -251,7 +261,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="card-text">{@html appyter.description}</p>
+              <p class="card-text">{@html appyter.description_html}</p>
               <div class="pb-4">
                 <span class="badge badge-success">v{appyter.version}</span>
                 &nbsp;<span class="badge badge-secondary">{appyter.license}</span>
@@ -291,7 +301,7 @@
             <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
           {/each}
         </p>
-        {@html appyter.long_description}
+        {@html appyter.long_description_html}
         <p>&nbsp;</p>
         <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
       </div>
