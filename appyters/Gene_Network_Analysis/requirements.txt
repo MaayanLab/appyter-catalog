@@ -4,3 +4,7 @@ pandas
 numpy
 networkx
 unidecode
+plotly
+pyvis
+seaborn
+matplotlib
