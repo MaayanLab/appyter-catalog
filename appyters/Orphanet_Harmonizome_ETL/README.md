@@ -9,7 +9,6 @@ From here, it creates gene and attribute similarity matrices, which store the ja
 
 The downloadable file will have the following outputs:
 * Binary matrix: the expression matrix with gene symbols
-* Filtered matrix: the normalized matrix
 * Gene list
 * Attribute list 
 * Up gene set library: for each attribute, a list of genes that are correlated
