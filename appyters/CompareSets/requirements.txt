@@ -8,3 +8,4 @@ scipy
 upsetplot
 plotly
 supervenn
+math
