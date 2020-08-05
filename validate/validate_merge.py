@@ -135,6 +135,9 @@ def validate_appyter(appyter):
         try:
           _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
           assert response.get_content_type() != 'text/html', 'Expected data, got html'
+        except AssertionError as e:
+          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+          early_stopping = True
         except urllib.error.HTTPError as e:
           assert e.getcode() != 404, f"File not found on remote, reported 404"
           print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
