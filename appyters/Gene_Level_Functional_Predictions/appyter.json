@@ -3,7 +3,7 @@
   "name": "Gene_Level_Functional_Predictions",
   "title": "Gene level functional predictions",
   "version": "0.0.3",
-  "description": "An appyter to predict functions of coding and noncoding RNA from the TCGA dataset and Enrichr gene set libraries.",
+  "description": "An appyter to predict functions of coding and noncoding genes from the TCGA dataset and Enrichr gene set libraries.",
   "image": "ncRNA_chart.png",
   "authors": [
     {
