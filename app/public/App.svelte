@@ -1,9 +1,13 @@
 <script>
-  const base_url = window.location.origin
-
-  import Masonry from './Masonry'
-
+	import { fade } from 'svelte/transition'
+  import { onMount } from 'svelte'
+  import * as JsSearch from 'js-search'
   import mdIt from 'markdown-it'
+
+  import { hash } from './stores'
+  import Masonry from './Masonry'
+  
+  const base_url = window.location.origin
 
   // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   function hashCode(str) {
@@ -30,35 +34,45 @@
   }
 
   // store appyters as list and lookup table based on name slugs
-  import appyterList from './appyters.json'
+  let appyterList = require('./appyters.json')
   // assemble appyter lookup table
   const appyterLookup = {}
   for (const appyter of appyterList) {
-    const {name, description, long_description, authors, ..._} = appyter
+    let {name, description, long_description, authors, ..._} = appyter
     const md = mdIt()
     const normalizeLink = md.normalizeLink
     md.normalizeLink = function (url) {
       if (/^https?:\/\//.exec(url) !== null) {
         return normalizeLink(url)
       } else if (/^\.\//.exec(url) !== null) {
-        return normalizeLink(`./${name}/${url.slice(2)}`)
+        return normalizeLink(`${base_url}/${name}/${url.slice(2)}`)
       } else {
-        return normalizeLink(`${name}/${url}`)
+        return normalizeLink(`${base_url}/${name}/${url}`)
       }
     }
+    const authors_flat = authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', ')
+    const description_html = md.render(description || '')
+    // A bit roundabout but seemingly the easiest way to add img-fluid class to all markdown-rendered img tags
+    let long_description_html = document.createElement('div')
+    long_description_html.innerHTML = md.render((long_description || description).split('\n').slice(1).join('\n'))
+    for (const img of long_description_html.querySelectorAll('img')) {
+      img.classList.add('img-fluid')
+    }
+    long_description_html = long_description_html.innerHTML
+    const color = intToRGB(hashCode(name))
     // modify appyters in-place
     Object.assign(appyter, {
-      authors_flat: authors.map(({ name, email }) => `${name || ''} (${email || ''})`).join(', '),
-      description: md.render(description || ''),
-      long_description: md.render((long_description || description).split('\n').slice(1).join('\n')),
-      color: intToRGB(hashCode(name)),
+      authors_flat,
+      description_html,
+      long_description_html,
+      color,
     })
     // save a reference in the lookup table
     appyterLookup[name] = appyter
   }
+  appyterList = appyterList.filter(appyter => appyter.public !== false)
 
   // index documents for search
-  import * as JsSearch from 'js-search'
   const search = new JsSearch.Search('name')
   search.addIndex('name')
   search.addIndex('title')
@@ -131,15 +145,12 @@
 
   // sync appyter variable and url hash
   let appyter
-  const updatehash = () => {
-    appyter = appyterLookup[`${window.location.hash || '#'}`.slice(1)]
+  $: {
+    appyter = appyterLookup[$hash]
     pagehit(appyter)
   }
-  window.onhashchange = updatehash
-  updatehash()
 
   // things to do on window load
-  import { onMount } from 'svelte'
   onMount(() => {
     get_pagehits()
   })
@@ -161,10 +172,13 @@
 .card {
   border-radius: 6px;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-  transition: 0.2s;
+  transition-timing-function: ease-in;
+  transition: box-shadow 1s, transform 1s;
 }
 .card:hover {
-  box-shadow: 0 6px 16px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  transition-timing-function: ease-out;
+  transition: box-shadow 1s;
 }
 
 :global(body) {
@@ -179,7 +193,7 @@
         <a href=".">
           <img
             src="{require('./images/appyters_logo.svg')}"
-            style="width: 100%; padding: 10px;"
+            class="img-fluid w-100 p-2"
             alt="Appyters"
           />
         </a>
@@ -205,7 +219,10 @@
     </div>
     <Masonry>
       {#each searchAppyters(searchString) as appyter}
-        <div>
+        <div
+          in:fade="{{duration: 250}}"
+          out:fade="{{duration: 250}}"
+        >
           <div class="card">
             <div 
               class="card-img-top"
@@ -250,7 +267,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="card-text">{@html appyter.description}</p>
+              <p class="card-text">{@html appyter.description_html}</p>
               <div class="pb-4">
                 <span class="badge badge-success">v{appyter.version}</span>
                 &nbsp;<span class="badge badge-secondary">{appyter.license}</span>
@@ -290,9 +307,9 @@
             <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
           {/each}
         </p>
-        {@html appyter.long_description}
+        {@html appyter.long_description_html}
         <p>&nbsp;</p>
-        <a href="./{appyter.name}/" class="btn btn-primary">Start Appyter</a>
+        <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
       </div>
     </div>
   {/if}
