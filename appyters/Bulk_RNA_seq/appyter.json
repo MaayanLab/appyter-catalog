@@ -18,6 +18,10 @@
   "license": "Apache-2.0",
   "appyter": {
     "file": "RNA_seq_Analysis_Pipeline.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
   }
 }
