@@ -164,15 +164,53 @@ def json_from_url(url):
 
 
 VERSION = 'v1'
-API_URL = 'http://amp.pharm.mssm.edu/drugmonizome/data-api/api'
-METADATA_URL = 'https://amp.pharm.mssm.edu/drugmonizome/metadata-api/entities'
+API_URL = 'http://maayanlab.cloud/drugmonizome/data-api/api'
+METADATA_URL = 'https://maayanlab.cloud/drugmonizome/metadata-api/entities'
 
-# This config objects pulls the names of the datasets, their directories, and
-# the possible downloads from the API. This allows us to add new datasets and
-# downloads without breaking this file.
-config = json_from_url('https://amp.pharm.mssm.edu/drugmonizome/metadata-api/libraries')
-DATASET_TO_LINK = {x['meta']['Library_name']: x['meta']['Download_link'] for x in config}
+# # This config objects pulls the names of the datasets, their directories, and
+# # the possible downloads from the API. This allows us to add new datasets and
+# # downloads without breaking this file.
+# config = json_from_url('https://maayanlab.cloud/drugmonizome/metadata-api/libraries')
+# DATASET_TO_LINK = {x['meta']['Library_name']: x['meta']['Download_link'] for x in config}
 
+# Static version of Drugmonizome datasets, as the Drugmonizome resource is temporarily unavailable
+LINK_BASE = 'https://appyters.maayanlab.cloud/storage/Drugmonizome_ML/DrugmonizomeGMTs/'
+DATASET_TO_LINK = {
+    'L1000FWD Downregulated GO Biological Processes': LINK_BASE + 'L1000FWD/L1000FWD_GO_Biological_Processes_drugsetlibrary_down.gmt',
+    'L1000FWD Downregulated GO Cellular Components': LINK_BASE + 'L1000FWD/L1000FWD_GO_Cellular_Component_drugsetlibrary_down.gmt',
+    'L1000FWD Downregulated GO Molecular Function': LINK_BASE + 'L1000FWD/L1000FWD_GO_Molecular_Function_drugsetlibrary_down.gmt',
+    'L1000FWD Downregulated KEGG Pathways': LINK_BASE + 'L1000FWD/L1000FWD_KEGG_Pathways_drugsetlibrary_down.gmt',
+    'L1000FWD Downregulated Signatures': LINK_BASE + 'L1000FWD/L1000FWD_signature_drugsetlibrary_down.gmt',
+    'L1000FWD Predicted Side Effects': LINK_BASE + 'L1000FWD/L1000FWD_predicted_side_effects.gmt',
+    'L1000FWD Upregulated GO Biological Process': LINK_BASE + 'L1000FWD/L1000FWD_GO_Biological_Processes_drugsetlibrary_up.gmt',
+    'L1000FWD Upregulated GO Cellular Components': LINK_BASE + 'L1000FWD/L1000FWD_GO_Cellular_Component_drugsetlibrary_up.gmt',
+    'L1000FWD Upregulated GO Molecular Function': LINK_BASE + 'L1000FWD/L1000FWD_GO_Molecular_Function_drugsetlibrary_up.gmt',
+    'L1000FWD Upregulated KEGG Pathways': LINK_BASE + 'L1000FWD/L1000FWD_KEGG_Pathways_drugsetlibrary_up.gmt',
+    'L1000FWD Upregulated Signatures': LINK_BASE + 'L1000FWD/L1000FWD_signature_drugsetlibrary_up.gmt',
+    'Downregulated CREEDS Signatures': LINK_BASE + 'CREEDS/CREEDS_signature_drugsetlibrary_down.gmt',
+    'Upregulated CREEDS Signatures': LINK_BASE + 'CREEDS/CREEDS_signature_drugsetlibrary_up.gmt',
+    'DrugCentral Targets': LINK_BASE + 'DrugCentral/DrugCentral_target_drugsetlibrary.gmt',
+    'DrugRepurposingHub Drug Targets': LINK_BASE + 'DrugRepurposingHub/DrugRepurposingHub_target_drugsetlibrary.gmt',
+    'Drugbank Small Molecule Carriers': LINK_BASE + 'Drugbank/Drugbank_smallmolecule_carrier_drugsetlibrary.gmt',
+    'Drugbank Small Molecule Enzymes': LINK_BASE + 'Drugbank/Drugbank_smallmolecule_enzyme_drugsetlibrary.gmt',
+    'Drugbank Small Molecule Targets': LINK_BASE + 'Drugbank/Drugbank_smallmolecule_target_drugsetlibrary.gmt',
+    'Drugbank Small Molecule Transporters': LINK_BASE + 'Drugbank/Drugbank_smallmolecule_transporter_drugsetlibrary.gmt',
+    'Geneshot Associated Genes': LINK_BASE + 'Geneshot/Geneshot_associated_drugsetlibrary.gmt',
+    'Geneshot Predicted AutoRIF Genes': LINK_BASE + 'Geneshot/Geneshot_predicted_autorif_drugsetlibrary.gmt',
+    'Geneshot Predicted Coexpression Genes': LINK_BASE + 'Geneshot/Geneshot_predicted_coexpression_drugsetlibrary.gmt',
+    'Geneshot Predicted Enrichr Genes': LINK_BASE + 'Geneshot/Geneshot_predicted_enrichr_drugsetlibrary.gmt',
+    'Geneshot Predicted GeneRIF Genes': LINK_BASE + 'Geneshot/Geneshot_predicted_generif_drugsetlibrary.gmt',
+    'Geneshot Predicted Tagger Genes': LINK_BASE + 'Geneshot/Geneshot_predicted_tagger_drugsetlibrary.gmt',
+    'KinomeScan Kinases': LINK_BASE + 'KinomeScan/KinomeScan_kinase_drugsetlibrary.gmt',
+    'PharmGKB Single Nucleotide Polymorphisms': LINK_BASE + 'PharmGKB/PharmGKB_snp_drugsetlibrary.gmt',
+    'STITCH Targets': LINK_BASE + 'STITCH/STITCH_genes_drugsetlibrary.gmt',
+    'ATC Codes Drugsetlibrary': LINK_BASE + 'ATC/ATC_drugsetlibrary.gmt',
+    'DrugRepurposingHub Mechanisms of Action': LINK_BASE + 'DrugRepurposingHub/DrugRepurposingHub_moa_drugsetlibrary.gmt',
+    'PharmGKB OFFSIDES Side Effects': LINK_BASE + 'PharmGKB/PharmGKB_OFFSIDES_side_effects_drugsetlibrary.gmt',
+    'SIDER Indications': LINK_BASE + 'SIDER/SIDER_indications_drugsetlibrary.gmt',
+    'SIDER Side Effects': LINK_BASE + 'SIDER/SIDER_side_effects_drugsetlibrary.gmt',
+    'RDKIT MACCS Chemical Fingerprints': LINK_BASE + 'RDKIT/RDKIT_maccs_fingerprints_drugsetlibrary.gmt',
+}
 
 # Drugmonizome class
 # -----------------------------------------------------------------------------
@@ -284,6 +322,7 @@ class Drugmonizome(object):
         """Given list of drug names, finds matching InChI keys in Drugmonizome
            and returns dictionary mapping names to associated InChI keys
         """
+        hits = set(hit.lower() for hit in hits)
         df_drugs = cls.read_drug_metadata()
         name_to_inchis = {}
         for i in range(len(df_drugs)):
@@ -293,7 +332,7 @@ class Drugmonizome(object):
             else:
                 names = [compound.Name]
             for name in names:
-                name = name.lower()
+                name = name.lower().strip()
                 if name not in name_to_inchis:
                     name_to_inchis[name] = set()
                 name_to_inchis[name].add(compound.InChI_key)
