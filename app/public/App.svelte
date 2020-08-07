@@ -288,13 +288,30 @@
     </Masonry>
   {:else}
     <div class="row">
-      <div class="col-sm-12">
-        <h3>{appyter.title}</h3>
-        <span class="card-subtitle mb-2 text-muted">
-          <span class="badge badge-success">v{appyter.version}</span>
-          <span class="badge badge-secondary">{appyter.license}</span>
+      <div class="col-sm-12 col-md-6 col-lg-4 align-self-center">
+        <div 
+          class="card-img-top"
+          style={[
+            `background-color: ${appyter.color}`,
+            appyter.image !== undefined ? (
+              `background-image: url('${localize_appyter_image(appyter)}')`
+            ) : undefined,
+            `background-repeat: no-repeat`,
+            `background-size: cover`,
+            `background-position: center`,
+            `width: 100%`,
+            `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
+          ].filter((el) => el !== undefined).join('; ')}
+        >
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-8">
+        <h2>{appyter.title}</h2>
+        <span class="card-subtitle mb-2 text-muted d-flex flex-row flex-wrap">
+          <span class="badge badge-success m-1">v{appyter.version}</span>
+          <span class="badge badge-secondary m-1">{appyter.license}</span>
           {#each appyter.tags as tag}
-            <span class="badge badge-primary">{tag}</span>
+            <span class="badge badge-primary m-1">{tag}</span>
           {/each}
         </span>
         {#if appyter.url !== undefined}
@@ -310,8 +327,11 @@
             <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
           {/each}
         </p>
+      </div>
+      <div class="col-sm-12">
         {@html appyter.long_description_html}
-        <p>&nbsp;</p>
+      </div>
+      <div class="col-sm-12">
         <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
       </div>
     </div>
