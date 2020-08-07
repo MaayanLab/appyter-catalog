@@ -192,6 +192,11 @@
   flex: 1 0 auto;
 }
 
+.link-unstyled {
+  color: inherit;
+  text-decoration: inherit;
+}
+
 /* card shadow on hover */
 .card {
   border-radius: 6px;
