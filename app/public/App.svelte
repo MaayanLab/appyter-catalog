@@ -36,7 +36,7 @@
   // store appyters as list and lookup table based on name slugs
   let appyterList = require('./appyters.json')
   // assemble appyter lookup table
-  const appyterLookup = {}
+  let appyterLookup = {}
   for (const appyter of appyterList) {
     let {name, description, long_description, authors, ..._} = appyter
     const md = mdIt()
@@ -115,8 +115,7 @@
         }
       }
     }
-    searchString = undefined
-    searchString = ''
+    appyterLookup = appyterLookup
   }
 
   async function pagehit(appyter) {
@@ -132,10 +131,8 @@
   }
 
   // facilitate search
-  let searchString = ''
   const searchAppyters = (searchString) => {
-    if (searchString === undefined) return
-    if (searchString === '') {
+    if (searchString === '' || searchString === undefined) {
       appyterList.sort((a, b) => (b.views||0) - (a.views||0))
       return appyterList
     } else {
@@ -217,13 +214,13 @@
           class="form-control"
           placeholder="Search appyters..."
           aria-label="Search appyters"
-          bind:value={searchString}
+          bind:value={$hash.params.q}
         />
         <p>&nbsp;</p>
       </div>
     </div>
     <Masonry>
-      {#each searchAppyters(searchString) as appyter}
+      {#each searchAppyters($hash.params.q) as appyter}
         <div
           in:fade="{{duration: 250}}"
           out:fade="{{duration: 250}}"
