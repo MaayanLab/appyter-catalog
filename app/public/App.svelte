@@ -184,22 +184,12 @@
   transition: box-shadow 1s;
 }
 
-:global(body), .md-sticky-top {
+:global(body) {
   background-color: #f5f5f5;
 }
-
-@media only screen and (min-width: 992px) {
-  .md-sticky-top {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-  }
-}
-
 </style>
 
-<div class="row md-sticky-top m-0 p-0">
+<div class="row m-0 p-0">
   <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4 text-center">
     <h1>
       <a href="#/">
