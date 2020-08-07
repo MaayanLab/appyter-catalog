@@ -167,8 +167,8 @@
   flex-direction: column;
 }
 
-.content {
-  flex: 1;
+.flex-grow {
+  flex: 1 0 auto;
 }
 
 /* card shadow on hover */
@@ -184,42 +184,51 @@
   transition: box-shadow 1s;
 }
 
-:global(body) {
+:global(body), .md-sticky-top {
   background-color: #f5f5f5;
 }
+
+@media only screen and (min-width: 992px) {
+  .md-sticky-top {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
+}
+
 </style>
 
-<div class="row" style="margin: 0">
-  <div class="col-sm-12 text-center">
-    <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
-      <h1>
-        <a href="#/">
-          <img
-            src="{require('./images/appyters_logo.svg')}"
-            class="img-fluid w-100 p-2"
-            alt="Appyters"
-          />
-        </a>
-      </h1>
-    </div>
+<div class="row md-sticky-top m-0 p-0">
+  <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4 text-center">
+    <h1>
+      <a href="#/">
+        <img
+          src="{require('./images/appyters_logo.svg')}"
+          class="img-fluid w-100 p-2"
+          alt="Appyters"
+        />
+      </a>
+    </h1>
     <h3 class="card-subtitle mb-2 text-muted">A catalog of appyter notebooks</h3>
+  </div>
+  <div class="col-sm-12 p-0">
     <hr />
   </div>
-</div>
-<div class="container content">
   {#if appyter === undefined}
-    <div class="row">
-      <div class="offset-sm-2 col-sm-8 text-center">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search appyters..."
-          aria-label="Search appyters"
-          bind:value={$hash.params.q}
-        />
-        <p>&nbsp;</p>
-      </div>
+    <div class="offset-sm-2 col-sm-8 text-center mb-3">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search appyters..."
+        aria-label="Search appyters"
+        bind:value={$hash.params.q}
+      />
     </div>
+  {/if}
+</div>
+<div class="container content flex-grow">
+  {#if appyter === undefined}
     <Masonry>
       {#each searchAppyters($hash.params.q) as appyter}
         <div
