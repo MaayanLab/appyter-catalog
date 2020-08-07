@@ -21,4 +21,4 @@ class AutocompleteField(Field):
         data = json.loads(requests.get(file_path).text)
         key = list(data.keys())[0]
         values = data[key]
-        return self.raw_value is not None and self.raw_value in values
+        return self.raw_value is not None and self.raw_value.upper() in values
