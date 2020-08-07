@@ -1,23 +1,18 @@
-# %%javascript
-# require.config({
-#   paths: {
-#     d3: 'https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3',
-#     jquery: 'https://code.jquery.com/jquery-3.4.1.min',
-#     plotly: 'https://cdn.plot.ly/plotly-latest.min'
-#   },
-
-#   shim: {
-#     plotly: {
-#       deps: ['d3', 'jquery'],
-#       exports: 'plotly'
-#     }
-#   }
-# });
-
 from rpy2 import robjects
 from rpy2.robjects import r, pandas2ri
-import warnings
+# Basic libraries
+import pandas as pd
+import os
+import urllib3
+import requests, json
+import sys
+import geode
+import random
+from time import sleep
+import time
 import numpy as np
+import warnings
+import base64  
 
 # Visualization
 import plotly
@@ -42,11 +37,10 @@ from itertools import combinations
 import scipy.spatial.distance as dist
 import scipy.stats as ss
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import quantile_transform
-
-
-def printa(a=1):
-  print(a)
+from maayanlab_bioinformatics.normalization.quantile import quantile_normalize
+from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
+import umap
+from sklearn.manifold import TSNE
 
 def CPM(data):
 
@@ -73,21 +67,60 @@ def log(data):
         data = data.fillna(0)
         data = np.log10(data+1)
 
-    # Return
     return data
 def qnormalization(data):
-    newdata = pd.DataFrame(quantile_transform(
-        data, axis=1, output_distribution='normal'))
-    newdata.columns = data.columns
-    newdata.index = data.index
-    return newdata  
+  
+    X_quantile_norm = quantile_normalize(data)
+    return X_quantile_norm  
 
-def run_pca(dataset, meta_id_column_name, normalization='logCPM', nr_genes=2500, color_by='auto', color_type='categorical', filter_samples=True, plot_type='interactive'):
+def normalize(dataset, logCPM_normalization, log_normalization, z_normalization, q_normalization):
+    normalization = 'rawdata'
+    if logCPM_normalization == True:  
+        data = dataset[normalization]
+        normalization += '+logCPM'
+        dataset[normalization] = logCPM(data)
+        
+    if log_normalization == True:    
+        data = dataset[normalization]
+        normalization += '+log'
+        dataset[normalization] = log(data)
+        
+    if z_normalization == True:
+        data = dataset[normalization]
+        normalization += '+z_norm'    
+        dataset[normalization] = data.T.apply(ss.zscore, axis=0).T.dropna()
+
+    if q_normalization == True:
+        data = dataset[normalization]
+        normalization += '+q_norm'
+        dataset[normalization] = qnormalization(data)
+    return dataset, normalization
+
+def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
+    df.to_csv(filename)
+    html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
+    return HTML(html)
+
+def display_link(url):
+    raw_html = '<a href="%s" target="_blank">%s</a>' % (url, url)
+    return display(HTML(raw_html))
+
+def display_object(counter, caption, df=None, istable=True):
+    if df is not None:
+        display(df)
+    if istable == True:
+        display(Markdown("*Table {}. {}*".format(counter, caption)))
+    else:
+        display(Markdown("*Figure {}. {}*".format(counter, caption)))
+    counter += 1
+    return counter
+
+def run_dimension_reduction(dataset, meta_id_column_name, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
     # Get data
     before_norm = normalization.replace("+z_norm", "").replace("+q_norm", "")
     top_genes = dataset[before_norm].var(axis=1).sort_values(ascending=False)
     
-    expression_dataframe = dataset[normalization].copy()
+    expression_dataframe = dataset[normalization]
     
     # Filter columns
     if filter_samples and dataset.get('signature_metadata'):
@@ -96,59 +129,62 @@ def run_pca(dataset, meta_id_column_name, normalization='logCPM', nr_genes=2500,
 
     # Filter rows
     expression_dataframe = expression_dataframe.loc[top_genes.index[:nr_genes]]
-    
-    # Run PCA
-    pca=PCA(n_components=3)
-    pca.fit(expression_dataframe)
+    result=None
+    axis = None
+    if method == 'PCA':
+        # Run PCA
+        pca=PCA(n_components=3)
+        result = pca.fit(expression_dataframe)
 
-    # Get Variance
-    var_explained = ['PC'+str((i+1))+'('+str(round(e*100, 1))+'% var. explained)' for i, e in enumerate(pca.explained_variance_ratio_)]
+        # Get Variance
+        axis = ['PC'+str((i+1))+'('+str(round(e*100, 1))+'% var. explained)' for i, e in enumerate(pca.explained_variance_ratio_)]
+    elif method == "UMAP":
+        u = umap.UMAP(n_components=3)
+        result = u.fit_transform(expression_dataframe.T)
+        axis = ['UMAP 1', 'UMAP 2', 'UMAP 3']
+    elif method == "t-SNE":
+        u = TSNE(n_components=3)
+        result = u.fit_transform(expression_dataframe.T)
+        axis = ['t-SNE 1', 't-SNE 2', 't-SNE 3']
 
-    # Estimate colors
-    if color_by == 'auto':
-
-        # Add signature groups
-        if dataset.get('signature_metadata'):
-            A_label, B_label = list(dataset.get('signature_metadata').keys())[0].split(' vs ')
-            col = []
-            group_dict = list(dataset.get('signature_metadata').values())[0]
-            for gsm in dataset['sample_metadata'].index:
-                if gsm in group_dict['A']:
-                    col.append(A_label)
-                elif gsm in group_dict['B']:
-                    col.append(B_label)
-                else:
-                    col.append('Other')
-            dataset['dataset_metadata']['Sample Group'] = col
-            color_by = 'Sample Group'
-        else:
-
-            # Add group column, if available
-            if 'Group' in dataset['dataset_metadata'].columns:
-                color_by = 'Group'
+    # Add signature groups
+    if dataset.get('signature_metadata'):
+        A_label, B_label = list(dataset.get('signature_metadata').keys())[0].split(' vs ')
+        col = []
+        group_dict = list(dataset.get('signature_metadata').values())[0]
+        for gsm in dataset['sample_metadata'].index:
+            if gsm in group_dict['A']:
+                col.append(A_label)
+            elif gsm in group_dict['B']:
+                col.append(B_label)
             else:
-                color_by = None
-
+                col.append('Other')
+        dataset['dataset_metadata']['Sample Group'] = col       
 
     # Return
-    pca_results = {'pca': pca, 'var_explained': var_explained, 
+    results = {'method': method, 'result': result, 'axis': axis, 
                    'dataset_metadata': dataset['dataset_metadata'][dataset['dataset_metadata'][meta_id_column_name] == expression_dataframe.columns], 
-                   'color_by': color_by, 'color_type': color_type, 'nr_genes': nr_genes, 
+                   'nr_genes': nr_genes, 
                    'normalization': normalization, 'signature_metadata': dataset.get('signature_metadata'), 
                    'plot_type': plot_type}
-    return pca_results
+    return results
 
-
-
-def plot_pca(pca_results, meta_id_column_name, meta_class_column_name,plot_type='interactive'):
-    pca_transformed = pca_results['pca']
-    variance_explained = pca_results['var_explained']
+def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, counter, plot_type='interactive',):
+    pca_transformed = pca_results['result']
+    axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
     
-    meta_df['x'] = pca_transformed.components_[0]
-    meta_df['y'] = pca_transformed.components_[1]
-    meta_df['z'] = pca_transformed.components_[2]
+    if pca_results["method"] == "PCA":
+        meta_df['x'] = pca_transformed.components_[0]
+        meta_df['y'] = pca_transformed.components_[1]
+        meta_df['z'] = pca_transformed.components_[2]
+    else:
+        meta_df['x'] = [x[0] for x in pca_transformed]
+        meta_df['y'] = [x[1] for x in pca_transformed]
+        meta_df['z'] = [x[2] for x in pca_transformed]
+        
 
+    caption = '3D {} plot for samples using {} genes having largest variance'.format(pca_results["method"], pca_results['nr_genes'])
     display(IPython.core.display.HTML('''
             <script src="/static/components/requirejs/require.js"></script>
             <script>
@@ -208,26 +244,74 @@ def plot_pca(pca_results, meta_id_column_name, meta_class_column_name,plot_type=
         data.append(trace)
 
     # Configs for layout and axes
+    
     layout=dict(height=1000, width=1000, 
-                title='3D PCA plot for samples',
+                title=caption,
                 scene=dict(
-                    xaxis=dict(title=variance_explained[0]),
-                    yaxis=dict(title=variance_explained[1]),
-                    zaxis=dict(title=variance_explained[2])
+                    xaxis=dict(title=axis[0]),
+                    yaxis=dict(title=axis[1]),
+                    zaxis=dict(title=axis[2])
                     )
     )
+    
+
     fig=dict(data=data, layout=layout)
     if plot_type == "interactive":
         plotly.offline.iplot(fig)
     else:
         py.image.ishow(fig)
-        
-        
+    display(Markdown("*Figure {}. {}*".format(counter, caption)))
+    counter += 1
+    return counter
+def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
+    # Subset the expression DataFrame using top 800 genes with largest variance
+    data = dataset[normalization]
+    variances = np.var(data, axis=1)
+    srt_idx = variances.argsort()[::-1]
+    if gene_list == None or len(gene_list) == 0:
+        expr_df_sub = data.iloc[srt_idx].iloc[:nr_genes]
+    else:
+        gene_list = gene_list.split("\n")
+        common_gene_list = list(set(gene_list).intersection(set(data.index)))
+        expr_df_sub = data.loc[common_gene_list, :]
+        assert len(expr_df_sub.index) > 0
+    
+    # prettify sample names
+    sample_names = ['::'.join([y, x]) for x,y in
+                       zip(dataset["dataset_metadata"][meta_class_column_name], expr_df_sub.columns)]
+    expr_df_sub.columns = sample_names
+    expr_df_sub.index = ["Gene: "+str(x) for x in expr_df_sub.index]
+    sample_name = ["Sample: "+x for x in sample_names]
+    expr_df_sub.columns = sample_name
+
+
+    treatment_type = ["Class: "+ x.split("::")[1] for x in sample_names]
+    new_series = pd.DataFrame(treatment_type).T
+    new_series.columns = expr_df_sub.columns
+    expr_df_sub = pd.concat([new_series, expr_df_sub], axis=0)
+
+    index_list = list(expr_df_sub.index)
+    index_list = ["" if "Gene" not in str(x) else x for x in index_list]
+    expr_df_sub.index = index_list
+    expr_df_sub_file = "expr_df_sub_file.txt"
+    expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
+    # POST the expression matrix to Clustergrammer and get the URL
+    clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
+    r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
+    return r
+    
+#############################################
+########## 2. Plot
+#############################################
+
+def plot_clustergrammar(clustergrammer_url):
+    clustergrammer_url = clustergrammer_url.replace("http:", "https:")
+    display_link(clustergrammer_url)
+    # Embed
+    display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
 
 robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
-    #print(rawcount_dataframe)
-    #print(design_dataframe)
     # Load packages
     suppressMessages(require(limma))
     suppressMessages(require(edgeR))
@@ -265,8 +349,553 @@ robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_gen
     # Get results
     limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
     
-
     # Return
-    return(limma_dataframe)
+    results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
+    return (results)
 }
 ''')
+def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name):
+    expr_df = dataset['rawdata']
+    meta_df = dataset["dataset_metadata"]
+    signatures = dict()
+
+    for cls1, cls2 in combinations(classes, 2):
+        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist()
+        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist()
+        signature_label = " vs. ".join([cls1, cls2])
+
+        if method == "limma":
+            design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in expr_df.columns]).set_index('index')
+
+            processed_data = {"expression": expr_df, 'design': design_dataframe}
+            limma = robjects.r['limma']
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=False))
+            
+            signature = pd.DataFrame(limma_results[0])
+            signature.index = limma_results[1]
+            
+        elif method == "characteristic_direction":
+            signature = characteristic_direction(dataset[normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
+        
+        signatures[signature_label] = signature
+
+    return signatures
+
+def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False, labels=False, plot_type='interactive', de_type='ma'):
+    range_x = [-max(abs(x))-pad, max(abs(x))+pad]if symmetric_x else None
+    range_y = [-max(abs(y))-pad, max(abs(y))+pad]if symmetric_y else None
+    trace = go.Scattergl(x=x, y=y, mode='markers', text=text, hoverinfo=hoverinfo, marker={'color': color, 'colorscale': colorscale, 'showscale': showscale, 'size': size})
+    if return_trace:
+        return trace
+    else:
+        if de_type == 'ma':
+            annotations = [
+                {'x': 1, 'y': 0.1, 'text':'<span style="color: blue; font-size: 10pt; font-weight: 600;">Down-regulated in '+labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'right', 'yanchor': 'top'},
+                {'x': 1, 'y': 0.9, 'text':'<span style="color: red; font-size: 10pt; font-weight: 600;">Up-regulated in '+labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'right', 'yanchor': 'bottom'}
+            ] if labels else []
+        elif de_type == 'volcano':
+            annotations = [
+                {'x': 0.25, 'y': 1.07, 'text':'<span style="color: blue; font-size: 10pt; font-weight: 600;">Down-regulated in '+labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},
+                {'x': 0.75, 'y': 1.07, 'text':'<span style="color: red; font-size: 10pt; font-weight: 600;">Up-regulated in '+labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}
+            ] if labels else []
+        layout = go.Layout(title=title, xaxis={'title': xlab, 'range': range_x}, yaxis={'title': ylab, 'range': range_y}, hovermode='closest', annotations=annotations)
+        fig = go.Figure(data=[trace], layout=layout)
+    
+    if plot_type=='interactive':
+        plotly.offline.iplot(fig)
+    else:
+        py.image.ishow(fig)
+
+def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
+    expr_df = dataset['rawdata']
+    meta_df = dataset["dataset_metadata"]
+    
+    color = []
+    text = []
+    for index, rowData in signature.iterrows():
+
+        # Text
+        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData['AveExpr'], ndigits=2))+'<br>logFC = '+str(round(rowData['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['P.Value'])+'<br>FDR = '+'{:.2e}'.format(rowData['adj.P.Val']))
+
+        # Color
+        if rowData['P.Value'] < pvalue_threshold:
+            if rowData['logFC'] < -logfc_threshold:
+                color.append('blue')
+            elif rowData['logFC'] > logfc_threshold:
+                color.append('red')
+            else:
+                color.append('black')
+
+        else:
+            color.append('black')
+
+    volcano_plot_results = {'x': signature['logFC'], 'y': -np.log10(signature['P.Value']), 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
+    return volcano_plot_results
+
+def plot_volcano(volcano_plot_results):
+    spacer = ' '*50
+    plot_2D_scatter(
+        x=volcano_plot_results['x'],
+        y=volcano_plot_results['y'],
+        text=volcano_plot_results['text'],
+        color=volcano_plot_results['color'],
+        symmetric_x=True,
+        xlab='log2FC',
+        ylab='-log10P',
+        title='<b>{volcano_plot_results[signature_label]} Signature | Volcano Plot</b>'.format(**locals()),
+        labels=volcano_plot_results['signature_label'].split(' vs. '),
+        plot_type=volcano_plot_results['plot_type'],
+        de_type='volcano'
+    )        
+
+def run_maplot(signature, signature_label='', pvalue_threshold=0.05, logfc_threshold=1.5, plot_type='interactive'):
+
+    # Loop through signature
+    color = []
+    text = []
+    for index, rowData in signature.iterrows():
+
+        # Text
+        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData['AveExpr'], ndigits=2))+'<br>logFC = '+str(round(rowData['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['P.Value'])+'<br>FDR = '+'{:.2e}'.format(rowData['adj.P.Val']))
+
+        # Color
+        if rowData['adj.P.Val'] < pvalue_threshold:
+            if rowData['logFC'] < -logfc_threshold:
+                color.append('blue')
+            elif rowData['logFC'] > logfc_threshold:
+                color.append('red')
+            else:
+                color.append('black')
+
+        else:
+            color.append('black')
+    
+    # Return 
+    volcano_plot_results = {'x': signature['AveExpr'], 'y': signature['logFC'], 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
+    return volcano_plot_results
+
+def plot_maplot(volcano_plot_results):    
+    plot_2D_scatter(
+        x=volcano_plot_results['x'],
+        y=volcano_plot_results['y'],
+        text=volcano_plot_results['text'],
+        color=volcano_plot_results['color'],
+        symmetric_y=True,
+        xlab='Average Expression',
+        ylab='logFC',
+        title='<b>{volcano_plot_results[signature_label]} Signature | MA Plot</b>'.format(**locals()),
+        labels=volcano_plot_results['signature_label'].split(' vs. '),
+        plot_type=volcano_plot_results['plot_type']
+    )
+
+
+def submit_enrichr_geneset(geneset, label=''):
+    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/addList'
+    genes_str = '\n'.join(geneset)
+    payload = {
+        'list': (None, genes_str),
+        'description': (None, label)
+    }
+    response = requests.post(ENRICHR_URL, files=payload)
+    if not response.ok:
+        raise Exception('Error analyzing gene list')
+    time.sleep(0.5)
+    data = json.loads(response.text)
+    return data
+
+def run_enrichr(signature, signature_label, geneset_size=500, sort_genes_by='t'):
+
+    # Sort signature
+    signature = signature.sort_values(sort_genes_by, ascending=False)
+
+    # Get genesets
+    genesets = {
+        'upregulated': signature.index[:geneset_size],
+        'downregulated': signature.index[-geneset_size:]
+    }
+
+    # Submit to Enrichr
+    enrichr_ids = {geneset_label: submit_enrichr_geneset(geneset=geneset, label=signature_label+', '+geneset_label+', from Bulk RNA-seq Appyter') for geneset_label, geneset in genesets.items()}
+    enrichr_ids['signature_label'] = signature_label
+    return enrichr_ids
+
+def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
+    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
+    query_string = '?userListId=%s&backgroundType=%s'
+    results = []
+    for gene_set_library, label in gene_set_libraries.items():
+        response = requests.get(
+                    ENRICHR_URL +
+                       query_string % (user_list_id, gene_set_library)
+                )
+        if not response.ok:
+            raise Exception('Error fetching enrichment results')
+
+        data = json.loads(response.text)
+        resultDataframe = pd.DataFrame(data[gene_set_library], columns=[
+                                       'rank', 'term_name', 'pvalue', 'zscore', 'combined_score', 'overlapping_genes', 'FDR', 'old_pvalue', 'old_FDR'])
+        selectedColumns = ['term_name', 'zscore', 'combined_score', 'pvalue', 'FDR'] if not overlappingGenes else [
+            'term_name', 'zscore', 'combined_score', 'FDR', 'pvalue', 'overlapping_genes']
+        resultDataframe = resultDataframe.loc[:, selectedColumns]
+        resultDataframe['gene_set_library'] = label
+        resultDataframe['log10P'] = -np.log10(resultDataframe['pvalue'])
+        results.append(resultDataframe)
+    concatenatedDataframe = pd.concat(results)
+    if geneset:
+        concatenatedDataframe['geneset'] = geneset
+    return concatenatedDataframe
+
+
+def run_go(enrichr_results, signature_label, plot_type='interactive', go_version='2018', sort_results_by='pvalue'):
+
+    # Libraries
+    go_version = str(go_version)
+    libraries = {
+        'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
+        'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
+        'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
+    }
+
+    # Get Enrichment Results
+    enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
+    enrichment_results['signature_label'] = signature_label
+    enrichment_results['plot_type'] = plot_type
+    enrichment_results['sort_results_by'] = sort_results_by
+
+    # Return
+    return enrichment_results
+
+def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='interactive', library_type='go', version='2018', sort_results_by='pvalue'):
+
+    # Libraries
+    if library_type == 'go':
+        go_version = str(version)
+        libraries = {
+            'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
+            'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
+            'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
+        }
+    elif library_type == "pathway":
+        # Libraries
+        libraries = {
+            'KEGG_2016': 'KEGG Pathways',
+            'WikiPathways_2016': 'WikiPathways',
+            'Reactome_2016': 'Reactome Pathways'
+        }
+
+    # Get Enrichment Results
+    enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
+    enrichment_results['signature_label'] = signature_label
+    enrichment_results['plot_type'] = plot_type
+    enrichment_results['sort_results_by'] = sort_results_by
+
+    # Return
+    return enrichment_results
+
+def get_enrichr_result_tables_by_library(enrichr_results, signature_label, library_type='tf'):
+
+    # Libraries
+    if library_type == 'tf':
+        # Libraries
+        libraries = {
+            'ChEA_2016': 'A. ChEA (experimentally validated targets)',
+            'ENCODE_TF_ChIP-seq_2015': 'B. ENCODE (experimentally validated targets)',
+            'ARCHS4_TFs_Coexp': 'C. ARCHS4 (coexpressed genes)'
+        }
+    elif library_type == "ke":
+        # Libraries
+        libraries = {
+            'KEA_2015': 'A. KEA (experimentally validated targets)',
+            'ARCHS4_Kinases_Coexp': 'B. ARCHS4 (coexpressed genes)'
+        }
+    elif library_type == "mirna":
+        libraries = {
+        'TargetScan_microRNA_2017': 'A. TargetScan (experimentally validated targets)',
+        'miRTarBase_2017': 'B. miRTarBase (experimentally validated targets)'
+        }
+
+
+    # Initialize results
+    results = []
+
+    # Loop through genesets
+    for geneset in ['upregulated', 'downregulated']:
+
+        # Append ChEA results
+        enrichment_dataframe = get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset)
+        results.append(enrichment_dataframe)
+
+    # Concatenate results
+    enrichment_dataframe = pd.concat(results)
+
+    return {'enrichment_dataframe': enrichment_dataframe, 'signature_label': signature_label}
+    
+
+def plot_library_barchart(enrichr_results, gene_set_library, signature_label, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
+    sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
+    fig = tools.make_subplots(rows=1, cols=2, print_grid=False)
+    for i, geneset in enumerate(['upregulated', 'downregulated']):
+        # Get dataframe
+        enrichment_dataframe = enrichr_results[geneset]
+        plot_dataframe = enrichment_dataframe[enrichment_dataframe['gene_set_library'] == gene_set_library].sort_values(sort_results_by, ascending=False).iloc[:nr_genesets].iloc[::-1]
+
+        # Format
+        n = 7
+        plot_dataframe['nr_genes'] = [len(genes) for genes in plot_dataframe['overlapping_genes']]
+        plot_dataframe['overlapping_genes'] = ['<br>'.join([', '.join(genes[i:i+n]) for i in range(0, len(genes), n)]) for genes in plot_dataframe['overlapping_genes']]
+
+        # Get Bar
+        bar = go.Bar(
+            x=plot_dataframe[sort_results_by],
+            y=plot_dataframe['term_name'],
+            orientation='h',
+            name=geneset.title(),
+            showlegend=False,
+            hovertext=['<b>{term_name}</b><br><b>P-value</b>: <i>{pvalue:.2}</i><br><b>FDR</b>: <i>{FDR:.2}</i><br><b>Z-score</b>: <i>{zscore:.3}</i><br><b>Combined score</b>: <i>{combined_score:.3}</i><br><b>{nr_genes} Genes</b>: <i>{overlapping_genes}</i><br>'.format(**rowData) for index, rowData in plot_dataframe.iterrows()],
+            hoverinfo='text',
+            marker={'color': '#FA8072' if geneset == 'upregulated' else '#87CEFA'}
+        )
+        fig.append_trace(bar, 1, i+1)
+
+        # Get text
+        text = go.Scatter(
+            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
+            y=bar['y'],
+            mode='text',
+            hoverinfo='none',
+            showlegend=False,
+            text=['*<b>{}</b>'.format(rowData['term_name']) if rowData['FDR'] < 0.1 else '{}'.format(
+                rowData['term_name']) for index, rowData in plot_dataframe.iterrows()],
+            textposition="middle right",
+            textfont={'color': 'black'}
+        )
+        fig.append_trace(text, 1, i+1)
+
+    # Get annotations
+    labels = signature_label.split(' vs. ')
+    annotations = [
+        {'x': 0.25, 'y': 1.06, 'text': '<span style="color: #FA8072; font-size: 10pt; font-weight: 600;">Up-regulated in ' +
+            labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},
+        {'x': 0.75, 'y': 1.06, 'text': '<span style="color: #87CEFA; font-size: 10pt; font-weight: 600;">Down-regulated in ' +
+            labels[-1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}
+    ] if signature_label else []
+
+    # Get title
+    title = signature_label + ' | ' + gene_set_library
+
+    fig['layout'].update(height=height, title='<b>{}</b>'.format(title),
+                         hovermode='closest', annotations=annotations)
+    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
+    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
+    fig['layout']['yaxis1'].update(showticklabels=False)
+    fig['layout']['yaxis2'].update(showticklabels=False)
+    fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
+    if plot_type=='interactive':
+        plotly.offline.iplot(fig)
+    else:
+        py.image.ishow(fig)
+
+
+
+def results_table(enrichment_dataframe, source_label, target_label, table_counter):
+
+    # Get libraries
+    for gene_set_library in enrichment_dataframe['gene_set_library'].unique():
+
+        # Get subset
+        enrichment_dataframe_subset = enrichment_dataframe[enrichment_dataframe['gene_set_library'] == gene_set_library].copy()
+
+        # Get unique values from source column
+        enrichment_dataframe_subset[source_label] = [x.split('_')[0] for x in enrichment_dataframe_subset['term_name']]
+        enrichment_dataframe_subset = enrichment_dataframe_subset.sort_values(['FDR', 'pvalue']).rename(columns={'pvalue': 'P-value'}).drop_duplicates(source_label)
+
+        # Add links and bold for significant results
+        # if " " in enrichment_dataframe_subset[source_label][0]:
+        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
+          
+        # else:
+        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
+        enrichment_dataframe_subset[source_label] = [rowData[source_label].replace('target="_blank">', 'target="_blank"><b>').replace('</a>', '*</b></a>') if rowData['FDR'] < 0.05 else rowData[source_label] for index, rowData in enrichment_dataframe_subset.iterrows()]
+
+        # Add rank
+        enrichment_dataframe_subset['Rank'] = ['<b>'+str(x+1)+'</b>' for x in range(len(enrichment_dataframe_subset.index))]
+
+        # Add overlapping genes with tooltip
+        enrichment_dataframe_subset['nr_overlapping_genes'] = [len(x) for x in enrichment_dataframe_subset['overlapping_genes']]
+        enrichment_dataframe_subset['overlapping_genes'] = [', '.join(x) for x in enrichment_dataframe_subset['overlapping_genes']]
+        enrichment_dataframe_subset[target_label.title()] = ['{nr_overlapping_genes} {geneset} '.format(**rowData)+target_label+'s' for index, rowData in enrichment_dataframe_subset.iterrows()]
+        # enrichment_dataframe[target_label.title()] = ['<span class="gene-tooltip">{nr_overlapping_genes} {geneset} '.format(**rowData)+target_label+'s<div class="gene-tooltip-text">{overlapping_genes}</div></span>'.format(**rowData) for index, rowData in enrichment_dataframe.iterrows()]
+
+        # Convert to HTML
+        pd.set_option('max.colwidth', -1)
+        html_table = enrichment_dataframe_subset.head(50)[['Rank', source_label, 'P-value', 'FDR', target_label.title()]].to_html(escape=False, index=False, classes='w-100')
+        html_results = '<div style="max-height: 200px; overflow-y: scroll;">{}</div>'.format(html_table)
+
+        # Add CSS
+        display(HTML('<style>.w-100{width: 100%;} .text-left th{text-align: left !important;}</style>'))
+        display(HTML('<style>.slick-cell{overflow: visible;}.gene-tooltip{text-decoration: underline; text-decoration-style: dotted;}.gene-tooltip .gene-tooltip-text{visibility: hidden; position: absolute; left: 60%; width: 250px; z-index: 1000; text-align: center; background-color: black; color: white; padding: 5px 10px; border-radius: 5px;} .gene-tooltip:hover .gene-tooltip-text{visibility: visible;} .gene-tooltip .gene-tooltip-text::after {content: " ";position: absolute;bottom: 100%;left: 50%;margin-left: -5px;border-width: 5px;border-style: solid;border-color: transparent transparent black transparent;}</style>'))
+
+        table_counter += 1
+        # Display table
+        display(HTML(html_results))
+        # Display gene set
+        display_object(table_counter, gene_set_library, istable=True)
+        display(create_download_link(enrichment_dataframe_subset, filename="Enrichment_analysis_{}_{}.csv".format(source_label, gene_set_library)))
+    return table_counter
+
+def display_table(analysis_results, source_label, table_counter):
+    
+    # Plot Table
+    return results_table(analysis_results['enrichment_dataframe'].copy(), source_label=source_label, target_label='target', table_counter=table_counter)
+
+
+
+def run_l1000cds2(signature, nr_genes=500, signature_label='', plot_type='interactive'):
+    # Define results
+    l1000cds2_results = {'signature_label': signature_label}
+
+    # Define upperGenes Function
+    upperGenes = lambda genes: [gene.upper() for gene in genes]
+
+    # Get Data
+    data = {"upGenes":upperGenes(signature.index[:nr_genes]),"dnGenes":upperGenes(signature.index[-nr_genes:])}
+
+    # Loop through aggravate:
+    for aggravate in [True, False]:
+
+        # Send to API
+        config = {"aggravate":aggravate,"searchMethod":"geneSet","share":True,"combination":False,"db-version":"latest"}
+        r = requests.post('http://amp.pharm.mssm.edu/L1000CDS2/query',data=json.dumps({"data":data,"config":config}),headers={'content-type':'application/json'})
+        label = 'mimic' if aggravate else 'reverse'
+
+        # Add results
+        resGeneSet = r.json()
+        if resGeneSet.get('topMeta'):
+            l1000cds2_dataframe = pd.DataFrame(resGeneSet['topMeta'])[['cell_id', 'pert_desc', 'pert_dose', 'pert_dose_unit', 'pert_id', 'pert_time', 'pert_time_unit', 'pubchem_id', 'score', 'sig_id']].replace('-666', np.nan)
+            l1000cds2_results[label] = {'url': 'http://amp.pharm.mssm.edu/L1000CDS2/#/result/{}'.format(resGeneSet['shareId']), 'table': l1000cds2_dataframe}
+        else:
+            l1000cds2_results[label] = None
+    l1000cds2_results['plot_type'] = plot_type
+
+    # Return
+    return l1000cds2_results
+    
+def plot_l1000cds2(l1000cds2_results, counter, nr_drugs=7, height=300):
+
+    # Check if there are results
+    if not l1000cds2_results['mimic'] or not l1000cds2_results['reverse']:
+        print('### No results were found.\n This is likely due to the fact that the gene identifiers were not recognized by L1000CDS<sup>2</sup>. Please note that L1000CDS<sup>2</sup> currently only supports HGNC gene symbols (https://www.genenames.org/). If your dataset uses other gene identifier systems, such as Ensembl IDs or Entrez IDs, consider converting them to HGNC. Automated gene identifier conversion is currently under development.')
+        
+    else:
+        # Bar charts
+        fig = tools.make_subplots(rows=1, cols=2, print_grid=False);
+        for i, direction in enumerate(['mimic', 'reverse']):
+            drug_counts = l1000cds2_results[direction]['table'].groupby('pert_desc').size().sort_values(ascending=False).iloc[:nr_drugs].iloc[::-1]
+
+            # Get Bar
+            bar = go.Bar(
+                x=drug_counts.values,
+                y=drug_counts.index,
+                orientation='h',
+                name=direction.title(),
+                hovertext=drug_counts.index,
+                hoverinfo='text',
+                marker={'color': '#FF7F50' if direction=='mimic' else '#9370DB'}
+            )
+            fig.append_trace(bar, 1, i+1)
+            
+            # Get text
+            text = go.Scatter(
+                x=[max(bar['x'])/50 for x in range(len(bar['y']))],
+                y=bar['y'],
+                mode='text',
+                hoverinfo='none',
+                showlegend=False,
+                text=drug_counts.index,
+                textposition="middle right",
+                textfont={'color': 'black'}
+            )
+            fig.append_trace(text, 1, i+1)
+
+        fig['layout'].update(height=height, title='<b>L1000CDS<sup>2</sup> {}| Small Molecule Query</b><br><i>Top small molecules</i>'.format(l1000cds2_results['signature_label']), hovermode='closest')
+        fig['layout']['xaxis1'].update(domain=[0,0.5])
+        fig['layout']['xaxis1'].update(title='<br>Count')
+        fig['layout']['xaxis2'].update(title='<br>Count')
+        fig['layout']['xaxis2'].update(domain=[0.5,1])
+        fig['layout']['yaxis1'].update(showticklabels=False)
+        fig['layout']['yaxis2'].update(showticklabels=False)
+        fig['layout']['margin'].update(l=10, t=95, r=0, b=45, pad=5)
+
+        if l1000cds2_results['plot_type'] == 'interactive':
+            plotly.offline.iplot(fig)        
+        else:
+            py.image.ishow(fig)
+
+        display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), istable=False)
+
+        # Links
+        
+        display(Markdown(' *Mimic Signature Query Results*:'))
+        display_link(l1000cds2_results['mimic']['url'])
+        display(Markdown(' *Reverse Signature Query Results*:'))
+        display_link(l1000cds2_results['reverse']['url'])
+        counter += 1
+    return counter
+        
+def run_l1000fwd(signature, nr_genes=500, signature_label=''):
+    # Define results
+    l1000fwd_results = {'signature_label': signature_label}
+
+    # Define upperGenes Function
+    upperGenes = lambda genes: [gene.upper() for gene in genes]
+
+    # Get Data
+    payload = {"up_genes":upperGenes(signature.index[:nr_genes]),"down_genes":upperGenes(signature.index[-nr_genes:])}
+
+    # Get URL
+    L1000FWD_URL = 'https://amp.pharm.mssm.edu/L1000FWD/'
+
+    # Get result
+    response = requests.post(L1000FWD_URL + 'sig_search', json=payload)
+    if 'KeyError' in response.text:
+        l1000fwd_results['result_url'] = None
+    else:
+        # Get ID and URL
+        result_id = response.json()['result_id']
+        l1000fwd_results['result_url'] = 'https://amp.pharm.mssm.edu/l1000fwd/vanilla/result/'+result_id
+        l1000fwd_results['result_id'] = result_id
+
+        # Get Top
+        l1000fwd_results['signatures'] = requests.get(L1000FWD_URL + 'result/topn/' + result_id).json()
+
+
+    # Return
+    return l1000fwd_results
+    
+def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
+    
+    # Check if results
+    if l1000fwd_results['result_url']:
+
+        # Display IFrame
+        display(IFrame(l1000fwd_results['result_url'], width="1000", height="1000"))
+
+        # Display tables
+        for direction, signature_list in l1000fwd_results['signatures'].items():
+
+            # Fix dataframe
+            rename_dict = {'sig_id': 'Signature ID', 'pvals': 'P-value', 'qvals': 'FDR', 'zscores': 'Z-score', 'combined_scores': 'Combined Score'}
+            signature_dataframe = pd.DataFrame(signature_list)[list(rename_dict.keys())].rename(columns=rename_dict).sort_values('P-value').rename_axis('Rank')
+            signature_dataframe.index = [x + 1 for x in range(len(signature_dataframe.index))]
+            signature_txt = signature_dataframe.to_csv(sep='\t')
+
+            # Display table
+            pd.set_option('max.colwidth', -1)
+            signature_dataframe['Signature ID'] = ['<a href="http://amp.pharm.mssm.edu/dmoa/sig/{x}" target="_blank">{x}</a>'.format(**locals()) for x in signature_dataframe['Signature ID']]
+            table_html = signature_dataframe.to_html(escape=False, classes='w-100')
+            
+            display(HTML('<style>.w-100{{width: 100% !important;}}</style><div style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">{}</div>'.format(table_html)))
+            display_object(counter, "L1000FWD Results: {} Signatures".format(direction.title()), istable=True)
+            display(create_download_link(signature_dataframe, filename="{} Signatures for {}.csv".format(direction.title(), l1000fwd_results["signature_label"])))
+            counter += 1
+    return counter
