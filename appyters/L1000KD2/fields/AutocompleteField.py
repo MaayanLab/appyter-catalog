@@ -17,9 +17,8 @@ class AutocompleteField(Field):
         super().__init__(**kwargs)  
     
     def constraint(self):
-        # file_path = self.args['file_path']
-        # data = json.loads(requests.get(file_path).text)
-        # key = list(data.keys())[0]
-        # values = data[key]
-        # return self.raw_value is not None and self.raw_value in values
-        return True
+        file_path = self.args['file_path']
+        data = json.loads(requests.get(file_path).text)
+        key = list(data.keys())[0]
+        values = data[key]
+        return self.raw_value is not None and self.raw_value in values
