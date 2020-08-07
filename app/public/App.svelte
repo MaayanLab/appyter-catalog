@@ -37,8 +37,9 @@
   let appyterList = require('./appyters.json')
   // assemble appyter lookup table
   let appyterLookup = {}
+  let globalTags = {}
   for (const appyter of appyterList) {
-    let {name, description, long_description, authors, ..._} = appyter
+    let {name, description, long_description, authors, tags, ..._} = appyter
     const md = mdIt()
     const normalizeLink = md.normalizeLink
     md.normalizeLink = function (url) {
@@ -67,8 +68,15 @@
       long_description_html,
       color,
     })
+    // save tags to global list
+    for (const tag of tags) {
+      globalTags[tag] = (globalTags[tag] || 0) + 1
+    }
     // save a reference in the lookup table
     appyterLookup[name] = appyter
+  }
+  for (const tag in globalTags) {
+    if (globalTags[tag] <= 1) delete globalTags[tag]
   }
   appyterList = appyterList.filter(appyter => appyter.public !== false)
 
@@ -115,7 +123,8 @@
         }
       }
     }
-    appyterLookup = appyterLookup
+    appyterList.sort((a, b) => (b.views||0) - (a.views||0))
+    appyterList = appyterList
   }
 
   async function pagehit(appyter) {
@@ -130,14 +139,26 @@
     })
   }
 
-  // facilitate search
-  const searchAppyters = (searchString) => {
-    if (searchString === '' || searchString === undefined) {
-      appyterList.sort((a, b) => (b.views||0) - (a.views||0))
-      return appyterList
-    } else {
-      return search.search(searchString)
+  function set_gte(A, B) {
+    for (const b of B) {
+      if (!A.has(b)) return false
     }
+    return true
+  }
+
+  // facilitate search
+  const searchAppyters = (appyterList, search, searchString, tags) => {
+    let rs
+    if (searchString !== '' && searchString !== undefined) {
+      rs = search.search(searchString)
+    } else {
+      rs = appyterList
+    }
+    if (tags !== '' && tags !== undefined) {
+      tags = new Set(tags.split(';'))
+      rs = rs.filter(appyter => set_gte(new Set(appyter.tags), tags))
+    }
+    return rs
   }
 
   // sync appyter variable and url hash
@@ -149,8 +170,8 @@
       appyter = appyterLookup[$hash.path.slice(1)]
       pagehit(appyter)
       lastPath = curPath
-      window.scrollTo(0,0)
     }
+    window.scrollTo(0,0)
   }
 
   // things to do on window load
@@ -218,6 +239,26 @@
               bind:value={$hash.params.q}
             />
           </div>
+          {#if $hash.params.tags}
+            <div class="col-sm-12 mb-2">
+              {#each $hash.params.tags.split(';') as tag}
+                <a
+                  href="javascript:"
+                  class="badge badge-success m-1 p-1 text-white"
+                  on:click={() => $hash.params.tags = $hash.params.tags.split(';').filter(t => t !== tag).join(';')}
+                >{tag}</a>
+              {/each}
+            </div>
+          {/if}
+          <div class="col-sm-12">
+            {#each Object.keys(globalTags).filter(tag => ($hash.params.tags || '').split(';').indexOf(tag) === -1) as tag}
+              <a
+                href="javascript:"
+                class="badge badge-primary m-1 p-1 text-white"
+                on:click={() => $hash.params.tags = [...($hash.params.tags || '').split(';').filter(t => t !== '' && t !== tag), tag].join(';')}
+              >{tag}</a>
+            {/each}
+          </div>
         </div>
       </div>
     </div>
@@ -226,68 +267,80 @@
 <div class="container content flex-grow">
   {#if appyter === undefined}
     <Masonry>
-      {#each searchAppyters($hash.params.q) as appyter}
+      {#each searchAppyters(appyterList, search, $hash.params.q, $hash.params.tags) as appyter}
         <div
           in:fade="{{duration: 250}}"
           out:fade="{{duration: 250}}"
         >
-          <div class="card">
-            <div 
-              class="card-img-top"
-              style={[
-                `background-color: ${appyter.color}`,
-                appyter.image !== undefined ? (
-                  `background-image: url('${localize_appyter_image(appyter)}')`
-                ) : undefined,
-                `background-repeat: no-repeat`,
-                `background-size: cover`,
-                `background-position: center`,
-                `width: 100%`,
-                `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
-              ].filter((el) => el !== undefined).join('; ')}
-            >
-            </div>
-            <div class="card-body">
-              <h3 class="card-title">{appyter.title}</h3>
-              <div class="d-flex flex-row flex-nowrap pt-1 pb-2">
-                <div class="d-flex flex-column pr-2">
-                {#if appyter.views }
-                  <div class="text-grey text-nowrap">
-                    Views: {appyter.views}
-                  </div>
-                {/if}
-                {#if appyter.runs }
-                  <div class="text-grey text-nowrap">
-                  Runs: {appyter.runs}
-                  </div>
-                {/if}
-                </div>
-                <div class="d-flex flex-column pl-2">
-                  {#if appyter.form_views }
+          <a
+            href="#/{appyter.name}"
+            class="link-unstyled"
+          >
+            <div class="card">
+              <div
+                class="card-img-top"
+                style={[
+                  `background-color: ${appyter.color}`,
+                  appyter.image !== undefined ? (
+                    `background-image: url('${localize_appyter_image(appyter)}')`
+                  ) : undefined,
+                  `background-repeat: no-repeat`,
+                  `background-size: cover`,
+                  `background-position: center`,
+                  `width: 100%`,
+                  `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
+                ].filter((el) => el !== undefined).join('; ')}
+              ></div>
+              <div class="card-body">
+                <h3 class="card-title">{appyter.title}</h3>
+                <div class="d-flex flex-row flex-nowrap pt-1 pb-2">
+                  <div class="d-flex flex-column pr-2">
+                  {#if appyter.views }
                     <div class="text-grey text-nowrap">
-                    Starts: {appyter.form_views}
+                      Views: {appyter.views}
                     </div>
                   {/if}
-                  {#if appyter.persistent_views }
+                  {#if appyter.runs }
                     <div class="text-grey text-nowrap">
-                    Retrievals: {appyter.persistent_views}
+                    Runs: {appyter.runs}
                     </div>
                   {/if}
+                  </div>
+                  <div class="d-flex flex-column pl-2">
+                    {#if appyter.form_views }
+                      <div class="text-grey text-nowrap">
+                      Starts: {appyter.form_views}
+                      </div>
+                    {/if}
+                    {#if appyter.persistent_views }
+                      <div class="text-grey text-nowrap">
+                      Retrievals: {appyter.persistent_views}
+                      </div>
+                    {/if}
+                  </div>
                 </div>
+                <p class="card-text">{@html appyter.description_html}</p>
+                <div class="pb-4 d-flex flex-row flex-wrap">
+                  <span class="badge badge-success m-1 p-1">v{appyter.version}</span>
+                  <a
+                    class="badge badge-secondary m-1 p-1"
+                    href="javascript:"
+                    on:click={() => $hash.params.license = appyter.license}
+                  >{appyter.license}</a>
+                  {#each appyter.tags as tag}
+                    <a
+                      class="badge badge-primary m-1 p-1 text-white"
+                      href="javascript:"
+                      on:click={() => $hash.params.tags = [...($hash.params.tags || '').split(';').filter(t => t !== '' && t !== tag), tag].join(';')}
+                    >{tag}</a>
+                  {/each}
+                </div>
+                <button class="btn btn-primary btn-sm">
+                  Select
+                </button>
               </div>
-              <p class="card-text">{@html appyter.description_html}</p>
-              <div class="pb-4">
-                <span class="badge badge-success">v{appyter.version}</span>
-                &nbsp;<span class="badge badge-secondary">{appyter.license}</span>
-                {#each appyter.tags as tag}
-                  &nbsp;<span class="badge badge-primary">{tag}</span>
-                {/each}
-              </div>
-              <a href="#/{appyter.name}" class="btn btn-primary btn-sm stretched-link">
-                Select
-              </a>
             </div>
-          </div>
+          </a>
         </div>
       {/each}
     </Masonry>
