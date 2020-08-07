@@ -216,14 +216,20 @@
     <hr />
   </div>
   {#if appyter === undefined}
-    <div class="offset-sm-2 col-sm-8 text-center mb-3">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Search appyters..."
-        aria-label="Search appyters"
-        bind:value={$hash.params.q}
-      />
+    <div class="container">
+      <div class="offset-sm-2 col-sm-8 text-center mb-3">
+        <div class="row">
+          <div class="col-sm-12">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search appyters..."
+              aria-label="Search appyters"
+              bind:value={$hash.params.q}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   {/if}
 </div>
