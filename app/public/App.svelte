@@ -149,6 +149,7 @@
       appyter = appyterLookup[$hash.path.slice(1)]
       pagehit(appyter)
       lastPath = curPath
+      window.scrollTo(0,0)
     }
   }
 
