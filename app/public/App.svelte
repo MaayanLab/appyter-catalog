@@ -145,9 +145,14 @@
 
   // sync appyter variable and url hash
   let appyter
+  let lastPath
   $: {
-    appyter = appyterLookup[$hash]
-    pagehit(appyter)
+    const curPath = $hash.path.slice(1)
+    if (curPath !== lastPath) {
+      appyter = appyterLookup[$hash.path.slice(1)]
+      pagehit(appyter)
+      lastPath = curPath
+    }
   }
 
   // things to do on window load
@@ -190,7 +195,7 @@
   <div class="col-sm-12 text-center">
     <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
       <h1>
-        <a href=".">
+        <a href="#/">
           <img
             src="{require('./images/appyters_logo.svg')}"
             class="img-fluid w-100 p-2"
@@ -275,7 +280,7 @@
                   &nbsp;<span class="badge badge-primary">{tag}</span>
                 {/each}
               </div>
-              <a href="#{appyter.name}" class="btn btn-primary btn-sm stretched-link">
+              <a href="#/{appyter.name}" class="btn btn-primary btn-sm stretched-link">
                 Select
               </a>
             </div>
