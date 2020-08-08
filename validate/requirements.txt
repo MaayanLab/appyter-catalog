@@ -1,4 +1,4 @@
 click
 git+git://github.com/Maayanlab/appyter.git
 jsonschema
-requests
+Pillow

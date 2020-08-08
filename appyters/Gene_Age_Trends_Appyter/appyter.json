@@ -2,8 +2,9 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name":"Gene_Age_Trends_Appyter",
     "title": "Gene Expression vs Age Plot Generator",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "description": "Generate Gene Expression vs Age Plots using cleaned RNA-seq data",
+    "image" : "appyterscreenshot.png",
     "authors": [
       {
         "name": "Tahmid Ahamed",

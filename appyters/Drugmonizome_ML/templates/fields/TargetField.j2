@@ -1,0 +1,45 @@
+<div class="row px-4 px-lg-3 pb-4">
+  <div class="col-lg-2 bold text-lg-right my-auto">
+    {{ this.args.label }}
+    {%- if this.args.description %}
+      <sup><i class="fa fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title="{{ this.args.description }}"></i></sup>
+    {% endif -%}:
+  </div>
+  <div class="col-lg-2 pt-2 pt-lg-0">
+    <div
+      class="nav flex-column nav-pills nav-justified"
+      aria-orientation="vertical"
+      role="tablist"
+      target="#{{ this.args.name }}"
+    >
+      {% for choice_name, choice in this.args.choices.items() %}
+        <a
+          href="#tab-content-{{ this.args.name }}-{{ choice_name }}"
+          class="nav-link{% if this.args.default == choice_name %} active{% endif %}"
+          aria-controls="tab-content-{{ this.args.name }}-{{ choice_name }}"
+          data-toggle="tab"
+          role="tab"
+          target="{{ choice_name }}"
+        >
+          {{ choice_name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-8 pt-2 pt-lg-0">
+    <div class="tab-content">
+      {% for choice_name, choice in this.args.choices.items() %}
+        <div
+          id="tab-content-{{ this.args.name }}-{{ choice_name }}"
+          class="tab-pane fade{% if this.args.default == choice_name %} show active{% endif %}"
+          role="tabpanel"
+        >
+          {% for item in choice %}
+          {{ item.render(hide_header=True) }}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <input type="text" class="hidden" id="{{ this.args.name }}" name="{{ this.args.name }}" value="{{ this.args.default }}" />
+  </div>
+</div>

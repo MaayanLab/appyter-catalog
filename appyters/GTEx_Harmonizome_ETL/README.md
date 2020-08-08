@@ -1,6 +1,6 @@
 # Harmonizome ETL: GTEx
 
-[the Genotype-Tissue Expression Project](https://www.gtexportal.org/home/) (GTEx) is a resource to study tissue-specific gene expression and regulation. It provides access to data including gene expressions, QTLs, and histology images.
+[The Genotype-Tissue Expression Project](https://www.gtexportal.org/home/) (GTEx) is a resource to study tissue-specific gene expression and regulation. It provides access to data including gene expressions, QTLs, and histology images.
 
 This appyter takes data from the RNA-Seq dataset and outputs files that are usable for the Harmonizome. It pre-processes the raw data  in order to construct an expression matrix with gene names as rows and tissue as column attributes. It then draws from the current NCBI database to map the gene names to a set of approved gene symbols, so that synonymous genes are mapped to the same symbol. 
 

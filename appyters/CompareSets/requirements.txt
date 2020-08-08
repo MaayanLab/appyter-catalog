@@ -7,3 +7,4 @@ tabulate
 scipy
 upsetplot
 plotly
+supervenn

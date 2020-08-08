@@ -2,8 +2,9 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name": "CompareSets",
     "title": "Set Comparison Appyter",
-    "version": "0.0.3",
+    "version": "0.0.6",
     "description": "An appyter that creates Venn diagrams and UpSet plots from user-inputted gene sets and determines whether the overlaps are significant.",
+    "image": "logo.png",
     "authors": [
       {
         "name": "Jason Hom",
@@ -12,11 +13,15 @@
     ],
     "url": "https://github.com/MaayanLab/appyter-catalog",
     "tags": [
-      "Venn diagrams", "UpSet plots", "Fisher's Exact Test"
+      "Venn diagrams", "SuperVenn diagrams", "UpSet plots", "Fisher's Exact Test"
     ],
     "license": "Apache-2.0",
     "appyter": {
       "file": "CompareSets.ipynb",
-      "profile": "biojupies"
+      "profile": "biojupies",
+      "extras": [
+        "toc",
+        "toggle-code"
+      ]
     }
   }

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "CREEDS_Drugmonizome_ETL",
+  "title": "Drugmonizome ETL: CREEDS",
+  "version": "0.0.2",
+  "description": "An appyter to process drug-induced gene signature data from CREEDS.",
+  "image": "Drugmonizome_ETL.png",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
+  "tags": [
+    "Drugmonizome",
+    "Drugmonizome ETL Script",
+    "CREEDS"
+  ],
+  "license": "MIT",
+  "appyter": {
+    "file": "CREEDS.ipynb",
+    "profile": "biojupies"
+  }
+}
