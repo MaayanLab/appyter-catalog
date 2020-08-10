@@ -14,6 +14,8 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
     "CLIP-SEQ",
+    "Enrichment Analysis",
+    "Enrichr",
     "microRNAs"
   ],
   "license": "Apache-2.0",

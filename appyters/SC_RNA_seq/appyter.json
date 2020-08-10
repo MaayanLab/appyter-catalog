@@ -13,7 +13,8 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "RNA-seq"
+    "RNA-seq",
+    "scRNA-seq"
   ],
   "license": "Apache-2.0",
   "appyter": {

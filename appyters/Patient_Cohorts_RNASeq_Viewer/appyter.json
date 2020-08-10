@@ -12,10 +12,12 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "Enrichr",
-    "TCGA",
     "Enrichment Analysis",
-    "RNA-seq"
+    "Enrichr",
+    "L1000",
+    "L1000FWD",
+    "RNA-seq",
+    "TCGA"
   ],
   "license": "MIT",
   "image": "main-image.png",

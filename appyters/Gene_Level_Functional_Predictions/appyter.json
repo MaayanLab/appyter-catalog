@@ -14,9 +14,10 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
     "ARCHS4",
-    "TCGA",
+    "Enrichr",
     "ncRNA",
-    "RNA-seq"
+    "RNA-seq",
+    "TCGA"
   ],
   "license": "Apache-2.0",
   "public": true,
