@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name":"Enrichr_Canvas_Appyter",
   "title": "Enrichr Canvas Appyter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An appyter that creates a hexagonal canvas comparing a user-inputted gene list with a selected Enrichr library.",
   "image": "featured-image.png",
   "authors": [
