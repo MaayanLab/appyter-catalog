@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
+    "Mouse Genome Informatics",
     "Harmonizome",
-    "Harmonizome ETL Script",
-    "Mouse Genome Informatics"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
@@ -23,4 +23,3 @@
     "profile": "biojupies"
   }
 }
-

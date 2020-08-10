@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
+    "ATC Codes",
     "Drugmonizome",
-    "Drugmonizome ETL Script",
-    "ATC Codes"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {

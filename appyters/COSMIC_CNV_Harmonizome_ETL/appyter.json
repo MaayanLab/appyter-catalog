@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
+    "COSMIC (Copy Number Variants)",
     "Harmonizome",
-    "Harmonizome ETL Script",
-    "COSMIC (Copy Number Variants)"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
@@ -23,4 +23,3 @@
     "profile": "biojupies"
   }
 }
-

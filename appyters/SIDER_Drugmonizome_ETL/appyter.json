@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
+    "SIDER",
     "Drugmonizome",
-    "Drugmonizome ETL Script",
-    "SIDER"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {

@@ -4,7 +4,7 @@
   "title": "Drugmonizome ETL: DrugBank",
   "version": "0.0.3",
   "description": "An appyter to process drug-protein associations from the DrugBank database.",
-  "image":"Drugmonizome_ETL.png",
+  "image": "Drugmonizome_ETL.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
@@ -14,7 +14,7 @@
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
     "Drugmonizome",
-    "Drugmonizome ETL Script",
+    "ETL Script",
     "DrugBank"
   ],
   "license": "MIT",

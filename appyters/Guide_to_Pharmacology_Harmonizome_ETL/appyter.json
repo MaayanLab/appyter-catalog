@@ -14,7 +14,7 @@
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
     "Harmonizome",
-    "Harmonizome ETL Script",
+    "ETL Script",
     "Guide to Pharmacology"
   ],
   "license": "MIT",
@@ -23,4 +23,3 @@
     "profile": "biojupies"
   }
 }
-

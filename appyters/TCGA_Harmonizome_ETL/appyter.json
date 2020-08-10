@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
+    "TCGA",
     "Harmonizome",
-    "Harmonizome ETL Script",
-    "The Cancer Genome Atlas"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
@@ -23,4 +23,3 @@
     "profile": "biojupies"
   }
 }
-

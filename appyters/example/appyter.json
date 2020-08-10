@@ -20,6 +20,10 @@
   "appyter": {
     "file": "example.ipynb",
     "profile": "biojupies",
-    "extras": ["toc", "hide-code", "toggle-code"]
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
   }
 }

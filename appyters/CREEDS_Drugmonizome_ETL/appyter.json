@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
+    "CREEDS",
     "Drugmonizome",
-    "Drugmonizome ETL Script",
-    "CREEDS"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
