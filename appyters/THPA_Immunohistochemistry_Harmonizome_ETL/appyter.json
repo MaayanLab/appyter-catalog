@@ -13,9 +13,10 @@
   ],
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
-    "The Human Protein Atlas (Immunihistochemistry)",
+    "ETL Script",
     "Harmonizome",
-    "ETL Script"
+    "Immunihistochemistry",
+    "The Human Protein Atlas"
   ],
   "license": "MIT",
   "appyter": {
