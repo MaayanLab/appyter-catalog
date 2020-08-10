@@ -33,11 +33,13 @@
     }
   }
 
+  // load config
+  let { global_tags } = require('./config.json')
+
   // store appyters as list and lookup table based on name slugs
   let appyterList = require('./appyters.json')
   // assemble appyter lookup table
   let appyterLookup = {}
-  let globalTags = {}
   for (const appyter of appyterList) {
     let {name, description, long_description, authors, tags, ..._} = appyter
     const md = mdIt()
@@ -68,15 +70,8 @@
       long_description_html,
       color,
     })
-    // save tags to global list
-    for (const tag of tags) {
-      globalTags[tag] = (globalTags[tag] || 0) + 1
-    }
     // save a reference in the lookup table
     appyterLookup[name] = appyter
-  }
-  for (const tag in globalTags) {
-    if (globalTags[tag] <= 1) delete globalTags[tag]
   }
   appyterList = appyterList.filter(appyter => appyter.public !== false)
 
@@ -256,7 +251,7 @@
             </div>
           {/if}
           <div class="col-sm-12">
-            {#each Object.keys(globalTags).filter(tag => ($hash.params.tags || '').split(';').indexOf(tag) === -1) as tag}
+            {#each global_tags.filter(tag => ($hash.params.tags || '').split(';').indexOf(tag) === -1) as tag}
               <a
                 href="javascript:"
                 class="badge badge-primary m-1 p-1 text-white"
