@@ -211,7 +211,7 @@
 </style>
 
 <div class="row m-0 p-0">
-  <div class="col-sm-12 offset-md-3 col-md-6 offset-lg-4 col-lg-4 text-center">
+  <div class="col-sm-12 offset-md-2 col-md-8 offset-lg-3 col-lg-6 text-center">
     <h1>
       <a href="#/">
         <img
