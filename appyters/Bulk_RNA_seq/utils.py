@@ -184,7 +184,11 @@ def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, count
         meta_df['z'] = [x[2] for x in pca_transformed]
         
 
-    caption = '3D {} plot for samples using {} genes having largest variance'.format(pca_results["method"], pca_results['nr_genes'])
+    caption = '3D {} plot for samples using {} genes having largest variance. \
+    The figure displays an interactive, three-dimensional scatter plot of the data. \
+    Each point represents an RNA-seq sample. \
+    Samples with similar gene expression profiles are closer in the three-dimensional space. \
+    If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
     display(IPython.core.display.HTML('''
             <script src="/static/components/requirejs/require.js"></script>
             <script>
@@ -369,10 +373,11 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
             processed_data = {"expression": expr_df, 'design': design_dataframe}
             limma = robjects.r['limma']
-            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=False))
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=True))
             
             signature = pd.DataFrame(limma_results[0])
             signature.index = limma_results[1]
+            signature = signature.sort_values("t", ascending=False)
             
         elif method == "characteristic_direction":
             signature = characteristic_direction(dataset[normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
@@ -546,24 +551,6 @@ def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True,
     return concatenatedDataframe
 
 
-def run_go(enrichr_results, signature_label, plot_type='interactive', go_version='2018', sort_results_by='pvalue'):
-
-    # Libraries
-    go_version = str(go_version)
-    libraries = {
-        'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
-        'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
-        'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
-    }
-
-    # Get Enrichment Results
-    enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
-    enrichment_results['signature_label'] = signature_label
-    enrichment_results['plot_type'] = plot_type
-    enrichment_results['sort_results_by'] = sort_results_by
-
-    # Return
-    return enrichment_results
 
 def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='interactive', library_type='go', version='2018', sort_results_by='pvalue'):
 
@@ -739,7 +726,13 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
         # Display table
         display(HTML(html_results))
         # Display gene set
-        display_object(table_counter, gene_set_library, istable=True)
+        if source_label == "Transcription Factor":
+            additional_description = ". The table contains scrollable tables displaying the results of the Transcription Factor (TF) enrichment analysis generated using Enrichr. Every row represents a TF; significant TFs are highlighted in bold."
+        elif source_label == "Kinase":
+            additional_description = ". The table contains browsable tables displaying the results of the Protein Kinase (PK) enrichment analysis generated using Enrichr. Every row represents a PK; significant PKs are highlighted in bold."    
+        elif source_label == "miRNA":
+            additional_description = ". The figure contains browsable tables displaying the results of the miRNA enrichment analysis generated using Enrichr. Every row represents a miRNA; significant miRNAs are highlighted in bold."
+        display_object(table_counter, gene_set_library+additional_description, istable=True)
         display(create_download_link(enrichment_dataframe_subset, filename="Enrichment_analysis_{}_{}.csv".format(source_label, gene_set_library)))
     return table_counter
 
@@ -776,7 +769,6 @@ def run_l1000cds2(signature, nr_genes=500, signature_label='', plot_type='intera
         else:
             l1000cds2_results[label] = None
     l1000cds2_results['plot_type'] = plot_type
-
     # Return
     return l1000cds2_results
     
@@ -878,6 +870,7 @@ def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
     if l1000fwd_results['result_url']:
 
         # Display IFrame
+        display_link(l1000fwd_results['result_url'])
         display(IFrame(l1000fwd_results['result_url'], width="1000", height="1000"))
 
         # Display tables
