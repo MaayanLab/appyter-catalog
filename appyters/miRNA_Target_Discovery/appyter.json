@@ -1,8 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name":"miRNA_Target_Discovery",
+  "name": "miRNA_Target_Discovery",
   "title": "miRNA Target Discovery via CLIP-SEQ",
   "version": "0.0.1",
+  "image": "screenshot.png",
   "description": "An appyter that extracts gene targets from dCLIP output and performs enrichment analysis to it.",
   "authors": [
     {
@@ -13,11 +14,18 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
     "CLIP-SEQ",
-    "miRNA targets"
+    "Enrichment Analysis",
+    "Enrichr",
+    "microRNAs"
   ],
   "license": "Apache-2.0",
   "appyter": {
     "file": "miRNA Target Discovery via CLIP-SEQ.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
   }
 }

@@ -1,0 +1,24 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='l1000fwd.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1> L1000FWD Consensus Drugs </h1>
+            <p class="my-0"> Generate consensus mimicker and reverser drugs. </p>
+        </div>
+    </div>
+</div>
+{{ super() }}
+{% endblock %}

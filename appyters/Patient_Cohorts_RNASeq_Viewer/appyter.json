@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Patient_Cohorts_RNASeq_Viewer",
   "title": "Patient Cohorts RNA-Seq Viewer",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "An appyter for the visualization and analysis of TCGA intra-cancer patient clusters based on RNA-Seq profiles and clinical data",
   "authors": [
     {
@@ -11,8 +11,16 @@
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
-  "tags": ["Enrichment Analysis", "TCGA", "RNA-Seq"],
+  "tags": [
+    "Enrichment Analysis",
+    "Enrichr",
+    "L1000",
+    "L1000FWD",
+    "RNA-seq",
+    "TCGA"
+  ],
   "license": "MIT",
+  "image": "main-image.png",
   "appyter": {
     "file": "Patient_Cohorts_RNASeq_Viewer.ipynb",
     "profile": "biojupies",

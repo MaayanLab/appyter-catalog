@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Bulk_RNA_seq",
   "title": "Bulk RNA-seq analysis pipeline",
-  "version": "0.0.2",
+  "version": "0.0.7",
   "description": "Bulk RNA-seq analysis pipeline enables you to analyze and visualize datasets with state-of-the-art algorithms and visualization methods.",
+  "image": "screenshot.png",
   "authors": [
     {
       "name": "Minji Jeon",
@@ -12,11 +13,19 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "RNAseq"
+    "Enrichment Analysis",
+    "Enrichr",
+    "L1000",
+    "L1000FWD",
+    "RNA-seq"
   ],
   "license": "Apache-2.0",
   "appyter": {
     "file": "RNA_seq_Analysis_Pipeline.ipynb",
-    "profile": "biojupies"
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
   }
 }

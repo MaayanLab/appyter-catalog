@@ -3,3 +3,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 
 BiocManager::install("limma")
 BiocManager::install("edgeR")
+BiocManager::install("DESeq2")
+
+install.packages("statmod")
