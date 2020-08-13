@@ -1,15 +1,14 @@
 <div class="row px-4 px-lg-3 pb-4">
-  {% if not hide_header %}
   <div class="col-lg-3 bold text-lg-right my-auto">
     {{ this.args.label }}
     {%- if this.args.description %}
       <sup><i class="fa fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title="{{ this.args.description }}"></i></sup>
     {% endif -%}:
   </div>
-  {% endif %}
-  <div class="col-lg-6 pt-2 pt-lg-0">
+  <div class="autocomplete col-lg-6 pt-2 pt-lg-0" name="{{ this.args.name }}" data-target="{{this.args.file_path}}">
     <input
       type="text"
+      id="{{ this.args.name }}"
       name="{{ this.args.name }}"
       class="form-control nodecoration tiny bg-white px-2 py-1 mb-0"
       placeholder="{{ this.args.hint }}"
