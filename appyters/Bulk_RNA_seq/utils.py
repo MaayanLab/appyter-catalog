@@ -250,7 +250,7 @@ def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, count
     # Configs for layout and axes
     
     layout=dict(height=1000, width=1000, 
-                title=caption,
+                title='3D {} plot for samples'.format(pca_results["method"]),
                 scene=dict(
                     xaxis=dict(title=axis[0]),
                     yaxis=dict(title=axis[1]),
