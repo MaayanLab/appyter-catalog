@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "GO_Harmonizome_ETL",
   "title": "Harmonizome ETL: Gene Ontology",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "An appyter to process data from Gene Ontology for the Harmonizome.",
+  "image": "ETL_Logo.png",
   "authors": [
     {
       "name": "Charles R. Dai",
@@ -12,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
   "tags": [
+    "Gene Ontology",
     "Harmonizome",
-    "Harmonizome ETL Script",
-    "Gene Ontology"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
