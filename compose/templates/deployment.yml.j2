@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-catalog
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-catalog
+  template:
+    metadata:
+      labels:
+        app: appyter-catalog
+    spec:
+      containers:
+      - name: appyter-catalog
+        image: maayanlab/appyter-catalog:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+      restartPolicy: Always
+{%- for appyter in appyters %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-{{ appyter['name'].lower() }}
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-{{ appyter['name'].lower() }}
+  template:
+    metadata:
+      labels:
+        app: appyter-{{ appyter['name'].lower() }}
+    spec:
+      containers:
+      - name: appyter-{{ appyter['name'].lower() }}
+        image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: PREFIX
+          value: /{{ appyter['name'] }}/
+        - name: PORT
+          value: '443'
+        - name: PROXY
+          value: 'true'
+      restartPolicy: Always
+{%- endfor %}
+{{- '{{- if eq .Values.POSTGREST "true" }}' }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-postgrest
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-postgrest
+  template:
+    metadata:
+      labels:
+        app: appyters-postgrest
+    spec:
+      containers:
+      - name: appyters-postgrest
+        image: postgrest/postgrest
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: PGRST_DB_URI
+          value: {{ '{{ .Values.PGRST_DB_URI }}' }}
+        - name: PGRST_DB_SCHEMA
+          value: {{ '{{ .Values.PGRST_DB_SCHEMA }}' }}
+        - name: PGRST_DB_ANON_ROLE
+          value: {{ '{{ .Values.PGRST_DB_ANON_ROLE }}' }}
+        - name: PGRST_SERVER_PROXY_URI
+          value: {{ '{{ .Values.PGRST_SERVER_PROXY_URI }}' }}
+      restartPolicy: Always
+{{- '{{- endif }}' }}
+{{- '{{- if eq .Values.POSTGRES "true" }}' }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: maayanlab/appyters-postgres:latest
+        imagePullPolicy: Always
+        tty: true
+        env:
+          POSTGRES_DB: appyters
+          POSTGRES_USER: appyters
+          POSTGRES_PASSWORD: {{ '{{ .Values.POSTGRES_PASSWORD }}' }}
+      restartPolicy: Always
+{{- '{{- endif }}' }}
+{{- '{{- if eq .Values.S3 "true" }}' }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-s3
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-s3
+  template:
+    metadata:
+      labels:
+        app: appyters-s3
+    spec:
+      containers:
+      - name: appyters-s3
+        image: maayanlab/appyters-s3:latest
+        imagePullPolicy: Always
+        tty: true
+        env:
+          MINIO_BUCKET: {{ '{{ .Values.MINIO_BUCKET }}' }}
+          MINIO_ACCESS_KEY: {{ '{{ .Values.MINIO_ACCESS_KEY }}' }}
+          MINIO_SECRET_KEY: {{ '{{ .Values.MINIO_SECRET_KEY }}' }}
+      restartPolicy: Always
+{{- '{{- endif }}' }}
