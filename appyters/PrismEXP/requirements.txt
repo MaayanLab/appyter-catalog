@@ -1,0 +1,15 @@
+git+git://github.com/Maayanlab/appyter.git
+ipython
+jupyter
+matplotlib
+numpy
+pandas
+scipy
+sklearn
+s3fs
+h5py
+tqdm
+pickle
+requests
+re
+shutil
