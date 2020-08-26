@@ -9,5 +9,3 @@ venv
 .ipynb_checkpoints
 data/
 \.tmp/
-
-appyters/Enrichr_Consensus_Terms/.DS_Store
