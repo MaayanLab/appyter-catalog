@@ -3,13 +3,16 @@ import re
 import sys
 import json
 import click
-import shutil
-import requests
-import tempfile
 import traceback
 import jsonschema
+import urllib.request, urllib.error
 from PIL import Image
 from subprocess import Popen, PIPE
+
+# remove user agent from urllib.request requests
+_opener = urllib.request.build_opener()
+_opener.addheaders = [('Accept', '*/*')]
+urllib.request.install_opener(_opener)
 
 def get_changed_appyters(github_action):
   if github_action:
@@ -57,11 +60,8 @@ def validate_appyter(appyter):
       image_name = os.path.basename(image)
       image_path = os.path.join(tmp_directory, image_name)
       print(f"{appyter}: WARNING it is recommended to use a relative path instead of a url")
-      response = requests.get(config['image'], stream=True)
-      assert response.status_code > 299, f"Could not download image {image}, received error {response.status_code}"
-      with open(os.path.join(tmp_directory, image_name), 'wb') as fw:
-        response.raw.decode_content = True
-        shutil.copyfileobj(response.raw, fw)
+      _, response = urllib.request.urlretrieve(config['image'], filename=os.path.join(tmp_directory, image_name))
+      assert response.get_content_maintype() == 'image', 'Expected image content'
     else:
       image_path = f"appyters/{appyter}/static/{image}"
     #
@@ -132,53 +132,55 @@ def validate_appyter(appyter):
     if default_file:
       if default_file in field_examples:
         print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
-        response = requests.get(field_examples[default_file], stream=True)
-        assert response.status_code != 404, f"File not found on remote, reported 404"
-        if response.status_code > 299:
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {response.status_code}.")
-          print(f"{appyter}: WARNING,  Stopping early as download requires manual intervention.")
+        try:
+          _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
+          assert response.get_content_type() != 'text/html', 'Expected data, got html'
+        except AssertionError as e:
+          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
           early_stopping = True
-        else:
-          with open(os.path.join(tmp_directory, default_file), 'wb') as fw:
-            response.raw.decode_content = True
-            shutil.copyfileobj(response.raw, fw)
+        except urllib.error.HTTPError as e:
+          assert e.getcode() != 404, f"File not found on remote, reported 404"
+          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+          early_stopping = True
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
       print(f"{appyter}: WARNING, no default file is provided")
   #
-  if not early_stopping:
-    print(f"{appyter}: Constructing default notebook from appyter...")
-    with Popen([
-      'docker', 'run',
-      '-v', f"{tmp_directory}:/data",
-      "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
-      'appyter', 'nbconstruct',
-      f"--output=/data/{nbfile}",
-      nbfile,
-    ], stdin=PIPE, stdout=PIPE) as p:
-      print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
-      stdout, _ = p.communicate(json.dumps(default_args).encode())
-      for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
-        print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
-      assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
-      assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
-    #
-    print(f"{appyter}: Executing default notebook with appyter...")
-    with Popen([
-      'docker', 'run',
-      '-v', f"{tmp_directory}:/data",
-      '-e', 'PYTHONPATH=/app',
-      f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
-      'appyter', 'nbexecute',
-      f"--cwd=/data",
-      f"/data/{nbfile}",
-    ], stdout=PIPE) as p:
-      for msg in map(json.loads, p.stdout):
-        assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
-        print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
-      assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
-    #
+  if early_stopping:
+    print(f"{appyter}: WARNING, Stopping early as a download requires manual intervention.")
+    return
+  print(f"{appyter}: Constructing default notebook from appyter...")
+  with Popen([
+    'docker', 'run',
+    '-v', f"{tmp_directory}:/data",
+    "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    'appyter', 'nbconstruct',
+    f"--output=/data/{nbfile}",
+    nbfile,
+  ], stdin=PIPE, stdout=PIPE) as p:
+    print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
+    stdout, _ = p.communicate(json.dumps(default_args).encode())
+    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
+      print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
+    assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
+    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
+  #
+  print(f"{appyter}: Executing default notebook with appyter...")
+  with Popen([
+    'docker', 'run',
+    '-v', f"{tmp_directory}:/data",
+    '-e', 'PYTHONPATH=/app',
+    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    'appyter', 'nbexecute',
+    f"--cwd=/data",
+    f"/data/{nbfile}",
+  ], stdout=PIPE) as p:
+    for msg in map(json.loads, p.stdout):
+      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+      print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
+    assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
+  #
   print(f"{appyter}: Success!")
 
 @click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/master')

@@ -9,8 +9,6 @@ appyter_path = os.path.join(root_dir, 'appyters')
 def get_appyters(appyter_path):
   for path in map(os.path.dirname, glob.glob(os.path.join(appyter_path, '*', 'appyter.json'))):
     appyter = json.load(open(os.path.join(path, 'appyter.json'), 'r'))
-    if appyter.get('public') == False:
-      continue
     yield dict(
       appyter,
       path=path,

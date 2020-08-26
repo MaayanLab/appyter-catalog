@@ -9,3 +9,4 @@ plotly
 requests
 matplotlib
 ipython
+networkx

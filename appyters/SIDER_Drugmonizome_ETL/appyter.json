@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "SIDER_Drugmonizome_ETL",
   "title": "Drugmonizome ETL: SIDER",
-  "version": "0.1.0",
+  "version": "0.0.2",
   "description": "An appyter to process drug-side effect and drug-indication associations from SIDER.",
+  "image": "Drugmonizome_ETL.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
@@ -12,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
+    "SIDER",
     "Drugmonizome",
-    "Drugmonizome ETL Script",
-    "SIDER"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {
