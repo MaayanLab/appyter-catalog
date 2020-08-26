@@ -6,3 +6,4 @@ numpy
 scipy
 seaborn
 fastcluster
+requests
