@@ -1,9 +1,9 @@
 # PrismEXP
 ## Gene Function Prediction
 
-<p align="center">
-<img src="static/featured-image.png" width=800 />
-</p>
+
+<img src="static/featured-image.png" class="fluid" />
+
 
 Gene co-expression is a commonly used feature in many machine learning applications. The elucidation of gene function frequently relies on the use of correlation structures, and the performance of the predictions relies on the chosen gene expression data. In some applications, correlations derived from tissue-specific gene expression outperform correlations derived from global gene expression. However, the identification of the optimal tissue may not always be trivial, and the constraint of a single tissue might be too limiting in some circumstances.
 
