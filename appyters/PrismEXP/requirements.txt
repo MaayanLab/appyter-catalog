@@ -9,7 +9,7 @@ sklearn
 s3fs
 h5py
 tqdm
-pickle
+pickle-mixin
 requests
 re
 shutil
