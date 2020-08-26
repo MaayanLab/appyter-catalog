@@ -9,10 +9,10 @@ services:
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
 {%- endfor %}
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
-      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) http://minio:9000$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://minio:9000$$1
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://app:80$$1
 {%- endwith %}
-      - nginx_redirect_00=(/minio(/(.*))) http://$$host:9000$$1
+      - nginx_redirect_00=(/minio(/(.*))) https://$$host:9000$$1
       - nginx_server_name=${nginx_server_name}
       - nginx_ssl=${nginx_ssl}
       - nginx_ssl_letsencrypt=${nginx_ssl}

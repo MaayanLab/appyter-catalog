@@ -1,17 +1,9 @@
 # Patient Cohorts RNA-Seq Viewer
 
-![Thumbnail](./static/main-image.png)
+The Patient Cohorts RNA-Seq Viewer Appyter is a web application that provides a customizable interface for processing, visualizing, and analyzing RNA-sequencing (RNA-Seq) data from patient cohorts. The goal of the Appyter is to provide comprehensive analysis of patient cohorts by considering the RNA-seq profiling of the patient samples together with information about their clinical parameters.
 
-[The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) dataset contains multiomics profiling and clinical data from over 10,000 tumors collected from patients spanning several cancer types. Specifically, TCGA has bulk RNA-sequencing (RNA-Seq) profiling of tumors, which can provide insights into mechanisms and classify tumors by subtype.
+The Appyter automatically identifies clusters of patients based on their RNA-seq profiles and associates clinical metadata with each cluster. The Patient Cohorts RNA-Seq Viewer Appyter is preloaded with data collected by The Cancer Genome Atlas (TCGA) but can accommodate user-uploaded datasets.
 
-By default, this appyter provides analysis and visualization of TCGA datasets. Users can optionally upload their own datasets.
+A standard RNA-seq preprocessing pipeline, including normalization and dimensionality reduction, is implemented. Clusters of patients and their associated differential gene expression profiles are fed into a series of downstream analyses. These include survival analysis, enrichment analysis, and small molecule and drug prioritization based on the L1000 dataset. These analyses provide insights into each cluster’s unique genomic, transcriptomic, and clinical features.
 
-The appyter provides analysis for RNA-Seq TCGA data for cancers with over 150 cases. The report automatically identifies clusters of patient and determines which clinical features and genes are most associated with each cluster.
-
-For the TCGA data, each column in the RNA-Seq dataset corresponds to a row in the clinical dataset; both are referenced by the same identifier (here the case_id as provided by TCGA).
-
-The RNA-Seq data loaded from TCGA is in the form of raw counts mapped to genes with the [htseq-count](https://htseq.readthedocs.io/en/release_0.9.0/count.html) analysis package; the same format should be followed for user-uploaded files. The analysis filters out lowly expressed genes, identifies the most variable genes, normalize the counts, and reduces the dimensionality of the dataset further with PCA and UMAP.
-
-To determine the ideal number of clusters, the analysis tests a range of possible K clusters, and selects the optimal number based on a modified silhouette score that prioritizes more clusters to avoid missing out small clusters.
-
-The appyter also identifies the top genes for each cluster, using these for enrichment analysis and suggestion for drugs and small molecules based on the drugs that mimic or reverse the signatures obtained for each cluster. Such drug suggestions are based on the L1000 dataset, using the L1000FWD API. It should be noted that these are speculative predictions and should not be applied to patients before carefully tested in cell based assays and animal models.
+The output of the Appyter is a downloadable Jupyter notebook with code blocks, descriptive markdown, interactive and static figures, and tables. Figure and table legends are provided so users can export the results directly into their publications. Of note, various parameters and methods used for preprocessing and subsequent analyses can be adjusted by the user in the input form before the notebook is executed. The Appyter enables researchers with no programming background to perform complex analyses to uncover patterns embedded in their RNA-seq patient cohort datasets.

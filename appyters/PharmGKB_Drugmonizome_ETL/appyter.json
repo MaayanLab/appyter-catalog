@@ -13,9 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/Drugmonizome-Data-Processing-Appyters",
   "tags": [
+    "PharmGKB",
     "Drugmonizome",
-    "Drugmonizome ETL Script",
-    "PharmGKB"
+    "ETL Script"
   ],
   "license": "MIT",
   "appyter": {

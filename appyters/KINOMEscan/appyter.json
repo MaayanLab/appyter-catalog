@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name":"KINOMEscan",
+  "name": "KINOMEscan",
   "title": "KINOMEscan and TAS Vectors Data Visualization",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An appyter that creates bar charts to visualize KINOMEscan and TAS Vectors data from HMS LINCS.",
   "image": "Appyter_Screenshot.png",
   "authors": [
@@ -13,12 +13,14 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "KINOMEscan", "TAS Vectors", "Protein kinases", "Drug binding"
+    "TAS Vectors",
+    "Kinome",
+    "KINOMEscan"
   ],
   "license": "Apache-2.0",
   "appyter": {
     "file": "KINOMEscan-Appyter.ipynb",
-    "profile": "biojupies", 
+    "profile": "biojupies",
     "extras": [
       "toc",
       "toggle-code"

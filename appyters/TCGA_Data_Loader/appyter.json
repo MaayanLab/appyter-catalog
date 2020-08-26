@@ -11,7 +11,10 @@
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
-  "tags": ["Databases", "TCGA", "RNA-Seq"],
+  "tags": [
+    "TCGA",
+    "RNA-seq"
+  ],
   "license": "MIT",
   "image": "TCGA-thumbnail.png",
   "appyter": {

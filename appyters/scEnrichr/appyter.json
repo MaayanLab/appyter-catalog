@@ -13,9 +13,10 @@
   "image": "thumbnail.png",
   "url": "https://github.com/maayanLab/scEnrichr",
   "tags": [
+    "Enrichr",
+    "scRNA-seq",
     "Enrichment Analysis",
-    "RNA-seq",
-    "scRNA-seq"
+    "RNA-seq"
   ],
   "license": "Apache-2.0",
   "appyter": {

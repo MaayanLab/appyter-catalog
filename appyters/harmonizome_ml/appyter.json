@@ -4,15 +4,17 @@
   "title": "Harmonizome-ML",
   "version": "0.0.2",
   "description": "Interactive On-the-Fly Imputation of Knowledge about Genes and Proteins with Machine Learning",
-  "authors": [{
-    "name": "Daniel J. B. Clarke",
-    "email": "u8sand@gmail.com"
-  }],
+  "authors": [
+    {
+      "name": "Daniel J. B. Clarke",
+      "email": "u8sand@gmail.com"
+    }
+  ],
   "image": "thumbnail.png",
   "url": "https://github.com/maayanLab/harmonizome-ml",
   "tags": [
-    "Machine Learning",
-    "Harmonizome"
+    "Harmonizome",
+    "Machine Learning"
   ],
   "license": "Apache-2.0",
   "appyter": {
