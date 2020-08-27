@@ -11,6 +11,8 @@ TLS_ISSUER: "letsencrypt-prod"
 APPYTERS_SERVER_NAME: "appyters.maayanlab.cloud"
 APPYTERS_TLS_SECRET: "appyters-maayanlab-cloud-tls"
 
+APPYTERS_ORCHESTRATOR_CONCURRENT_JOBS: "4"
+
 POSTGREST: "true"
 PGRST_DB_ANON_ROLE: "guest"
 PGRST_DB_SCHEMA: "api"
@@ -24,8 +26,9 @@ POSTGRES_PV_CLASS: "aws-ssd"
 POSTGRES_PV_SIZE: "10G"
 
 S3: "true"
-S3_ACCESS_KEY: ""
+S3_URI: "s3://<S3_ACCESS_KEY>:<S3_SECRET_KEY>@s3.appyters.maayanlab.cloud/"
 S3_BUCKET: "storage"
+S3_ACCESS_KEY: ""
 S3_SECRET_KEY: ""
 S3_SERVER_NAME: "s3.appyters.maayanlab.cloud"
 S3_TLS_SECRET: "s3-appyters-maayanlab-cloud-tls"
@@ -355,6 +358,51 @@ spec:
     secretName: {{ '{{ .Values.S3_TLS_SECRET }}' }}
 {{ '{{- endif }}' }}
 {{ '{{- endif }}' }}
+---
+# Source: templates/deployment-appyters-orchestrator.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-orchestrator
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-orchestrator
+  template:
+    metadata:
+      labels:
+        app: appyters-orchestrator
+    spec:
+      containers:
+      - name: appyters-orchestrator
+        image: maayanlab/appyter:latest
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - HOST=0.0.0.0
+        - PORT=80
+        - JOBS={{ .Values.APPYTERS_ORCHESTRATOR_CONCURRENT_JOBS }}
+        - DISPATCH=kubernetes
+        - DEBUG=false
+      restartPolicy: Always
+---
+# Source: templates/service-appyters-orchestrator.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-orchestrator
+  namespace: appyters
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
 {%- for appyter in appyters %}
 ---
 # Source: templates/deployment-appyter-{{ appyter['name'].lower() }}.yaml
@@ -379,12 +427,22 @@ spec:
         imagePullPolicy: Always
         tty: true
         env:
-        - name: PREFIX
-          value: /{{ appyter['name'] }}/
-        - name: PORT
-          value: '80'
         - name: PROXY
           value: 'true'
+        - name: HOST
+          value: 0.0.0.0
+        - name: PORT
+          value: '80'
+        - name: PREFIX
+          value: /{{ appyter['name'] }}/
+        - name: DATA_DIR
+          value: {{ '{{ .Values.S3_URI }}' }}/{{ '{{ .Values.S3_BUCKET }}' }}/{{ appyter['name'] }}/
+        - name: DISPATCHER
+          value: http://appyters-orchestrator
+        - name: DISPATCHER_URL
+          value: http://appyter-{{ appyter['name'].lower() }}/{{ appyter['name'] }}
+        - name: DISPATCHER_IMAGE
+          value: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
       restartPolicy: Always
 ---
 # Source: templates/service-appyter-{{ appyter['name'].lower() }}.yaml
