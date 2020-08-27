@@ -1,57 +1,71 @@
+# Source: deployment-appyters-catalog.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appyter-catalog
+  name: appyters-catalog
   namespace: appyters
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyter-catalog
+      app: appyters-catalog
   template:
     metadata:
       labels:
-        app: appyter-catalog
+        app: appyters-catalog
     spec:
       containers:
-      - name: appyter-catalog
-        image: maayanlab/appyter-catalog:{{ version }}
+      - name: appyters-catalog
+        image: maayanlab/appyters-catalog:{{ version }}
         imagePullPolicy: Always
         tty: true
       restartPolicy: Always
-{%- for appyter in appyters %}
 ---
-apiVersion: apps/v1
-kind: Deployment
+# Source: service-appyters-catalog.yaml
+apiVersion: v1
+kind: Service
 metadata:
-  name: appyter-{{ appyter['name'].lower() }}
+  name: appyters-catalog
   namespace: appyters
 spec:
-  replicas: 1
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
   selector:
-    matchLabels:
-      app: appyter-{{ appyter['name'].lower() }}
-  template:
-    metadata:
-      labels:
-        app: appyter-{{ appyter['name'].lower() }}
-    spec:
-      containers:
-      - name: appyter-{{ appyter['name'].lower() }}
-        image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
-        imagePullPolicy: Always
-        tty: true
-        env:
-        - name: PREFIX
-          value: /{{ appyter['name'] }}/
-        - name: PORT
-          value: '443'
-        - name: PROXY
-          value: 'true'
-      restartPolicy: Always
-{%- endfor %}
-{{- '{{- if eq .Values.POSTGREST "true" }}' }}
+    workload.user.cattle.io/workloadselector: deployment-appyters-catalog
 ---
+---
+# Source: ingress-appyters-catalog.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-catalog
+  namespace: appyters
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  annotations:
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- endif }}' }}
+spec:
+  rules:
+  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+    http:
+      paths:
+      - backend:
+          serviceName: appyters-catalog
+          servicePort: 80
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+{{ '{{- endif }}' }}
+---
+# Source: deployment-appyters-postgrest.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,26 +96,70 @@ spec:
         - name: PGRST_SERVER_PROXY_URI
           value: {{ '{{ .Values.PGRST_SERVER_PROXY_URI }}' }}
       restartPolicy: Always
-{{- '{{- endif }}' }}
-{{- '{{- if eq .Values.POSTGRES "true" }}' }}
 ---
+# Source: service-appyters-postgrest.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgrest
+  namespace: appyters
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
+---
+# Source: ingress-appyters-postgrest.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-postgrest
+  namespace: appyters
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  annotations:
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- endif }}' }}
+spec:
+  rules:
+  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+    http:
+      paths:
+      - backend:
+          serviceName: appyters-postgrest
+          servicePort: 3000
+        path: /postgrest/
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+{{ '{{- endif }}' }}
+{{ '{{- endif }}' }}
+---
+# Source: deployment-appyters-postgres.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: appyters-postgres
   namespace: appyters
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: appyters-postgres
   template:
     metadata:
       labels:
-        app: postgres
+        app: appyters-postgres
     spec:
       containers:
-      - name: postgres
+      - name: appyters-postgres
         image: maayanlab/appyters-postgres:latest
         imagePullPolicy: Always
         tty: true
@@ -110,9 +168,10 @@ spec:
           POSTGRES_USER: appyters
           POSTGRES_PASSWORD: {{ '{{ .Values.POSTGRES_PASSWORD }}' }}
       restartPolicy: Always
-{{- '{{- endif }}' }}
-{{- '{{- if eq .Values.S3 "true" }}' }}
+{{ '{{- endif }}' }}
 ---
+# Source: deployment-appyters-s3.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,4 +197,122 @@ spec:
           MINIO_ACCESS_KEY: {{ '{{ .Values.MINIO_ACCESS_KEY }}' }}
           MINIO_SECRET_KEY: {{ '{{ .Values.MINIO_SECRET_KEY }}' }}
       restartPolicy: Always
-{{- '{{- endif }}' }}
+---
+# Source: service-appyters-s3.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-s3
+  namespace: appyters
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-s3
+---
+# Source: ingress-appyters-s3.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-s3
+  namespace: appyters
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  annotations:
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- endif }}' }}
+spec:
+  rules:
+  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+    http:
+      paths:
+      - backend:
+          serviceName: appyters-s3
+          servicePort: 9000
+        path: /postgrest/
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+{{ '{{- endif }}' }}
+{{ '{{- endif }}' }}
+{%- for appyter in appyters %}
+---
+# Source: deployment-appyter-{{ appyter['name'].lower() }}.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-{{ appyter['name'].lower() }}
+  namespace: appyters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-{{ appyter['name'].lower() }}
+  template:
+    metadata:
+      labels:
+        app: appyter-{{ appyter['name'].lower() }}
+    spec:
+      containers:
+      - name: appyter-{{ appyter['name'].lower() }}
+        image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: PREFIX
+          value: /{{ appyter['name'] }}/
+        - name: PORT
+          value: '80'
+        - name: PROXY
+          value: 'true'
+      restartPolicy: Always
+---
+# Source: service-appyter-{{ appyter['name'].lower() }}.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyter-{{ appyter['name'].lower() }}
+  namespace: appyters
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-{{ appyter['name'].lower() }}
+---
+# Source: ingress-appyter-{{ appyter['name'].lower() }}.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyter-{{ appyter['name'].lower() }}
+  namespace: appyters
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  annotations:
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- endif }}' }}
+spec:
+  rules:
+  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+    http:
+      paths:
+      - backend:
+          serviceName: appyter-{{ appyter['name'].lower() }}
+          servicePort: 80
+        path: /{{ appyter['name'] }}/
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+{{ '{{- endif }}' }}
+{%- endfor %}
