@@ -1,4 +1,33 @@
-# Source: deployment-appyters-catalog.yaml
+# Source: Chart.yaml
+apiVersion: v1
+appVersion: "0.0.1"
+description: Appyters Catalog
+name: appyters
+version: v1
+---
+# Source: values.yaml
+TLS_ISSUER: "letsencrypt-prod"
+
+APPYTERS_SERVER_NAME: "appyters.maayanlab.cloud"
+APPYTERS_TLS_SECRET: "appyters-maayanlab-cloud-tls"
+
+POSTGREST: "true"
+PGRST_DB_ANON_ROLE: "guest"
+PGRST_DB_SCHEMA: "api"
+PGRST_DB_URI: "postgres://appyters-postgres:5432/appyters"
+PGRST_SERVER_PROXY_URI: "https://appyters.maayanlab.cloud/postgrest"
+
+POSTGRES: "true"
+POSTGRES_PASSWORD: ""
+
+S3: "true"
+S3_ACCESS_KEY: ""
+S3_BUCKET: "storage"
+S3_SECRET_KEY: ""
+S3_SERVER_NAME: "s3.appyters.maayanlab.cloud"
+S3_TLS_SECRET: "s3-appyters-maayanlab-cloud-tls"
+---
+# Source: templates/deployment-appyters-catalog.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +50,7 @@ spec:
         tty: true
       restartPolicy: Always
 ---
-# Source: service-appyters-catalog.yaml
+# Source: templates/service-appyters-catalog.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -37,8 +66,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-catalog
 ---
----
-# Source: ingress-appyters-catalog.yaml
+# Source: templates/ingress-appyters-catalog.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -51,7 +79,7 @@ metadata:
 {{ '{{- endif }}' }}
 spec:
   rules:
-  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+  - host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
     http:
       paths:
       - backend:
@@ -60,11 +88,11 @@ spec:
 {{ '{{- if .Values.TLS_ISSUER }}' }}
   tls:
   - hosts:
-    - {{ '{{ .Values.SERVER_NAME }}' }}
-    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
 {{ '{{- endif }}' }}
 ---
-# Source: deployment-appyters-postgrest.yaml
+# Source: templates/deployment-appyters-postgrest.yaml
 {{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -97,7 +125,7 @@ spec:
           value: {{ '{{ .Values.PGRST_SERVER_PROXY_URI }}' }}
       restartPolicy: Always
 ---
-# Source: service-appyters-postgrest.yaml
+# Source: templates/service-appyters-postgrest.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -113,7 +141,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
 ---
-# Source: ingress-appyters-postgrest.yaml
+# Source: templates/ingress-appyters-postgrest.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -126,7 +154,7 @@ metadata:
 {{ '{{- endif }}' }}
 spec:
   rules:
-  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+  - host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
     http:
       paths:
       - backend:
@@ -136,12 +164,12 @@ spec:
 {{ '{{- if .Values.TLS_ISSUER }}' }}
   tls:
   - hosts:
-    - {{ '{{ .Values.SERVER_NAME }}' }}
-    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
 {{ '{{- endif }}' }}
 {{ '{{- endif }}' }}
 ---
-# Source: deployment-appyters-postgres.yaml
+# Source: templates/deployment-appyters-postgres.yaml
 {{ '{{- if eq .Values.POSTGRES "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -167,10 +195,14 @@ spec:
           POSTGRES_DB: appyters
           POSTGRES_USER: appyters
           POSTGRES_PASSWORD: {{ '{{ .Values.POSTGRES_PASSWORD }}' }}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql
+          name: postgres-data
       restartPolicy: Always
+{#- TODO: Volume #}
 {{ '{{- endif }}' }}
 ---
-# Source: deployment-appyters-s3.yaml
+# Source: templates/deployment-appyters-s3.yaml
 {{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -193,12 +225,16 @@ spec:
         imagePullPolicy: Always
         tty: true
         env:
-          MINIO_BUCKET: {{ '{{ .Values.MINIO_BUCKET }}' }}
-          MINIO_ACCESS_KEY: {{ '{{ .Values.MINIO_ACCESS_KEY }}' }}
-          MINIO_SECRET_KEY: {{ '{{ .Values.MINIO_SECRET_KEY }}' }}
+          MINIO_BUCKET: {{ '{{ .Values.S3_BUCKET }}' }}
+          MINIO_ACCESS_KEY: {{ '{{ .Values.S3_ACCESS_KEY }}' }}
+          MINIO_SECRET_KEY: {{ '{{ .Values.S3_SECRET_KEY }}' }}
+        volumeMounts:
+        - mountPath: /data
+          name: s3-data
       restartPolicy: Always
+{#- TODO: s3-data volume #}
 ---
-# Source: service-appyters-s3.yaml
+# Source: templates/service-appyters-s3.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -214,7 +250,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-s3
 ---
-# Source: ingress-appyters-s3.yaml
+# Source: templates/ingress-appyters-s3.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -227,7 +263,7 @@ metadata:
 {{ '{{- endif }}' }}
 spec:
   rules:
-  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+  - host: "{{ '{{ .Values.S3_SERVER_NAME }}' }}"
     http:
       paths:
       - backend:
@@ -237,13 +273,13 @@ spec:
 {{ '{{- if .Values.TLS_ISSUER }}' }}
   tls:
   - hosts:
-    - {{ '{{ .Values.SERVER_NAME }}' }}
-    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+    - {{ '{{ .Values.S3_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.S3_TLS_SECRET }}' }}
 {{ '{{- endif }}' }}
 {{ '{{- endif }}' }}
 {%- for appyter in appyters %}
 ---
-# Source: deployment-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/deployment-appyter-{{ appyter['name'].lower() }}.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -273,7 +309,7 @@ spec:
           value: 'true'
       restartPolicy: Always
 ---
-# Source: service-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/service-appyter-{{ appyter['name'].lower() }}.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -289,7 +325,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-{{ appyter['name'].lower() }}
 ---
-# Source: ingress-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/ingress-appyter-{{ appyter['name'].lower() }}.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -302,7 +338,7 @@ metadata:
 {{ '{{- endif }}' }}
 spec:
   rules:
-  - host: "{{ '{{ .Values.SERVER_NAME }}' }}"
+  - host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
     http:
       paths:
       - backend:
@@ -312,7 +348,7 @@ spec:
 {{ '{{- if .Values.TLS_ISSUER }}' }}
   tls:
   - hosts:
-    - {{ '{{ .Values.SERVER_NAME }}' }}
-    secretName: {{ '{{ .Values.TLS_SECRET }}' }}
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
 {{ '{{- endif }}' }}
 {%- endfor %}
