@@ -19,6 +19,9 @@ PGRST_SERVER_PROXY_URI: "https://appyters.maayanlab.cloud/postgrest"
 
 POSTGRES: "true"
 POSTGRES_PASSWORD: ""
+POSTGRES_PV: "true"
+POSTGRES_PV_CLASS: "aws-ssd"
+POSTGRES_PV_SIZE: "10G"
 
 S3: "true"
 S3_ACCESS_KEY: ""
@@ -26,6 +29,9 @@ S3_BUCKET: "storage"
 S3_SECRET_KEY: ""
 S3_SERVER_NAME: "s3.appyters.maayanlab.cloud"
 S3_TLS_SECRET: "s3-appyters-maayanlab-cloud-tls"
+S3_PV: "true"
+S3_PV_CLASS: "aws-ssd"
+S3_PV_SIZE: "10G"
 ---
 # Source: templates/deployment-appyters-catalog.yaml
 apiVersion: apps/v1
@@ -124,8 +130,10 @@ spec:
         - name: PGRST_SERVER_PROXY_URI
           value: {{ '{{ .Values.PGRST_SERVER_PROXY_URI }}' }}
       restartPolicy: Always
+{{ '{{- endif }}' }}
 ---
 # Source: templates/service-appyters-postgrest.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -140,8 +148,10 @@ spec:
     targetPort: 3000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
+{{ '{{- endif }}' }}
 ---
 # Source: templates/ingress-appyters-postgrest.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -186,6 +196,12 @@ spec:
       labels:
         app: appyters-postgres
     spec:
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+      volumes:
+      - name: appyters-postgres-data
+        persistentVolumeClaim:
+          claimName: appyters-postgres-data-claim
+{{ '{{- endif }}' }}
       containers:
       - name: appyters-postgres
         image: maayanlab/appyters-postgres:latest
@@ -197,9 +213,43 @@ spec:
           POSTGRES_PASSWORD: {{ '{{ .Values.POSTGRES_PASSWORD }}' }}
         volumeMounts:
         - mountPath: /var/lib/postgresql
-          name: postgres-data
+          name: appyters-postgres-data
       restartPolicy: Always
-{#- TODO: Volume #}
+{{ '{{- endif }}' }}
+---
+# Source: templates/appyters-postgres-pvc.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES_PV "true" }}' }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-postgres-data-claim
+spec:
+  storageClassName: {{ '{{ .Values.POSTGRES_PV_CLASS }}' }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ '{{ .Values.POSTGRES_PV_SIZE }}' }}
+{{ '{{- endif }}' }}
+{{ '{{- endif }}' }}
+---
+# Source: templates/service-appyters-postgres.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgres
+  namespace: appyters
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-postgres
 {{ '{{- endif }}' }}
 ---
 # Source: templates/deployment-appyters-s3.yaml
@@ -219,6 +269,12 @@ spec:
       labels:
         app: appyters-s3
     spec:
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+      volumes:
+      - name: appyters-s3-data
+        persistentVolumeClaim:
+          claimName: appyters-s3-data-claim
+{{ '{{- endif }}' }}
       containers:
       - name: appyters-s3
         image: maayanlab/appyters-s3:latest
@@ -228,13 +284,33 @@ spec:
           MINIO_BUCKET: {{ '{{ .Values.S3_BUCKET }}' }}
           MINIO_ACCESS_KEY: {{ '{{ .Values.S3_ACCESS_KEY }}' }}
           MINIO_SECRET_KEY: {{ '{{ .Values.S3_SECRET_KEY }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
         volumeMounts:
         - mountPath: /data
-          name: s3-data
+          name: appyters-s3-data
+{{ '{{- endif }}' }}
       restartPolicy: Always
-{#- TODO: s3-data volume #}
+{{ '{{- endif }}' }}
+---
+# Source: templates/pv-appyters-s3.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-s3-data-claim
+spec:
+  storageClassName: {{ '{{ .Values.S3_PV_CLASS }}' }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ '{{ .Values.S3_PV_SIZE }}' }}
+{{ '{{- endif }}' }}
+{{ '{{- endif }}' }}
 ---
 # Source: templates/service-appyters-s3.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -249,8 +325,10 @@ spec:
     targetPort: 9000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-s3
+{{ '{{- endif }}' }}
 ---
 # Source: templates/ingress-appyters-s3.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
