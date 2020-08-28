@@ -21,9 +21,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/proxy:/data
-  app:
+  appyters-catalog:
     build: app
-    image: maayanlab/appyters:{{ version }}
+    restart: unless-stopped
+    image: maayanlab/appyters-catalog:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
