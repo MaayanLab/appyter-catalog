@@ -88,17 +88,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
-  minio:
-    image: minio/minio
+  s3:
+    build: ./s3
+    image: maayanlab/appyters-s3
     restart: unless-stopped
-    entrypoint:
-    - /bin/sh
-    command:
-    - -c
-    - >
-      mkdir -p /data/storage;
-      minio server /data;
-      exit 0
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`s3.${server_name}`) || (Host(`${server_name}`) && (PathPrefix(`/storage`) || PathPrefix(`/minio`)))"
@@ -109,6 +102,7 @@ services:
       - "traefik.http.routers.minio.tls.domains[0].main=${server_name}"
 {%- endif %}
     environment:
+      MINIO_BUCKET: ${MINIO_BUCKET}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     ports:
