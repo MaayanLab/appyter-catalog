@@ -6,7 +6,7 @@ services:
     environment:
 {%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
 {%- for appyter in appyters %}
-      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://appyter-{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
 {%- endfor %}
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://s3:9000$$1
@@ -22,10 +22,10 @@ services:
       - 443:443
     volumes:
       - ./data/letsencrypt/:/etc/letsencrypt/
-  app:
+  appyters-catalog:
     build: app
     restart: unless-stopped
-    image: maayanlab/appyters:{{ version }}
+    image: maayanlab/appyters-catalog:{{ version }}
   postgrest:
     image: postgrest/postgrest
     restart: unless-stopped
@@ -60,7 +60,7 @@ services:
       - ./data/minio/.minio:/root/.minio
       - ./data/minio/:/data
 {%- for appyter in appyters %}
-  {{ appyter['name'].lower() }}:
+  appyter-{{ appyter['name'].lower() }}:
     build:
       context: {{ os.path.relpath(appyter['path'], root_dir) }}
       dockerfile: Dockerfile
