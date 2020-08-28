@@ -99,7 +99,7 @@ questions:
   description: "Whether or not we should allocate a persistent volume for postgres"
 - variable: POSTGRES_PV_SIZE
   type: string
-  required: true
+  required: false
   default: "10G"
   group: Postgres
   description: "The size of the persistent volume to request"
@@ -141,7 +141,7 @@ questions:
   description: "The server hostname for the s3 bucket (s3.amazonaws.com for AWS)"
 - variable: S3_TLS_SECRET
   type: string
-  required: true
+  required: false
   default: "s3-appyters-maayanlab-cloud-tls"
   group: S3
   description: "The TLS secret for S3"
@@ -153,7 +153,7 @@ questions:
   description: "Whether or not to create a persistent volume for S3 data"
 - variable: S3_PV_SIZE
   type: string
-  required: true
+  required: false
   default: "10G"
   group: S3
   description: "The size of the storage that should be allocated for S3"
