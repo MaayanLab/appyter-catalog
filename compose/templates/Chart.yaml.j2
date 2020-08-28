@@ -526,11 +526,13 @@ spec:
         image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter:latest
         imagePullPolicy: Always
         tty: true
+        command: ["appyter"]
+        args: ["orchestration", "dispatcher"]
         env:
         - name: HOST
           value: "0.0.0.0"
         - name: PORT
-          value: "80"
+          value: "5000"
         - name: JOBS
           value: "{{ '{{ .Values.APPYTERS_ORCHESTRATOR_CONCURRENT_JOBS }}' }}"
         - name: DISPATCH
@@ -549,9 +551,9 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port: 80
+    port: 5000
     protocol: TCP
-    targetPort: 80
+    targetPort: 5000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
 {%- for appyter in appyters %}
