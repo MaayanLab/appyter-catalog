@@ -9,7 +9,7 @@ services:
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
 {%- endfor %}
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
-      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://minio:9000$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://s3:9000$$1
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://app:80$$1
 {%- endwith %}
       - nginx_redirect_00=(/minio(/(.*))) https://$$host:9000$$1
@@ -46,20 +46,14 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
-  minio:
-    image: minio/minio
+  s3:
+    build: ./s3
+    image: maayanlab/appyters-s3
     restart: unless-stopped
-    entrypoint:
-    - /bin/sh
-    command:
-    - -c
-    - >
-      mkdir -p /data/storage;
-      minio server /data;
-      exit 0
     ports:
       - 9000:9000
     environment:
+      MINIO_BUCKET: ${MINIO_BUCKET}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     volumes:
