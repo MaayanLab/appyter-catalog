@@ -1,7 +1,8 @@
 version: '3'
 services:
   proxy:
-    image: traefik:v2.2
+    build: ./proxy
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-proxy:{{ version }}
     restart: unless-stopped
     command: >
       --api.insecure=true
@@ -22,9 +23,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/proxy:/data
   appyters-catalog:
-    build: app
+    build: ./app
     restart: unless-stopped
-    image: maayanlab/appyters-catalog:{{ version }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-catalog:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -38,7 +39,7 @@ services:
       context: ./appyter
       args:
         - appyter_version=${appyter_version}
-    image: maayanlab/appyters-orchestrator:{{ version }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}
     environment:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "2"
@@ -51,7 +52,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   postgrest:
-    image: postgrest/postgrest
+    build: ./postgrest
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -69,7 +71,7 @@ services:
       PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
   postgres:
     build: ./postgres
-    image: maayanlab/appyters-postgres
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgres:{{ version }}
     restart: unless-stopped
     ports:
       - 5432:5432
@@ -81,7 +83,7 @@ services:
       - ./data/postgres/:/var/lib/postgresql/data
   s3:
     build: ./s3
-    image: maayanlab/appyters-s3
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -106,7 +108,7 @@ services:
       dockerfile: Dockerfile
       args:
         - appyter_version=${appyter_version}
-    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
     restart: unless-stopped
     environment:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
