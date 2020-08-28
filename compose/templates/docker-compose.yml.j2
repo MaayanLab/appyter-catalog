@@ -29,6 +29,23 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`${nginx_server_name}`)"
       - "traefik.http.services.app.loadbalancer.server.port=80"
+  appyters-orchestrator:
+    build:
+      context: ./appyter
+      args:
+        - appyter_version=${appyter_version}
+    image: maayanlab/appyter:{{ version }}
+    environment:
+      HOST: "0.0.0.0"
+      JOBS: "2"
+      DISPATCH: "docker"
+      DEBUG: "false"
+    command:
+      - appyter
+      - orchestration
+      - dispatcher
+    volumes:
+      - /var/lib/docker.sock:/var/lib/docker.sock
   postgrest:
     image: postgrest/postgrest
     restart: unless-stopped
