@@ -1,7 +1,8 @@
 version: '3'
 services:
   proxy:
-    image: maayanlab/proxy:1.2.2
+    build: ./proxy
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-proxy:{{ version }}
     restart: unless-stopped
     environment:
 {%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
@@ -23,11 +24,12 @@ services:
     volumes:
       - ./data/letsencrypt/:/etc/letsencrypt/
   appyters-catalog:
-    build: app
+    build: ./app
     restart: unless-stopped
-    image: maayanlab/appyters-catalog:{{ version }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-catalog:{{ version }}
   postgrest:
-    image: postgrest/postgrest
+    build: ./postgrest
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
     environment:
       PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
@@ -36,7 +38,7 @@ services:
       PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
   postgres:
     build: ./postgres
-    image: maayanlab/appyters-postgres
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgres:{{ version }}
     restart: unless-stopped
     ports:
       - 5432:5432
@@ -48,7 +50,7 @@ services:
       - ./data/postgres/:/var/lib/postgresql/data
   s3:
     build: ./s3
-    image: maayanlab/appyters-s3
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
     ports:
       - 9000:9000
@@ -66,7 +68,7 @@ services:
       dockerfile: Dockerfile
       args:
         - appyter_version=${appyter_version}
-    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
     restart: unless-stopped
     environment:
       - PREFIX=/{{ appyter['name'] }}/
