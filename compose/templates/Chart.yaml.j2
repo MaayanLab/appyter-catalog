@@ -7,6 +7,12 @@ version: v1
 ---
 # Source: questions.yaml
 questions:
+- variable: DOCKER_REGISTRY
+  type: string
+  required: true
+  default: "maayanlab"
+  group: "Cluster Config"
+  description: "The docker registry to use if not the public one"
 - variable: TLS
   type: string
   required: true
@@ -76,7 +82,7 @@ questions:
 - variable: POSTGRES_PASSWORD
   type: password
   required: true
-  default: "true"
+  default: ""
   group: Postgres
   description: "The password for the primary user on postgres"
 - variable: POSTGRES_ANON_ROLE
@@ -182,7 +188,7 @@ spec:
     spec:
       containers:
       - name: appyters-catalog
-        image: maayanlab/appyters-catalog:{{ version }}
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-catalog:{{ version }}
         imagePullPolicy: Always
         tty: true
       restartPolicy: Always
@@ -248,7 +254,7 @@ spec:
     spec:
       containers:
       - name: appyters-postgrest
-        image: postgrest/postgrest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-postgrest:{{ version }}
         imagePullPolicy: Always
         tty: true
         env:
@@ -335,7 +341,7 @@ spec:
 {{ '{{ end }}' }}
       containers:
       - name: appyters-postgres
-        image: maayanlab/appyters-postgres:latest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-postgres:{{ version }}
         imagePullPolicy: Always
         tty: true
         env:
@@ -415,7 +421,7 @@ spec:
 {{ '{{ end }}' }}
       containers:
       - name: appyters-s3
-        image: maayanlab/appyters-s3:latest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-s3:{{ version }}
         imagePullPolicy: Always
         tty: true
         env:
@@ -517,7 +523,7 @@ spec:
     spec:
       containers:
       - name: appyters-orchestrator
-        image: maayanlab/appyter:latest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter:latest
         imagePullPolicy: Always
         tty: true
         env:
@@ -568,7 +574,7 @@ spec:
     spec:
       containers:
       - name: appyter-{{ appyter['name'].lower() }}
-        image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
         imagePullPolicy: Always
         tty: true
         env:
