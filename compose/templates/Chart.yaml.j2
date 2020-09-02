@@ -192,11 +192,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyters-catalog
+      workload.user.cattle.io/workloadselector: deployment-appyters-catalog
   template:
     metadata:
       labels:
-        app: appyters-catalog
+        workload.user.cattle.io/workloadselector: deployment-appyters-catalog
     spec:
       containers:
       - name: appyters-catalog
@@ -273,11 +273,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyters-postgrest
+      workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
   template:
     metadata:
       labels:
-        app: appyters-postgrest
+        workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
     spec:
       containers:
       - name: appyters-postgrest
@@ -369,11 +369,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyters-postgres
+      workload.user.cattle.io/workloadselector: deployment-appyters-postgres
   template:
     metadata:
       labels:
-        app: appyters-postgres
+        workload.user.cattle.io/workloadselector: deployment-appyters-postgres
     spec:
 {{ '{{ if eq .Values.S3_PV "true" }}' }}
       volumes:
@@ -449,11 +449,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyters-s3
+      workload.user.cattle.io/workloadselector: deployment-appyters-s3
   template:
     metadata:
       labels:
-        app: appyters-s3
+        workload.user.cattle.io/workloadselector: deployment-appyters-s3
     spec:
 {{ '{{ if eq .Values.S3_PV "true" }}' }}
       volumes:
@@ -550,7 +550,6 @@ spec:
       - backend:
           serviceName: appyters-s3
           servicePort: 9000
-        path: /
 {{ '{{ if .Values.S3_SERVER_NAME }}' }}
     host: "{{ '{{ .Values.S3_SERVER_NAME }}' }}"
 {{ '{{ end }}' }}
@@ -572,15 +571,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyters-orchestrator
+      workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
   template:
     metadata:
       labels:
-        app: appyters-orchestrator
+        workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
     spec:
       containers:
       - name: appyters-orchestrator
-        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter:latest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter:{{ version }}
         imagePullPolicy: Always
         tty: true
         command: ["appyter"]
@@ -625,11 +624,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+      workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
   template:
     metadata:
       labels:
-        app: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+        workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
     spec:
       containers:
       - name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
