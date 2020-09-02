@@ -157,6 +157,12 @@ questions:
   default: "s3.appyters.maayanlab.cloud"
   group: S3
   description: "The server hostname for the s3 bucket (s3.amazonaws.com for AWS)"
+- variable: S3_NETLOC
+  type: string
+  required: false
+  default: "appyters-s3:9000"
+  group: S3
+  description: "The internal server hostname, leave at default if hosted in kubernetes, otherwise same as S3_SERVER_NAME"
 - variable: S3_TLS_SECRET
   type: string
   required: false
@@ -646,7 +652,7 @@ spec:
         - name: PREFIX
           value: "/{{ appyter['name'] }}/"
         - name: DATA_DIR
-          value: "{{ '{{ .Values.S3_SERVER_NAME }}' }}/{{ '{{ .Values.S3_BUCKET }}' }}/{{ appyter['name'] }}/"
+          value: "{{ 's3://{{ .Values.S3_ACCESS_KEY }}:{{ .Values.S3_SECRET_KEY }}@{{ .Values.S3_NETLOC }}/{{ .Values.S3_BUCKET }}' }}/{{ appyter['name'] }}/"
         - name: DISPATCHER
           value: "http://appyters-orchestrator"
         - name: DISPATCHER_URL
