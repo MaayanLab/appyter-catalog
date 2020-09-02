@@ -669,7 +669,7 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    workload.user.cattle.io/workloadselector: deployment-appyters-{{ appyter['name'].lower().replace('_', '-') }}
+    workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
 ---
 # Source: templates/ingress-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
 apiVersion: extensions/v1beta1
