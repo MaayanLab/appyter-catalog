@@ -194,7 +194,7 @@ questions:
   group: S3
   description: "The storage class to use for S3 data volume claims"
 ---
-# Source: templates/deployment-appyters-catalog.yaml
+# Source: templates/appyters-catalog/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -217,7 +217,7 @@ spec:
         tty: true
       restartPolicy: Always
 ---
-# Source: templates/service-appyters-catalog.yaml
+# Source: templates/appyters-catalog/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -233,7 +233,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-catalog
 ---
-# Source: templates/ingress-appyters-catalog.yaml
+# Source: templates/appyters-catalog/ingress.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -274,7 +274,7 @@ spec:
     secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
 {{ '{{ end }}' }}
 ---
-# Source: templates/deployment-appyters-postgrest.yaml
+# Source: templates/appyters-postgrest/deployment.yaml
 {{ '{{ if eq .Values.POSTGREST "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -308,7 +308,7 @@ spec:
       restartPolicy: Always
 {{ '{{ end }}' }}
 ---
-# Source: templates/service-appyters-postgrest.yaml
+# Source: templates/appyters-postgrest/service.yaml
 {{ '{{ if eq .Values.POSTGREST "true" }}' }}
 apiVersion: v1
 kind: Service
@@ -326,7 +326,7 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
 {{ '{{ end }}' }}
 ---
-# Source: templates/ingress-appyters-postgrest.yaml
+# Source: templates/appyters-postgrest/ingress.yaml
 {{ '{{ if eq .Values.POSTGREST "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -371,7 +371,7 @@ spec:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 ---
-# Source: templates/deployment-appyters-postgres.yaml
+# Source: templates/appyters-postgres/deployment.yaml
 {{ '{{ if eq .Values.POSTGRES "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -414,7 +414,7 @@ spec:
       restartPolicy: Always
 {{ '{{ end }}' }}
 ---
-# Source: templates/appyters-postgres-pvc.yaml
+# Source: templates/appyters-postgres/pvc.yaml
 {{ '{{ if eq .Values.POSTGRES "true" }}' }}
 {{ '{{ if eq .Values.POSTGRES_PV "true" }}' }}
 apiVersion: v1
@@ -433,7 +433,7 @@ spec:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 ---
-# Source: templates/service-appyters-postgres.yaml
+# Source: templates/appyters-postgres/service.yaml
 {{ '{{ if eq .Values.POSTGRES "true" }}' }}
 apiVersion: v1
 kind: Service
@@ -451,7 +451,7 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgres
 {{ '{{ end }}' }}
 ---
-# Source: templates/deployment-appyters-s3.yaml
+# Source: templates/appyters-s3/deployment.yaml
 {{ '{{ if eq .Values.S3 "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
@@ -494,7 +494,7 @@ spec:
       restartPolicy: Always
 {{ '{{ end }}' }}
 ---
-# Source: templates/pv-appyters-s3.yaml
+# Source: templates/appyters-s3/pvc.yaml
 {{ '{{ if eq .Values.S3 "true" }}' }}
 {{ '{{ if eq .Values.S3_PV "true" }}' }}
 apiVersion: v1
@@ -513,7 +513,7 @@ spec:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 ---
-# Source: templates/service-appyters-s3.yaml
+# Source: templates/appyters-s3/service.yaml
 {{ '{{ if eq .Values.S3 "true" }}' }}
 apiVersion: v1
 kind: Service
@@ -531,7 +531,7 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-s3
 {{ '{{ end }}' }}
 ---
-# Source: templates/ingress-appyters-s3.yaml
+# Source: templates/appyters-s3/ingress.yaml
 {{ '{{ if eq .Values.S3 "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -574,14 +574,14 @@ spec:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 ---
-# Source: templates/service-account-appyters-orchestrator.yaml
+# Source: templates/appyters-orchestrator/service-account.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: appyters-orchestrator-service-account
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
 ---
-# Source: templates/role-appyters-orchestrator.yaml
+# Source: templates/appyters-orchestrator/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -592,7 +592,7 @@ rules:
   resources: ["jobs"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
-# Source: templates/role-binding-appyters-orchestrator.yaml
+# Source: templates/appyters-orchestrator/role-binding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -607,7 +607,7 @@ roleRef:
   name: appyters-orchestrator-role
   apiGroup: rbac.authorization.k8s.io
 ---
-# Source: templates/deployment-appyters-orchestrator.yaml
+# Source: templates/appyters-orchestrator/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -646,7 +646,7 @@ spec:
       restartPolicy: Always
       serviceAccount: appyters-orchestrator-service-account
 ---
-# Source: templates/service-appyters-orchestrator.yaml
+# Source: templates/appyters-orchestrator/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -663,7 +663,7 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
 {%- for appyter in appyters %}
 ---
-# Source: templates/deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -703,7 +703,7 @@ spec:
           value: "{{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}"
       restartPolicy: Always
 ---
-# Source: templates/service-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -719,7 +719,7 @@ spec:
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
 ---
-# Source: templates/ingress-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/ingress.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
