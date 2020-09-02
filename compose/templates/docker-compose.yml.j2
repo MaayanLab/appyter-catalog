@@ -7,7 +7,7 @@ services:
     environment:
 {%- with id=iter(count()), n=int(log10(len(appyters))+2) %}
 {%- for appyter in appyters %}
-      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://appyter-{{ appyter['name'].lower() }}:443/{{ appyter['name'] }}$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/{{ appyter['name'] }}(/.*) https://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}$$1
 {%- endfor %}
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://s3:9000$$1
@@ -92,7 +92,7 @@ services:
     restart: unless-stopped
     environment:
       - PREFIX=/{{ appyter['name'] }}/
-      - PORT=443
+      - PORT=5000
       - PROXY=true
       - KEYFILE=/etc/letsencrypt/live/${nginx_server_name}/privkey.pem
       - CERTFILE=/etc/letsencrypt/live/${nginx_server_name}/cert.pem

@@ -642,15 +642,15 @@ spec:
         - name: HOST
           value: "0.0.0.0"
         - name: PORT
-          value: "80"
+          value: "5000"
         - name: PREFIX
           value: "/{{ appyter['name'] }}/"
         - name: DATA_DIR
           value: "{{ '{{ .Values.S3_SERVER_NAME }}' }}/{{ '{{ .Values.S3_BUCKET }}' }}/{{ appyter['name'] }}/"
         - name: DISPATCHER
-          value: "http://appyters-orchestrator"
+          value: "http://appyters-orchestrator:5000"
         - name: DISPATCHER_URL
-          value: "http://appyter-{{ appyter['name'].lower().replace('_', '-') }}/{{ appyter['name'] }}"
+          value: "http://appyter-{{ appyter['name'].lower().replace('_', '-') }}:5000/{{ appyter['name'] }}"
         - name: DISPATCHER_IMAGE
           value: "{{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}"
       restartPolicy: Always
@@ -665,9 +665,9 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port: 80
+    port: 5000
     protocol: TCP
-    targetPort: 80
+    targetPort: 5000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
 ---
@@ -701,7 +701,7 @@ spec:
       paths:
       - backend:
           serviceName: appyter-{{ appyter['name'].lower().replace('_', '-') }}
-          servicePort: 80
+          servicePort: 5000
         path: /{{ appyter['name'] }}/
 {{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
     host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
