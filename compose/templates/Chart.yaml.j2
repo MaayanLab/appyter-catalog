@@ -7,6 +7,12 @@ version: v1
 ---
 # Source: questions.yaml
 questions:
+- variable: NAMESPACE
+  type: string
+  required: true
+  default: "appyters"
+  group: "Cluster Config"
+  description: "The kubernetes namespace to run this in"
 - variable: DOCKER_REGISTRY
   type: string
   required: true
@@ -193,7 +199,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyters-catalog
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -216,7 +222,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyters-catalog
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -232,7 +238,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyters-catalog
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 {{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
@@ -274,7 +280,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyters-postgrest
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -308,7 +314,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyters-postgrest
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -326,7 +332,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyters-postgrest
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     traefik.ingress.kubernetes.io/rewrite-target: /
@@ -371,7 +377,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyters-postgres
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -433,7 +439,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyters-postgres
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -451,7 +457,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyters-s3
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -513,7 +519,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyters-s3
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -531,7 +537,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyters-s3
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 {{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
@@ -573,7 +579,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyters-orchestrator
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -602,6 +608,8 @@ spec:
           value: "kubernetes"
         - name: DEBUG
           value: "false"
+        - name: KUBE_NAMESPACE
+          value: {{ '{{ .Values.NAMESPACE }}' }}
       restartPolicy: Always
 ---
 # Source: templates/service-appyters-orchestrator.yaml
@@ -609,7 +617,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyters-orchestrator
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -626,7 +634,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
@@ -666,7 +674,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
   ports:
@@ -682,7 +690,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
-  namespace: appyters
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
 {{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
