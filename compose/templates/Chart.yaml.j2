@@ -292,7 +292,7 @@ spec:
         - name: PGRST_DB_ANON_ROLE
           value: "{{ '{{ .Values.POSTGRES_ANON_ROLE }}' }}"
         - name: PGRST_SERVER_PROXY_URI
-          value: "{{ 'http{{ if eq .Values.TLS "true" }}s{{ end }}://{{ .Values.APPYTERS_SERVER_NAME }}/postgrest/' }}"
+          value: "{{ 'http{{ if eq .Values.TLS "true" }}s{{ end }}://{{ .Values.APPYTERS_SERVER_NAME }}/postgrest' }}"
       restartPolicy: Always
 {{ '{{ end }}' }}
 ---
@@ -321,8 +321,10 @@ kind: Ingress
 metadata:
   name: appyters-postgrest
   namespace: appyters
-{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/rewrite-target: /
+{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
 {{ '{{ if .Values.TLS_ACME }}' }}
 {{ '{{ if eq .Values.TLS_ACME "true" }}' }}
@@ -331,7 +333,6 @@ metadata:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_ISSUER }}' }}
-  annotations:
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
 {{ '{{ if .Values.TLS_ACME }}' }}
 {{ '{{ if eq .Values.TLS_ACME "true" }}' }}
@@ -346,7 +347,7 @@ spec:
       - backend:
           serviceName: appyters-postgrest
           servicePort: 3000
-        path: /postgrest/
+        path: /postgrest
 {{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
     host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
 {{ '{{ end }}' }}
