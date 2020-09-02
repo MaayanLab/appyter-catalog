@@ -71,6 +71,8 @@ RUN set -x \
 
 ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
+  && echo "Removing existing installation..." \
+  && pip3 uninstall -y appyter \
   && echo "Installing appyter..." \
   && pip3 install -Iv ${appyter_version}
 
