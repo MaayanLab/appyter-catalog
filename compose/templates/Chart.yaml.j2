@@ -19,6 +19,12 @@ questions:
   default: "maayanlab"
   group: "Cluster Config"
   description: "The docker registry to use if not the public one"
+- variable: INGRESS_CLASS
+  type: string
+  required: true
+  default: "nginx"
+  group: "Cluster Config"
+  description: "The ingress class, supported classes are `nginx` and `traefik`"
 - variable: TLS
   type: string
   required: true
@@ -334,8 +340,13 @@ metadata:
   name: appyters-postgrest
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+{{ '{{ if eq .Values.INGRESS_CLASS "nginx" }}' }}
+    nginx.ingress.kubernetes.io/rewrite-target: $1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+{{ '{{ end }}' }}
+{{ '{{ if eq .Values.INGRESS_CLASS "traefik" }}' }}
     traefik.ingress.kubernetes.io/rewrite-target: /
+{{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
 {{ '{{ if .Values.TLS_ACME }}' }}
@@ -359,7 +370,12 @@ spec:
       - backend:
           serviceName: appyters-postgrest
           servicePort: 3000
+{{ '{{ if eq .Values.INGRESS_CLASS "nginx" }}' }}
+        path: /postgrest(/.*)
+{{ '{{ end }}' }}
+{{ '{{ if eq .Values.INGRESS_CLASS "traefik" }}' }}
         path: /postgrest
+{{ '{{ end }}' }}
 {{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
     host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
 {{ '{{ end }}' }}
