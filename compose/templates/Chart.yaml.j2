@@ -588,6 +588,9 @@ metadata:
   name: appyters-orchestrator-role
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
 rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["batch", "extensions"]
   resources: ["jobs"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
