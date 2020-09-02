@@ -574,6 +574,39 @@ spec:
 {{ '{{ end }}' }}
 {{ '{{ end }}' }}
 ---
+# Source: templates/service-account-appyters-orchestrator.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: appyters-orchestrator-service-account
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+---
+# Source: templates/role-appyters-orchestrator.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: appyters-orchestrator-role
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+rules:
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+# Source: templates/role-binding-appyters-orchestrator.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: appyters-orchestrator-role-binding
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+subjects:
+- kind: ServiceAccount
+  name: appyters-orchestrator-service-account
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+roleRef:
+  kind: Role
+  name: appyters-orchestrator-role
+  apiGroup: rbac.authorization.k8s.io
+---
 # Source: templates/deployment-appyters-orchestrator.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -611,6 +644,7 @@ spec:
         - name: KUBE_NAMESPACE
           value: {{ '{{ .Values.NAMESPACE }}' }}
       restartPolicy: Always
+      serviceAccount: appyters-orchestrator-service-account
 ---
 # Source: templates/service-appyters-orchestrator.yaml
 apiVersion: v1
