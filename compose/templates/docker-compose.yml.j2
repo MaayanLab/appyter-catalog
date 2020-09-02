@@ -31,7 +31,7 @@ services:
     build:
       context: ./appyter
       args:
-        appyter_version: git+git://github.com/Maayanlab/appyter.git
+        - appyter_version=${appyter_version}
     image: ${DOCKER_REGISTRY:-maayanlab}/appyter:{{ version }}
     environment:
       HOST: "0.0.0.0"
