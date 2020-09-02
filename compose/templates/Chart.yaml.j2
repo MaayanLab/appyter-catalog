@@ -24,7 +24,19 @@ questions:
   required: false
   default: "letsencrypt-prod"
   group: "Cluster Config"
-  description: "The cert-manager issuer name for automated TLS"
+  description: "The cert-manager issuer name for automated TLS (mutually exclusive with TLS_CLUSTER_ISSUER)"
+- variable: TLS_CLUSTER_ISSUER
+  type: string
+  required: false
+  default: ""
+  group: "Cluster Config"
+  description: "The cert-manager cluster-issuer name for automated TLS (mutually exclusive with TLS_ISSUER)"
+- variable: TLS_ACME
+  type: string
+  required: false
+  default: "true"
+  group: "Cluster Config"
+  description: "Whether to add tls acme annotation on TLS ingress"
 - variable: APPYTERS_SERVER_NAME
   type: string
   required: false
@@ -215,10 +227,23 @@ kind: Ingress
 metadata:
   name: appyters-catalog
   namespace: appyters
+{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_ISSUER }}' }}
   annotations:
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ end }}' }}
 spec:
   rules:
@@ -296,10 +321,23 @@ kind: Ingress
 metadata:
   name: appyters-postgrest
   namespace: appyters
+{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_ISSUER }}' }}
   annotations:
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ end }}' }}
 spec:
   rules:
@@ -487,10 +525,23 @@ kind: Ingress
 metadata:
   name: appyters-s3
   namespace: appyters
+{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_ISSUER }}' }}
   annotations:
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ end }}' }}
 spec:
   rules:
@@ -564,24 +615,24 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
 {%- for appyter in appyters %}
 ---
-# Source: templates/deployment-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appyter-{{ appyter['name'].lower() }}
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
   namespace: appyters
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: appyter-{{ appyter['name'].lower() }}
+      app: appyter-{{ appyter['name'].lower().replace('_', '-') }}
   template:
     metadata:
       labels:
-        app: appyter-{{ appyter['name'].lower() }}
+        app: appyter-{{ appyter['name'].lower().replace('_', '-') }}
     spec:
       containers:
-      - name: appyter-{{ appyter['name'].lower() }}
+      - name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
         image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
         imagePullPolicy: Always
         tty: true
@@ -599,16 +650,16 @@ spec:
         - name: DISPATCHER
           value: "http://appyters-orchestrator"
         - name: DISPATCHER_URL
-          value: "http://appyter-{{ appyter['name'].lower() }}/{{ appyter['name'] }}"
+          value: "http://appyter-{{ appyter['name'].lower().replace('_', '-') }}/{{ appyter['name'] }}"
         - name: DISPATCHER_IMAGE
           value: "{{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}"
       restartPolicy: Always
 ---
-# Source: templates/service-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/service-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: appyter-{{ appyter['name'].lower() }}
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
   namespace: appyters
 spec:
   type: ClusterIP
@@ -618,25 +669,38 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    workload.user.cattle.io/workloadselector: deployment-appyters-{{ appyter['name'].lower() }}
+    workload.user.cattle.io/workloadselector: deployment-appyters-{{ appyter['name'].lower().replace('_', '-') }}
 ---
-# Source: templates/ingress-appyter-{{ appyter['name'].lower() }}.yaml
+# Source: templates/ingress-appyter-{{ appyter['name'].lower().replace('_', '-') }}.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: appyter-{{ appyter['name'].lower() }}
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
   namespace: appyters
+{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ if .Values.TLS_ISSUER }}' }}
   annotations:
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{ if .Values.TLS_ACME }}' }}
+{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
+{{ '{{ end }}' }}
+{{ '{{ end }}' }}
 {{ '{{ end }}' }}
 spec:
   rules:
   - http:
       paths:
       - backend:
-          serviceName: appyter-{{ appyter['name'].lower() }}
+          serviceName: appyter-{{ appyter['name'].lower().replace('_', '-') }}
           servicePort: 80
         path: /{{ appyter['name'] }}/
 {{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
