@@ -11,7 +11,7 @@ services:
 {%- endfor %}
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/postgrest(/(.*)) http://postgrest:3000$$2
       - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=/(storage(/(.*))) https://s3:9000$$1
-      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://app:80$$1
+      - nginx_proxy_{{ ("{:0%d}" % (n)).format(next(id)) }}=(/.*) http://appyters-catalog:80$$1
 {%- endwith %}
       - nginx_redirect_00=(/minio(/(.*))) https://$$host:9000$$1
       - nginx_server_name=${nginx_server_name}
@@ -28,12 +28,11 @@ services:
     restart: unless-stopped
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-catalog:{{ version }}
   appyters-orchestrator:
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyter:{{ version }}
     build:
       context: ./appyter
       args:
         appyter_version: git+git://github.com/Maayanlab/appyter.git
-    image: maayanlab/appyter:latest
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter:{{ version }}
     environment:
       HOST: "0.0.0.0"
       JOBS: "2"
@@ -47,7 +46,7 @@ services:
       - /var/lib/docker.sock:/var/lib/docker.sock
     # disabled
     entrypoint: /bin/true
-    restart: no
+    restart: 'no'
   postgrest:
     build: ./postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}

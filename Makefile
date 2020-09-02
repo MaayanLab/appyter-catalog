@@ -19,7 +19,7 @@ $(DOCKERFILES): compose/.build $$(call +s,$$(shell find $$(@D) -type f ! \( -nam
 
 .SECONDEXPANSION:
 $(BUILDAPPYTERS): docker-compose.yml $$(@D)/Dockerfile
-	docker-compose build $(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
+	docker-compose build appyter-$(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
 
 docker-compose.yml: compose/.build .env $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py > $@
@@ -28,7 +28,7 @@ app/public/appyters.json: $(APPYTERFILES)
 	$(PYTHON) compose/build_appyters.py > $@
 
 app/.build: app/public/appyters.json app/package.json $$(call +s,$$(shell find app/public -type f | sed 's/ /+/g'))
-	cd app && npm i && npm run build && cd .. && docker-compose build app && touch $@
+	cd app && npm i && npm run build && cd .. && docker-compose build appyters-catalog && touch $@
 
 .build: app/.build $(BUILDAPPYTERS)
 
