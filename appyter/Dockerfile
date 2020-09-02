@@ -29,7 +29,7 @@ RUN set -x \
   && pip3 install ipykernel \
   && python3 -m ipykernel install
 
-ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
+ARG appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install -Iv ${appyter_version}
