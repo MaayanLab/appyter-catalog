@@ -6,7 +6,7 @@ ENV TZ "America/New_York"
 RUN set -x \
   && echo "Preparing system..." \
   && apt-get -y update \
-  && apt-get -y install git python3-pip python3-dev \
+  && apt-get -y install git python3-pip python3-dev nginx \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install --upgrade pip
 
