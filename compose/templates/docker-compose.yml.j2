@@ -39,7 +39,7 @@ services:
       context: ./appyter
       args:
         - appyter_version=${appyter_version}
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter:{{ version }}
     environment:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "2"
