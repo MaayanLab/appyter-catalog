@@ -1,0 +1,7 @@
+git+https://github.com/MaayanLab/appyter
+pandas
+numpy
+requests
+tqdm
+matplotlib
+seaborn
