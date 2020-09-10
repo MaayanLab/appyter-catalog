@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Drugmonizome_Consensus_Terms",
   "title": "Drugmonizome Consensus Terms",
-  "version": "0.0.1",
-  "description": "An appyter that enriches input drug sets and returns the top consensus terms",
+  "version": "0.0.2",
+  "description": "An appyter that queries an input collection of drug sets against libraries in Drugmonizome and returns the top enriched consensus terms",
   "image":"drugmonizome-consensus.png",
   "authors": [
     {
