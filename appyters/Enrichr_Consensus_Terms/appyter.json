@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "miRNA_Target_Discovery",
-  "title": "miRNA Target Discovery via CLIP-SEQ",
-  "version": "0.1.0",
+  "name": "Enrichr_Consensus_Terms",
+  "title": "Enrichr Consensus Terms",
+  "version": "0.2.0",
+  "description": "This appyter returns consensus Enrichr terms using a set of gene sets",
   "image": "screenshot.png",
-  "description": "An appyter that extracts gene targets from dCLIP output and performs enrichment analysis to it.",
   "authors": [
     {
       "name": "John Erol Evangelists",
@@ -13,14 +13,12 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "CLIP-SEQ",
-    "Enrichment Analysis",
     "Enrichr",
-    "microRNAs"
+    "Gene Set Enrichment"
   ],
   "license": "Apache-2.0",
   "appyter": {
-    "file": "miRNA Target Discovery via CLIP-SEQ.ipynb",
+    "file": "EnrichrConsensus.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
