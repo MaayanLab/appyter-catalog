@@ -19,12 +19,18 @@ questions:
   default: "maayanlab"
   group: "Cluster Config"
   description: "The docker registry to use if not the public one"
+- variable: INGRESS_TYPE
+  type: string
+  required: true
+  default: "nginx"
+  group: "Cluster Config"
+  description: "The ingress type, supported types are `nginx` and `traefik`"
 - variable: INGRESS_CLASS
   type: string
   required: true
   default: "nginx"
   group: "Cluster Config"
-  description: "The ingress class, supported classes are `nginx` and `traefik`"
+  description: "The ingress class name"
 - variable: TLS
   type: string
   required: true
@@ -245,24 +251,24 @@ kind: Ingress
 metadata:
   name: appyters-catalog
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
-{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ if .Values.TLS_ISSUER }}' }}
-  annotations:
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 spec:
   rules:
   - http:
@@ -270,18 +276,18 @@ spec:
       - backend:
           serviceName: appyters-catalog
           servicePort: 80
-{{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
-    host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.TLS "true" }}' }}
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
   tls:
   - hosts:
     - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
     secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgrest/deployment.yaml
-{{ '{{ if eq .Values.POSTGREST "true" }}' }}
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -312,10 +318,10 @@ spec:
         - name: PGRST_SERVER_PROXY_URI
           value: "{{ 'http{{ if eq .Values.TLS "true" }}s{{ end }}://{{ .Values.APPYTERS_SERVER_NAME }}/postgrest' }}"
       restartPolicy: Always
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgrest/service.yaml
-{{ '{{ if eq .Values.POSTGREST "true" }}' }}
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -330,39 +336,40 @@ spec:
     targetPort: 3000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgrest/ingress.yaml
-{{ '{{ if eq .Values.POSTGREST "true" }}' }}
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyters-postgrest
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
   annotations:
-{{ '{{ if eq .Values.INGRESS_CLASS "nginx" }}' }}
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "nginx" }}' }}
     nginx.ingress.kubernetes.io/rewrite-target: $1
     nginx.ingress.kubernetes.io/use-regex: "true"
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.INGRESS_CLASS "traefik" }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "traefik" }}' }}
     traefik.ingress.kubernetes.io/rewrite-target: /
-{{ '{{ end }}' }}
-{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ if .Values.TLS_ISSUER }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 spec:
   rules:
   - http:
@@ -370,25 +377,25 @@ spec:
       - backend:
           serviceName: appyters-postgrest
           servicePort: 3000
-{{ '{{ if eq .Values.INGRESS_CLASS "nginx" }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "nginx" }}' }}
         path: /postgrest(/.*)
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.INGRESS_CLASS "traefik" }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "traefik" }}' }}
         path: /postgrest
-{{ '{{ end }}' }}
-{{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
-    host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.TLS "true"}}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true"}}' }}
   tls:
   - hosts:
     - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
     secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgres/deployment.yaml
-{{ '{{ if eq .Values.POSTGRES "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -404,12 +411,12 @@ spec:
       labels:
         workload.user.cattle.io/workloadselector: deployment-appyters-postgres
     spec:
-{{ '{{ if eq .Values.S3_PV "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
       volumes:
       - name: appyters-postgres-data
         persistentVolumeClaim:
           claimName: appyters-postgres-data-claim
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
       containers:
       - name: appyters-postgres
         image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-postgres:{{ version }}
@@ -422,35 +429,35 @@ spec:
           value: "{{ '{{ .Values.POSTGRES_USER }}' }}"
         - name: POSTGRES_PASSWORD
           value: "{{ '{{ .Values.POSTGRES_PASSWORD }}' }}"
-{{ '{{ if eq .Values.S3_PV "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
         volumeMounts:
         - mountPath: /var/lib/postgresql
           name: appyters-postgres-data
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
       restartPolicy: Always
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgres/pvc.yaml
-{{ '{{ if eq .Values.POSTGRES "true" }}' }}
-{{ '{{ if eq .Values.POSTGRES_PV "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES_PV "true" }}' }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: appyters-postgres-data-claim
 spec:
-{{ '{{ if .Values.POSTGRES_PVC }}' }}
+{{ '{{- if .Values.POSTGRES_PVC }}' }}
   storageClassName: {{ '{{ .Values.POSTGRES_PVC }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ '{{ .Values.POSTGRES_PV_SIZE }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-postgres/service.yaml
-{{ '{{ if eq .Values.POSTGRES "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -465,10 +472,10 @@ spec:
     targetPort: 5432
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-postgres
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-s3/deployment.yaml
-{{ '{{ if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -484,12 +491,12 @@ spec:
       labels:
         workload.user.cattle.io/workloadselector: deployment-appyters-s3
     spec:
-{{ '{{ if eq .Values.S3_PV "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
       volumes:
       - name: appyters-s3-data
         persistentVolumeClaim:
           claimName: appyters-s3-data-claim
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
       containers:
       - name: appyters-s3
         image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-s3:{{ version }}
@@ -502,35 +509,35 @@ spec:
           value: "{{ '{{ .Values.S3_ACCESS_KEY }}' }}"
         - name: MINIO_SECRET_KEY
           value: "{{ '{{ .Values.S3_SECRET_KEY }}' }}"
-{{ '{{ if eq .Values.S3_PV "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
         volumeMounts:
         - mountPath: /data
           name: appyters-s3-data
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
       restartPolicy: Always
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-s3/pvc.yaml
-{{ '{{ if eq .Values.S3 "true" }}' }}
-{{ '{{ if eq .Values.S3_PV "true" }}' }}
+{{ '{{- if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: appyters-s3-data-claim
 spec:
-{{ '{{ if .Values.S3_PVC }}' }}
+{{ '{{- if .Values.S3_PVC }}' }}
   storageClassName: {{ '{{ .Values.S3_PVC }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ '{{ .Values.S3_PV_SIZE }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-s3/service.yaml
-{{ '{{ if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -545,33 +552,33 @@ spec:
     targetPort: 9000
   selector:
     workload.user.cattle.io/workloadselector: deployment-appyters-s3
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-s3/ingress.yaml
-{{ '{{ if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3 "true" }}' }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: appyters-s3
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
-{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ if .Values.TLS_ISSUER }}' }}
-  annotations:
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 spec:
   rules:
   - http:
@@ -579,16 +586,16 @@ spec:
       - backend:
           serviceName: appyters-s3
           servicePort: 9000
-{{ '{{ if .Values.S3_SERVER_NAME }}' }}
-    host: "{{ '{{ .Values.S3_SERVER_NAME }}' }}"
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.TLS "true" }}' }}
+{{ '{{- if .Values.S3_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.S3_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
   tls:
   - hosts:
     - {{ '{{ .Values.S3_SERVER_NAME }}' }}
     secretName: {{ '{{ .Values.S3_TLS_SECRET }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 ---
 # Source: templates/appyters-orchestrator/service-account.yaml
 apiVersion: v1
@@ -744,24 +751,24 @@ kind: Ingress
 metadata:
   name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
-{{ '{{ if .Values.TLS_CLUSTER_ISSUER }}' }}
   annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
     cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ if .Values.TLS_ISSUER }}' }}
-  annotations:
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
     cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
-{{ '{{ if .Values.TLS_ACME }}' }}
-{{ '{{ if eq .Values.TLS_ACME "true" }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
     kubernetes.io/tls-acme: "true"
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
 spec:
   rules:
   - http:
@@ -770,13 +777,13 @@ spec:
           serviceName: appyter-{{ appyter['name'].lower().replace('_', '-') }}
           servicePort: 5000
         path: /{{ appyter['name'] }}/
-{{ '{{ if .Values.APPYTERS_SERVER_NAME }}' }}
-    host: "{{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}"
-{{ '{{ end }}' }}
-{{ '{{ if eq .Values.TLS "true" }}' }}
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
   tls:
   - hosts:
     - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
     secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
-{{ '{{ end }}' }}
+{{ '{{- end }}' }}
 {%- endfor %}
