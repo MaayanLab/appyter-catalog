@@ -6,7 +6,13 @@ ENV TZ "America/New_York"
 RUN set -x \
   && echo "Preparing system..." \
   && apt-get -y update \
-  && apt-get -y install git python3-pip python3-dev \
+  && apt-get -y install \
+    curl \
+    git \
+    nginx \
+    python3-dev \
+    python3-pip \
+    rclone \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install --upgrade pip
 
@@ -69,6 +75,13 @@ RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --upgrade ${appyter_version}
 
+RUN set -x \
+  && echo "Preparing user..." \
+  && useradd -ms /bin/bash -d /app app \
+  && chown -R app:app /app \
+  && chmod og+rwx -R /var/lib/nginx /var/log/nginx
+
+USER app
 WORKDIR /app
 EXPOSE 80
 VOLUME /app/data
@@ -78,7 +91,7 @@ ENV HOST "0.0.0.0"
 ENV PORT "80"
 ENV DEBUG "false"
 
-COPY . /app
+COPY --chown=app:app . /app
 
 RUN set -x \
   && echo "Overriding appyter templates..." \
