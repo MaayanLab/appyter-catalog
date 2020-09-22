@@ -8,6 +8,7 @@ RUN set -x \
   && apt-get -y update \
   && apt-get -y install \
     curl \
+    fuse \
     git \
     nginx \
     python3-dev \
