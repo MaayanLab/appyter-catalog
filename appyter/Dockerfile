@@ -4,16 +4,24 @@ ENV DEBIAN_FRONTEND "noninteractive"
 ENV TZ "America/New_York"
 
 RUN set -x \
-  && echo "Preparing user..." \
-  && useradd -ms /bin/bash -d /app app
-
-RUN set -x \
   && echo "Preparing system..." \
   && apt-get -y update \
-  && apt-get -y install git python3-pip python3-dev nginx \
+  && apt-get -y install \
+    curl \
+    git \
+    nginx \
+    python3-dev \
+    python3-pip \
+    rclone \
+  && curl https://get.docker.com | sh \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install --upgrade pip \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
+
+RUN set -x \
+  && echo "Preparing user..." \
+  && useradd -ms /bin/bash -d /app app \
+  && adduser app docker
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
@@ -25,7 +33,6 @@ RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install -Iv ${appyter_version}
 
-USER app
 WORKDIR /app
 
 CMD [ "appyter" ]

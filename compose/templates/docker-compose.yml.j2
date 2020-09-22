@@ -34,7 +34,7 @@ services:
       context: ./appyter
       args:
         - appyter_version=${appyter_version}
-    image: maayanlab/appyter:{{ version }}
+    image: maayanlab/appyters-orchestrator:{{ version }}
     environment:
       HOST: "0.0.0.0"
       JOBS: "2"
@@ -45,7 +45,7 @@ services:
       - orchestration
       - dispatcher
     volumes:
-      - /var/lib/docker.sock:/var/lib/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
   postgrest:
     image: postgrest/postgrest
     restart: unless-stopped
@@ -108,6 +108,10 @@ services:
       - PREFIX=/{{ appyter['name'] }}/
       - PORT=5000
       - PROXY=true
+      - DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio:9000/storage/{{ appyter['name'] }}/
+      - DISPATCHER=http://appyters-orchestrator:5000
+      - DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
+      - DISPATCHER_IMAGE=maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=PathPrefix(`/{{ appyter['name'] }}/`)"
