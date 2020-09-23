@@ -84,12 +84,12 @@ RUN set -x \
 
 USER app
 WORKDIR /app
-EXPOSE 80
+EXPOSE 5000
 VOLUME /app/data
 
 ENV PREFIX "/"
 ENV HOST "0.0.0.0"
-ENV PORT "80"
+ENV PORT "5000"
 ENV DEBUG "false"
 
 COPY --chown=app:app . /app
