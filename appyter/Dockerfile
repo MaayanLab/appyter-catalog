@@ -32,7 +32,7 @@ RUN set -x \
 ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
   && echo "Installing appyter..." \
-  && pip3 install -Iv ${appyter_version}
+  && pip3 install --upgrade ${appyter_version}
 
 WORKDIR /app
 
