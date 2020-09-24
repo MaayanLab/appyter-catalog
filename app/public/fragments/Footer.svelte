@@ -1,5 +1,4 @@
-<div class="footer" style="margin-top: 25px;">
-  <hr />
+<div class="footer mt-4 pt-4 bg-white">
   <div class="row justify-content-center align-content-center" style="margin: 0">
     <div class="col-md-3 col-sm-12 text-center">
       <p>

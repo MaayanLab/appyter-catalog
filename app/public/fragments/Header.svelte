@@ -16,7 +16,7 @@
   }
 </style>
 
-<div class="container-fluid bg-white">
+<div class="container-fluid bg-white pb-2 mb-4">
   <div class="container">
     <div class="row">
       <div class="col-md-12 col-lg-4 col-xl-5">
