@@ -30,7 +30,7 @@
           </a>
         </h1>
       </div>
-      <div class="col-sm-12 col-lg-8 col-xl-7 text-right my-4" style="white-space: nowrap">
+      <div class="col-sm-12 col-lg-8 col-xl-7 text-center my-4" style="white-space: nowrap">
         <span class="text-muted">
           <a
             href="#/what-is-an-appyter/"
