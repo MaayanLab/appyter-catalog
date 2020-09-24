@@ -45,7 +45,7 @@ services:
       - orchestration
       - dispatcher
     volumes:
-      - /var/lib/docker.sock:/var/lib/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
   postgrest:
     build: ./postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
