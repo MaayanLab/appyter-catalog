@@ -102,7 +102,7 @@ services:
       - PROXY=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=PathPrefix(`/{{ appyter['name'] }}/`)"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${nginx_server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
       - "traefik.http.services.{{ appyter['name'].lower() }}.loadbalancer.server.port=5000"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
