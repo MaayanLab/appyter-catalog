@@ -28,6 +28,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`${nginx_server_name}`)"
+      - "traefik.http.routers.app.tls=true"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.app.tls.domains[0].main=${nginx_server_name}"
       - "traefik.http.services.app.loadbalancer.server.port=80"
   postgrest:
     image: postgrest/postgrest
@@ -35,6 +38,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.postgrest.rule=Host(`${nginx_server_name}`) && PathPrefix(`/postgrest`)"
+      - "traefik.http.routers.postgrest.tls=true"
+      - "traefik.http.routers.postgrest.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.postgrest.tls.domains[0].main=${nginx_server_name}"
       - "traefik.http.services.postgrest.loadbalancer.server.port=3000"
       - "traefik.http.routers.postgrest.middlewares=postgrest-stripprefix"
       - "traefik.http.middlewares.postgrest-stripprefix.stripprefix.prefixes=/postgrest"
@@ -69,6 +75,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`s3.${nginx_server_name}`) || (Host(`${nginx_server_name}`) && (PathPrefix(`/storage`) || PathPrefix(`/minio`)))"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.routers.minio.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.minio.tls.domains[0].main=${nginx_server_name}"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
@@ -95,6 +104,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=PathPrefix(`/{{ appyter['name'] }}/`)"
       - "traefik.http.services.{{ appyter['name'].lower() }}.loadbalancer.server.port=5000"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${nginx_server_name}"
       - "traefik.http.middlewares.{{ appyter['name'].lower() }}.headers.customrequestheaders.X-Forwarded-Proto=${nginx_server_scheme}"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.middlewares={{ appyter['name'].lower() }}@docker"
     volumes:
