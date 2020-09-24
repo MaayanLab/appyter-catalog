@@ -153,7 +153,7 @@
 {#if appyter === undefined}
   <div class="row m-0 p-0">
     <div class="col-sm-12 p-0">
-      <hr />
+      &nbsp;
     </div>
     {#if search}
       <SearchBox />

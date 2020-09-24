@@ -6,6 +6,11 @@
 
   let pages = {
     '': require('./pages/Catalog.svelte').default,
+    '/what-is-an-appyter': require('./pages/WhatIsAnAppyter.svelte').default,
+    '/using-appyters': require('./pages/UsingAppyters.svelte').default,
+    '/creating-appyters': require('./pages/CreatingAppyters.svelte').default,
+    '/publishing-appyters': require('./pages/PublishingAppyters.svelte').default,
+    '/about': require('./pages/About.svelte').default,
     [undefined]: require('./pages/NotFound.svelte').default,
   }
 </script>
