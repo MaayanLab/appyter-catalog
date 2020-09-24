@@ -19,18 +19,18 @@
 <div class="container-fluid bg-white pb-2 mb-4">
   <div class="container">
     <div class="row">
-      <div class="col-md-12 col-lg-4 col-xl-5">
+      <div class="col-md-12 col-lg-4">
         <h1>
           <a href="#/">
             <img
               src="{require('../images/appyters_logo.svg')}"
-              class="img-fluid w-100 p-2"
+              class="img-fluid w-100 p-4"
               alt="Appyters"
             />
           </a>
         </h1>
       </div>
-      <div class="col-sm-12 col-lg-8 col-xl-7 text-center my-4" style="white-space: nowrap">
+      <div class="col-sm-12 col-lg-8 offset-xl-1 col-xl-7 text-center my-4" style="white-space: nowrap">
         <span class="text-muted">
           <a
             href="#/what-is-an-appyter/"
