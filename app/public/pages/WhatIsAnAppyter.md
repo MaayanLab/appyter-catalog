@@ -4,4 +4,4 @@ Appyters are web-based applications that introduce users with a data entry form.
 
 <img class="img-fluid w-100 m-2 mb-4" src="../images/what-is-an-appyter-figure.svg" />
 
-Appyters extends biojupies by permitting rapid construction of biojupies-like applications based off of the same jupyter notebook reports that are produced. Helping to turn any data analysis into a highly-accessible parameterized web application.
+Appyters extends biojupies by permitting rapid construction of biojupies-like applications based off of the same jupyter notebook reports that are produced, helping to turn any data analysis into a highly-accessible parameterized web application.
