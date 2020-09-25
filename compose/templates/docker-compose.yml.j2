@@ -94,7 +94,7 @@ services:
       dockerfile: Dockerfile
       args:
         - appyter_version=${appyter_version}
-    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
     restart: unless-stopped
     environment:
       - PREFIX=/{{ appyter['name'] }}/
