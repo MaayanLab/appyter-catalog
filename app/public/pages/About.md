@@ -7,7 +7,7 @@ The Appyter Catalog is actively being developed in the [Ma'ayan Lab](https://lab
 
 __Software design and development__: Daniel J. B. Clarke  
 __Appyter contributors__: Minji Jeon, Daniel J. Stein, Nicole Moiseyev, Charles Dai, Megan L. Wojciechowicz, Skylar Litz, Jason Hom, John Erol Evangelista, Lucas Goldman, Serena Zhang, Christine Yoon, Tahmid Ahamed, Alexander Lchmann, Daniel J. B. Clarke  
-__Appyeter testers__: Samantha Bhuiyan, Jessie Cheng, and Julie Karama  
+__Appyeter testers__: Samantha Bhuiyan, Jessie Cheng, and Julie Karam  
 __User interface design__: Sam Ayling, Daniel J. B. Clarke  
 __Documentation__: Daniel J. B. Clarke, Avi Ma’ayan  
 __Project management__: Sherry L. Jenkins, Avi Ma’ayan
