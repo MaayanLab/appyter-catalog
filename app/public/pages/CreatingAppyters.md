@@ -73,7 +73,7 @@ Check out this lecture where we introduce appyters and describe how to extend it
 <div class="row">
   <div class="col-sm-12 col-md-6">
     <a href="https://www.youtube.com/watch?v=IWyjxvDg8JQ">
-      <img class="img-fluid w-100" src="http://img.youtube.com/vi/IWyjxvDg8JQ/0.jpg" />
+      <img class="img-fluid w-100" src="https://img.youtube.com/vi/IWyjxvDg8JQ/0.jpg" />
     </a>
   </div>
 </div>
