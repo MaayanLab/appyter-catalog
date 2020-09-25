@@ -51,7 +51,7 @@ services:
       - dispatcher
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  postgrest:
+  appyters-postgrest:
     build: ./postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
@@ -69,7 +69,7 @@ services:
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
       PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
-  postgres:
+  appyters-postgres:
     build: ./postgres
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgres:{{ version }}
     restart: unless-stopped
@@ -81,7 +81,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
-  s3:
+  appyters-s3:
     build: ./s3
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
