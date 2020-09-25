@@ -1,4 +1,7 @@
+<script>
+  import StaticMarkdown from '../components/StaticMarkdown.svelte'
+</script>
+
 <div class="container content flex-grow">
-  <h1 class="display-4">Creating Appyters</h1>
-  <p class="lead">Coming soon</p>
+  <StaticMarkdown data={require('./CreatingAppyters.md')} />
 </div>
