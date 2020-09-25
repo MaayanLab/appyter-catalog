@@ -13,11 +13,6 @@
       </a>
     </div>
     <div class="col-md-2 col-sm-3 text-center">
-      <a href="http://lincs-dcic.org" target="_blank">
-        <img class="rounded" src="{require('../images/dcic_light.png')}" style="height: 5rem;">
-      </a>
-    </div>
-    <div class="col-md-2 col-sm-3 text-center">
       <a href="https://labs.icahn.mssm.edu/maayanlab/" target="_blank">
         <img class="rounded" src="{require('../images/maayanlab_logo.png')}" style="height: 5rem;">
       </a>
