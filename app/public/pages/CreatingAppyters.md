@@ -65,3 +65,15 @@ Supported cell_types:
 
 By submitting the form for execution, the Appyter assembles all the necessary variables to fully serialize a customized instance of the target instantiation of the template Jupyter Notebook. A file input form field also exists. It facilitates uploading user-submitted files to utilize for a given analysis.
 The appyter command line interface (CLI) can be used to easily interact with the appyter feature-set including locating and describing available fields, profiles, and extras as well as facilitating the inspection, construction, evaluation, and serving (via flask) of appyters. Furthermore, the interface facilitates interacting with remote appyter instances using both the appyter REST API and with websockets, allowing inspection and real-time asynchronous evaluation of public appyter endpoints straight from the command line or indeed, as part of a workflow.
+
+## Video Tutorial
+
+Check out this lecture where we introduce appyters and describe how to extend it.
+
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <a href="https://www.youtube.com/watch?v=IWyjxvDg8JQ">
+      <img class="img-fluid w-100" src="http://img.youtube.com/vi/IWyjxvDg8JQ/0.jpg" />
+    </a>
+  </div>
+</div>
