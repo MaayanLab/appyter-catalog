@@ -40,13 +40,6 @@
           </a>
             |
           <a
-            href="#/using-appyters/"
-            class:selected={$hash.path.split('/').slice(0, -1).join('/')==='/using-appyters'}
-          >
-            Using Appyters
-          </a>
-           | 
-          <a
             href="#/creating-appyters/"
             class:selected={$hash.path.split('/').slice(0, -1).join('/')==='/creating-appyters'}
           >
