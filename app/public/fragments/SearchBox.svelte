@@ -5,7 +5,7 @@
 </script>
 
 <div class="container">
-  <div class="offset-sm-2 col-sm-8 text-center mb-3">
+  <div class="col-sm-10 col-md-12 mb-3">
     <div class="row">
       <div class="col-sm-12">
         <input
