@@ -1,4 +1,5 @@
 PYTHON ?= python3
+COMPOSE_ARGS ?= 
 
 # Get all appyter directories
 APPYTERS = $(shell find appyters -name appyter.json -exec sh -c 'realpath --relative-to=appyters $$(dirname {})' \;)
@@ -22,7 +23,7 @@ $(BUILDAPPYTERS): docker-compose.yml $$(@D)/Dockerfile
 	docker-compose build appyter-$(shell basename $(shell dirname $@ | awk '{print tolower($$0)}')) && touch $@
 
 docker-compose.yml: compose/.build .env $(DOCKERFILES)
-	$(PYTHON) compose/build_compose.py > $@
+	$(PYTHON) compose/build_compose.py $(COMPOSE_ARGS) > $@
 
 app/public/appyters.json: $(APPYTERFILES)
 	$(PYTHON) compose/build_appyters.py > $@
