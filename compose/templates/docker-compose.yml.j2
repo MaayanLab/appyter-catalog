@@ -130,7 +130,7 @@ services:
       - APPYTER_DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio:9000/storage/{{ appyter['name'] }}/
       - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
       - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
-      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
