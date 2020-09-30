@@ -1,6 +1,6 @@
 <div class="footer mt-4 pt-4 bg-white">
   <div class="row justify-content-center align-content-center" style="margin: 0">
-    <div class="col-md-3 col-sm-12 text-center">
+    <div class="col-md-3 col-sm-12 text-left">
       <p>
         <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
         <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
@@ -10,11 +10,6 @@
     <div class="col-md-2 col-sm-3 text-center">
       <a href="https://icahn.mssm.edu/research/bioinformatics" target="_blank">
         <img class="rounded" src="{require('../images/icahn_cb.png')}" style="height: 5rem;">
-      </a>
-    </div>
-    <div class="col-md-2 col-sm-3 text-center">
-      <a href="http://lincs-dcic.org" target="_blank">
-        <img class="rounded" src="{require('../images/dcic_light.png')}" style="height: 5rem;">
       </a>
     </div>
     <div class="col-md-2 col-sm-3 text-center">
