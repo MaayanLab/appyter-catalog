@@ -55,6 +55,8 @@ services:
       - dispatcher
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 5000:5000
   postgrest:
     image: postgrest/postgrest
     restart: unless-stopped
