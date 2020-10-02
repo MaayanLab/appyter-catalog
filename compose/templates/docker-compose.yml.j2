@@ -140,7 +140,7 @@ services:
       - "traefik.http.middlewares.{{ appyter['name'].lower() }}.headers.customrequestheaders.X-Forwarded-Proto=http{% if tls %}s{% endif %}"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.middlewares={{ appyter['name'].lower() }}@docker"
 {%- if tls %}
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=${server_tls}"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${server_name}"
 {% endif %}
