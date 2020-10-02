@@ -43,7 +43,7 @@ services:
       context: ./appyter
       args:
         - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
-    image: maayanlab/appyters-orchestrator:{{ version }}
+    image: maayanlab/appyters-orchestrator:{{ version }}-${appyter_version}
     environment:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "2"
