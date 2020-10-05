@@ -144,6 +144,4 @@ services:
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${server_name}"
 {% endif %}
-    volumes:
-      - ./data/{{ appyter['name'].lower() }}/:/app/data
 {%- endfor %}
