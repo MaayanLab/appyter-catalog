@@ -79,6 +79,8 @@ RUN set -x \
 RUN set -x \
   && echo "Preparing user..." \
   && useradd -ms /bin/bash -d /app app \
+  && groupadd fuse \
+  && adduser app fuse \
   && chown -R app:app /app \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 

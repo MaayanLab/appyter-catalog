@@ -22,7 +22,9 @@ RUN set -x \
 RUN set -x \
   && echo "Preparing user..." \
   && useradd -ms /bin/bash -d /app app \
-  && adduser app docker
+  && adduser app docker \
+  && groupadd fuse \
+  && adduser app fuse
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
