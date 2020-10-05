@@ -16,7 +16,7 @@ RUN set -x \
     rclone \
   && curl https://get.docker.com | sh \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --upgrade pip \
+  && pip3 install --no-cache-dir --upgrade pip \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 
 RUN set -x \
@@ -28,13 +28,13 @@ RUN set -x \
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
-  && pip3 install ipykernel \
+  && pip3 install --no-cache-dir ipykernel \
   && python3 -m ipykernel install
 
 ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
   && echo "Installing appyter..." \
-  && pip3 install -Iv ${appyter_version}
+  && pip3 install --no-cache-dir ${appyter_version}
 
 WORKDIR /app
 
