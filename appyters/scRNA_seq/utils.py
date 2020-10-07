@@ -5,7 +5,6 @@ import urllib3
 import requests, json
 import sys
 import math
-import geode
 from collections import OrderedDict
 import random
 from time import sleep
@@ -100,7 +99,7 @@ def autoselect_color_by(sample_metadata):
 
 
 def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_name, magic_normalization=False, nr_genes=500, color_by='auto', color_type='categorical', plot_type='interactive'):
-    top_genes = dataset.raw.to_adata().to_df().T.var(axis=1).sort_values(ascending=False)
+    # top_genes = dataset.raw.to_adata().to_df().T.var(axis=1).sort_values(ascending=False)
     if magic_normalization == False:
         expression_dataframe = dataset.to_df()
         
@@ -108,9 +107,11 @@ def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_nam
         expression_dataframe = dataset.uns["magic"]
     
     top_genes = expression_dataframe.T.var(axis=1).sort_values(ascending=False)
-    # Filter rows
-    expression_dataframe = expression_dataframe.T.loc[top_genes.index[:nr_genes]]
     
+    # Filter rows    
+    expression_dataframe = expression_dataframe.loc[:, top_genes.index[:nr_genes]].T
+    # expression_dataframe is gene x sample
+
     # Run PCA
     if dim_reduction_method == "PCA":
         dim_red=PCA(n_components=3)
@@ -127,7 +128,6 @@ def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_nam
         dim_red = umap.UMAP(n_components=3)
         dim_red.fit(expression_dataframe)
         var_explained = ['UMAP 1', 'UMAP 2', 'UMAP 3']
-        
         
     sample_metadata = pd.DataFrame(dataset.obs.loc[:, meta_class_column_name])
     # Estimate colors
@@ -179,6 +179,7 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
                                  marker=marker)
         data = [trace]
     elif color_by and color_type == 'categorical' and len(color_column.unique()) <= len(colors):
+
         # Get unique categories
         unique_categories = color_column.unique()
         # Define empty list
@@ -212,7 +213,6 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
                                      text=[sample_titles[x] for x in category_indices],
                                      name = category,
                                      marker=dict(size=5, color=category_color))
-            
             # Append trace to data list
             data.append(trace)
     else:
@@ -234,7 +234,7 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
                         text=sample_titles,
                         marker=marker)
         data = [trace]
-
+    
     colored = '' if str(color_by) == 'None' else 'Colored by {}'.format(color_by)
     layout = go.Layout(title='<b>{} Analysis | Scatter Plot</b><br><i>{}</i>'.format(dimension_reduction_results["dim_reduction_method"], colored), 
         hovermode='closest', margin=go.Margin(l=0,r=0,b=0,t=50), width=900,
@@ -261,7 +261,7 @@ def normalize_magic(dataset, k=10, a=15, t='auto', n_pca=100, knn_dist='euclidea
 
 def run_magic(dataset, dim_reduction_method, meta_class_column_name, plot_type='interactive'):
     # Run imputation
-    dataset.uns['magic'] = normalize_magic(dataset.to_df())
+    dataset.uns['magic'] = normalize_magic(dataset.to_df()).T
     return dataset
     
 def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=False, nr_genes=800, metadata_cols=None, filter_samples=True,gene_list=None):
@@ -298,13 +298,15 @@ def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=Fals
     index_list = ["" if "Gene" not in str(x) else x for x in index_list]
     expr_df_sub.index = index_list
     #subset of expr_df_sub
-    if len(expr_df_sub.columns) > 400:
-        expr_df_sub = expr_df_sub.sample(400, axis=1)
+    if len(expr_df_sub.columns) > 50:
+        print("Input data is too large. Random sampling (n=50) is performed.")
+        expr_df_sub = expr_df_sub.sample(50, axis=1)
     expr_df_sub_file = "expr_df_sub_file.txt"
     expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
     # POST the expression matrix to Clustergrammer and get the URL
     clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
     r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
+
     return r
     
 #############################################
