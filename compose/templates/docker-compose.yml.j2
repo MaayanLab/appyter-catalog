@@ -44,6 +44,7 @@ services:
       args:
         - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
     image: maayanlab/appyters-orchestrator:{{ version }}-${appyter_version}
+    restart: unless-stopped
     environment:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "3"
