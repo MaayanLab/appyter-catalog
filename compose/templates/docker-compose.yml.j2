@@ -1,8 +1,8 @@
 version: '3'
 services:
-  proxy:
-    build: ./proxy
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-proxy:{{ version }}
+  appyters-ingress:
+    build: ./ingress
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-ingress:{{ version }}
     restart: unless-stopped
     command: >
       --api.insecure=true
@@ -25,7 +25,7 @@ services:
 {%- endif %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/proxy:/data
+      - ./data/ingress:/data
   appyters-catalog:
     build: ./app
     restart: unless-stopped
