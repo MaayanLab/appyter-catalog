@@ -15,11 +15,11 @@ RUN set -x \
     python3-pip \
     rclone \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --upgrade pip
+  && pip3 install --no-cache-dir --upgrade pip
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
-  && pip3 install ipykernel \
+  && pip3 install --no-cache-dir ipykernel \
   && python3 -m ipykernel install
 
 {%- if os.path.isfile(os.path.join(appyter_path, 'deps.txt')) %}
@@ -66,7 +66,7 @@ RUN set -x \
 ADD requirements.txt /app/requirements.txt
 RUN set -x \
   && echo "Installing python dependencies from requirements.txt..." \
-  && pip3 install -r /app/requirements.txt \
+  && pip3 install --no-cache-dir -r /app/requirements.txt \
   && rm /app/requirements.txt
 
 {%- endif %}
@@ -74,11 +74,13 @@ RUN set -x \
 ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
   && echo "Installing appyter..." \
-  && pip3 install --upgrade ${appyter_version}
+  && pip3 install --no-cache-dir --upgrade ${appyter_version}
 
 RUN set -x \
   && echo "Preparing user..." \
   && useradd -ms /bin/bash -d /app app \
+  && groupadd fuse \
+  && adduser app fuse \
   && chown -R app:app /app \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 
@@ -91,6 +93,9 @@ ENV APPYTER_PREFIX "/"
 ENV APPYTER_HOST "0.0.0.0"
 ENV APPYTER_PORT "5000"
 ENV APPYTER_DEBUG "false"
+
+ENV PATH "/app:$PATH"
+ENV PYTHONPATH "/app:$PYTHONPATH"
 
 COPY --chown=app:app . /app
 
