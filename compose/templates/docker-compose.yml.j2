@@ -47,6 +47,8 @@ services:
         - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${appyter_version}
     restart: unless-stopped
+    ports:
+      - 5000:5000
     environment:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "3"
@@ -62,8 +64,6 @@ services:
   appyters-postgrest:
     build: ./postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
-    ports:
-      - 5000:5000
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
