@@ -77,7 +77,7 @@ services:
       - "traefik.http.routers.postgrest.tls.domains[0].main=${server_name}"
 {%- endif %}
     environment:
-      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
+      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@appyters-postgres:5432/appyters"
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
       PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${server_name}/postgrest"
