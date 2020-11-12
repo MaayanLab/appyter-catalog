@@ -7,12 +7,19 @@ import traceback
 import jsonschema
 import urllib.request, urllib.error
 from PIL import Image
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 # remove user agent from urllib.request requests
 _opener = urllib.request.build_opener()
 _opener.addheaders = [('Accept', '*/*')]
 urllib.request.install_opener(_opener)
+
+def try_json_loads(s):
+  import json
+  try:
+    return json.loads(s)
+  except:
+    s
 
 def get_changed_appyters(github_action):
   if github_action:
@@ -20,7 +27,7 @@ def get_changed_appyters(github_action):
     changed_files = [record['filename'] for record in json.load(sys.stdin)]
   else:
     # use git
-    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE) as p:
+    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE, stderr=STDOUT) as p:
       changed_files = set(filter(None, map(str.strip, map(bytes.decode, p.stdout))))
   #
   appyters = {
@@ -92,7 +99,7 @@ def validate_appyter(appyter):
     'docker', 'build',
     '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     '.',
-  ], cwd=os.path.join('appyters', appyter), stdout=PIPE) as p:
+  ], cwd=os.path.join('appyters', appyter), stdout=PIPE, stderr=STDOUT) as p:
     for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
       print(f"{appyter}: `docker build .`: {line}")
     assert p.wait() == 0, '`docker build .` command failed'
@@ -103,7 +110,7 @@ def validate_appyter(appyter):
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbinspect',
     nbfile,
-  ], stdout=PIPE) as p:
+  ], stdout=PIPE, stderr=STDOUT) as p:
     nbinspect_output = p.stdout.read().decode().strip()
     print(f"{appyter}: `appyter nbinspect {nbfile}`: {nbinspect_output})")
     assert p.wait() == 0, f"`appyter nbinspect {nbfile}` command failed"
@@ -158,7 +165,7 @@ def validate_appyter(appyter):
     'appyter', 'nbconstruct',
     f"--output=/data/{nbfile}",
     nbfile,
-  ], stdin=PIPE, stdout=PIPE) as p:
+  ], stdin=PIPE, stdout=PIPE, stderr=STDOUT) as p:
     print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
     for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
@@ -175,9 +182,9 @@ def validate_appyter(appyter):
     'appyter', 'nbexecute',
     f"--cwd=/data",
     f"{nbfile}",
-  ], stdout=PIPE) as p:
-    for msg in map(json.loads, p.stdout):
-      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+  ], stdout=PIPE, stderr=STDOUT) as p:
+    for msg in map(try_json_loads, p.stdout):
+      assert not (type(msg) == dict and msg['type'] == 'error'), f"{appyter}: error {msg.get('data')}"
       print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
     assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
