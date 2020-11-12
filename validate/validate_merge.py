@@ -168,7 +168,7 @@ def validate_appyter(appyter):
   ], stdin=PIPE, stdout=PIPE, stderr=STDOUT) as p:
     print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
-    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
+    for line in filter(None, map(str.strip, stdout.decode().splitlines())):
       print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
