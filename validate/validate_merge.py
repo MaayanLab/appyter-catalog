@@ -85,7 +85,7 @@ def validate_appyter(appyter):
     json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
-    traceback.print_exc()
+    print(f"{appyter}: {traceback.format_exc()}")
   #
   assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
   print(f"{appyter}: Creating Dockerfile...")
@@ -168,7 +168,7 @@ def validate_appyter(appyter):
   ], stdin=PIPE, stdout=PIPE, stderr=STDOUT) as p:
     print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
-    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
+    for line in filter(None, map(str.strip, stdout.decode().splitlines())):
       print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
@@ -206,7 +206,7 @@ def validate_merge(github_action=False):
       validate_appyter(appyter)
     except Exception as e:
       print(f"{appyter}: ERROR {str(e)}")
-      traceback.print_exc()
+      print(f"{appyter}: {traceback.format_exc()}")
       valid = False
   #
   if valid:
