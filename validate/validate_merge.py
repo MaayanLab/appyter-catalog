@@ -157,6 +157,8 @@ def validate_appyter(appyter):
   if early_stopping:
     print(f"{appyter}: WARNING, Stopping early as a download requires manual intervention.")
     return
+  print(f"{appyter}: Fixing permissions...")
+  assert Popen(['chmod', '-R', '777', tmp_directory]).wait() == 0, f"{appyter}: ERROR: Changing permissions failed"
   print(f"{appyter}: Constructing default notebook from appyter...")
   with Popen([
     'docker', 'run',
