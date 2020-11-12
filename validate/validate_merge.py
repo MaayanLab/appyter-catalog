@@ -85,7 +85,7 @@ def validate_appyter(appyter):
     json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
-    traceback.print_exc()
+    print(f"{appyter}: {traceback.format_exc()}")
   #
   assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
   print(f"{appyter}: Creating Dockerfile...")
@@ -206,7 +206,7 @@ def validate_merge(github_action=False):
       validate_appyter(appyter)
     except Exception as e:
       print(f"{appyter}: ERROR {str(e)}")
-      traceback.print_exc()
+      print(f"{appyter}: {traceback.format_exc()}")
       valid = False
   #
   if valid:
