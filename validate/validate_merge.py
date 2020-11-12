@@ -174,7 +174,7 @@ def validate_appyter(appyter):
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
     f"--cwd=/data",
-    f"/data/{nbfile}",
+    f"{nbfile}",
   ], stdout=PIPE) as p:
     for msg in map(json.loads, p.stdout):
       assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"

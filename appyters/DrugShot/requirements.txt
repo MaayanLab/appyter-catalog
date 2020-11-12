@@ -1,0 +1,5 @@
+pandas
+numpy
+git+git://github.com/Maayanlab/appyter.git
+requests
+plotly

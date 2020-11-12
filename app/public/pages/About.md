@@ -1,0 +1,13 @@
+## Abstract
+
+Most biomedical researchers face a barrier in executing computational pipelines to analyze and visualize their data. It is therefore desirable to develop interfaces that enable biomedical researchers to execute pipelines without needing to learn how to code. Jupyter notebooks have transformed the communication of data analysis pipelines by facilitating a modular structure that brings together code, markdown text, and interactive visualizations to increase transparency and reproducibility. However, executing pipelines delivered as Jupyter notebooks is still difficult for biomedical researchers with no programming skills. Here, we extended Jupyter notebooks to broaden their accessibility with Appyters. Appyters turn Jupyter notebooks into fully functional standalone web applications. Appyters present to users a data entry form that enables them to upload their data and set various parameters for multitude bioinformatics analysis pipelines. Once the form is filled, the Appyter executes the corresponding notebook online, producing the output without requiring the user to interact directly with the code. Appyters can be applied to a variety of workflows including building customized machine learning pipelines, analyzing RNA-seq data, and producing publishable figures. We developed several Appyters spanning a variety of bioinformatic tasks demonstrating both the versatility and value of such web-based applications. These Appyters are served in the Appyters Catalog at: <https://appyters.maayanlab.cloud>. In summary, Appyters enable the rapid development of web-based bioinformatics applications. While our initial application is geared toward enabling bioinformatics workflows, Appyters can be applied broadly to enable data analysis across many other scientific fields.
+
+## Contributors
+The Appyter Catalog is actively being developed in the [Ma'ayan Lab](https://labs.icahn.mssm.edu/maayanlab/) at the [Icahn School of Medicine at Mount Sinai](https://icahn.mssm.edu/) in the [Mount Sinai Center for Bioinformatics](https://icahn.mssm.edu/research/bioinformatics).
+
+__Software design and development__: Daniel J. B. Clarke  
+__Appyter contributors__: Minji Jeon, Daniel J. Stein, Nicole Moiseyev, Charles Dai, Megan L. Wojciechowicz, Skylar Litz, Jason Hom, John Erol Evangelista, Lucas Goldman, Serena Zhang, Christine Yoon, Tahmid Ahamed, Alexander Lchmann, Daniel J. B. Clarke  
+__Appyeter testers__: Samantha Bhuiyan, Jessie Cheng, and Julie Karam  
+__User interface design__: Sam Ayling, Daniel J. B. Clarke  
+__Documentation__: Daniel J. B. Clarke, Avi Ma’ayan  
+__Project management__: Sherry L. Jenkins, Avi Ma’ayan
