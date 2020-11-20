@@ -9,8 +9,7 @@
 <style>
 
 body {
-  font: 16px Arial;  
-  margin-top: 10%;
+  font: 16px Arial;
   text-align: center;
 }
 .autocomplete {
@@ -67,6 +66,9 @@ input[type=submit] {
 {% endblock %}
 
 {% block body %}
+<div class="row">
+<div class="col-sm-12" style="margin-top: 10%">&nbsp;</div>
+<div class="col-sm-12">
 <div class="container">
     <div class="mt-3 row">
         <div class="col-3">
@@ -79,6 +81,8 @@ input[type=submit] {
     <br><br>To start the prediction, choose a gene of interest and provide a GMT file. To provide a GMT file either select one from the Enrichr database or upload a custom file.
         </div>
     </div>
+</div>
+</div>
 </div>
 {{ super() }}
 {% endblock %}

@@ -9,20 +9,25 @@
 {% endblock %}
 
 {% block body %}
+<div class="row">
+<div class="col-sm-12">
 <div class="container">
     <div class="mt-3 row align-items-center">
         <div class="col-3">
-            <img src="{{ url_for('static', filename='target.png') }}" style="width:150px" class="img-fluid float-right">
+            <img src="{{ url_for('static', filename='drugshot_logo.png') }}" style="width:450px" class="img-fluid float-right">
         </div>
         <div class="col-7">
-            <h1> DrugShot </h1>
-            <p class="my-0"> Submit any biomedical search term to receive prioritized drugs that are most relevant to the search term. DrugShot finds publications that mention both the search term and drugs. It then prioritizes these drugs using various methods: </p>
-            <ol>
-                <li>list of drugs from publications </li>
-                <li>predicted drugs using a drug-drug similarity matrix derived from L1000 compound-induced gene expression </li>
+            <h1 class = 'text-center'> DrugShot </h1>
+            <p class="my-0"> This Appyter searches PubMed for articles that co-mention any search term that relates to drugs.
+             <br><br>In the first input box you can enter any search term for the PubMed search.
+             <br>In the second input box you can enter the number of drugs to use as positives for predicting additional drugs. 
+             <br><br>DrugShot finds publications that mention both the search term and drugs. It then prioritizes these drugs using various methods, as well as predicts additional drugs based on shared properties among drugs and other small molecules. 
+             </p>
 
         </div>
     </div>
+</div>
+</div>
 </div>
 {{ super() }}
 {% endblock %}
