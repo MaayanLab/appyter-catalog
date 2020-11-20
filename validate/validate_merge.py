@@ -7,12 +7,19 @@ import traceback
 import jsonschema
 import urllib.request, urllib.error
 from PIL import Image
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 # remove user agent from urllib.request requests
 _opener = urllib.request.build_opener()
 _opener.addheaders = [('Accept', '*/*')]
 urllib.request.install_opener(_opener)
+
+def try_json_loads(s):
+  import json
+  try:
+    return json.loads(s)
+  except:
+    s
 
 def get_changed_appyters(github_action):
   if github_action:
@@ -20,7 +27,7 @@ def get_changed_appyters(github_action):
     changed_files = [record['filename'] for record in json.load(sys.stdin)]
   else:
     # use git
-    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE) as p:
+    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE, stderr=STDOUT) as p:
       changed_files = set(filter(None, map(str.strip, map(bytes.decode, p.stdout))))
   #
   appyters = {
@@ -78,7 +85,7 @@ def validate_appyter(appyter):
     json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
-    traceback.print_exc()
+    print(f"{appyter}: {traceback.format_exc()}")
   #
   assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
   print(f"{appyter}: Creating Dockerfile...")
@@ -92,7 +99,7 @@ def validate_appyter(appyter):
     'docker', 'build',
     '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     '.',
-  ], cwd=os.path.join('appyters', appyter), stdout=PIPE) as p:
+  ], cwd=os.path.join('appyters', appyter), stdout=PIPE, stderr=STDOUT) as p:
     for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
       print(f"{appyter}: `docker build .`: {line}")
     assert p.wait() == 0, '`docker build .` command failed'
@@ -103,7 +110,7 @@ def validate_appyter(appyter):
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbinspect',
     nbfile,
-  ], stdout=PIPE) as p:
+  ], stdout=PIPE, stderr=STDOUT) as p:
     nbinspect_output = p.stdout.read().decode().strip()
     print(f"{appyter}: `appyter nbinspect {nbfile}`: {nbinspect_output})")
     assert p.wait() == 0, f"`appyter nbinspect {nbfile}` command failed"
@@ -150,6 +157,8 @@ def validate_appyter(appyter):
   if early_stopping:
     print(f"{appyter}: WARNING, Stopping early as a download requires manual intervention.")
     return
+  print(f"{appyter}: Fixing permissions...")
+  assert Popen(['chmod', '-R', '777', tmp_directory]).wait() == 0, f"{appyter}: ERROR: Changing permissions failed"
   print(f"{appyter}: Constructing default notebook from appyter...")
   with Popen([
     'docker', 'run',
@@ -158,10 +167,10 @@ def validate_appyter(appyter):
     'appyter', 'nbconstruct',
     f"--output=/data/{nbfile}",
     nbfile,
-  ], stdin=PIPE, stdout=PIPE) as p:
+  ], stdin=PIPE, stdout=PIPE, stderr=STDOUT) as p:
     print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
-    for line in filter(None, map(str.strip, map(bytes.decode, stdout))):
+    for line in filter(None, map(str.strip, stdout.decode().splitlines())):
       print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
     assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
@@ -174,10 +183,10 @@ def validate_appyter(appyter):
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
     f"--cwd=/data",
-    f"/data/{nbfile}",
-  ], stdout=PIPE) as p:
-    for msg in map(json.loads, p.stdout):
-      assert msg['type'] != 'error', f"{appyter}: error {msg.get('data')}"
+    f"{nbfile}",
+  ], stdout=PIPE, stderr=STDOUT) as p:
+    for msg in map(try_json_loads, p.stdout):
+      assert not (type(msg) == dict and msg['type'] == 'error'), f"{appyter}: error {msg.get('data')}"
       print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
     assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
@@ -199,7 +208,7 @@ def validate_merge(github_action=False):
       validate_appyter(appyter)
     except Exception as e:
       print(f"{appyter}: ERROR {str(e)}")
-      traceback.print_exc()
+      print(f"{appyter}: {traceback.format_exc()}")
       valid = False
   #
   if valid:

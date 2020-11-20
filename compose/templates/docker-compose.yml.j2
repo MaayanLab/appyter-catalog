@@ -1,57 +1,89 @@
 version: '3'
 services:
-  proxy:
-    image: traefik:v2.2
+  appyters-ingress:
+    build: ./ingress
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-ingress:{{ version }}
     restart: unless-stopped
     command: >
       --api.insecure=true
       --providers.docker
       --providers.docker.exposedByDefault=false
       --entrypoints.web.address=:80
+{%- if tls %}
       --entrypoints.web.http.redirections.entrypoint.to=websecure
       --entrypoints.web.http.redirections.entrypoint.scheme=https
       --entrypoints.websecure.address=:443
       --certificatesresolvers.letsencrypt-prod.acme.email=${letsencrypt_email}
       --certificatesresolvers.letsencrypt-prod.acme.storage=/data/acme.json
       --certificatesresolvers.letsencrypt-prod.acme.tlschallenge=true
+{%- endif %}
     ports:
       - 80:80
-      - 443:443
       - 8080:8080
+{%- if tls %}
+      - 443:443
+{%- endif %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/proxy:/data
-  app:
-    build: app
-    image: maayanlab/appyters:{{ version }}
+      - ./data/ingress:/data
+  appyters-catalog:
+    build: ./app
+    restart: unless-stopped
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-catalog:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`${nginx_server_name}`)"
+      - "traefik.http.routers.app.rule=Host(`${server_name}`)"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+{%- if tls %}
       - "traefik.http.routers.app.tls=true"
       - "traefik.http.routers.app.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.app.tls.domains[0].main=${nginx_server_name}"
-      - "traefik.http.services.app.loadbalancer.server.port=80"
-  postgrest:
-    image: postgrest/postgrest
+      - "traefik.http.routers.app.tls.domains[0].main=${server_name}"
+{% endif %}
+  appyters-orchestrator:
+    build:
+      context: ./appyter
+      args:
+        - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${appyter_version}
+    restart: unless-stopped
+    ports:
+      - 5000:5000
+    environment:
+      APPYTER_HOST: "0.0.0.0"
+      APPYTER_JOBS: "3"
+      APPYTER_JOBS_PER_IMAGE: "1"
+      APPYTER_DISPATCH: "docker"
+      APPYTER_DEBUG: "false"
+    command:
+      - appyter
+      - orchestration
+      - dispatcher
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  appyters-postgrest:
+    build: ./postgrest
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.postgrest.rule=Host(`${nginx_server_name}`) && PathPrefix(`/postgrest`)"
-      - "traefik.http.routers.postgrest.tls=true"
-      - "traefik.http.routers.postgrest.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.postgrest.tls.domains[0].main=${nginx_server_name}"
+      - "traefik.http.routers.postgrest.rule=Host(`${server_name}`) && PathPrefix(`/postgrest`)"
       - "traefik.http.services.postgrest.loadbalancer.server.port=3000"
       - "traefik.http.routers.postgrest.middlewares=postgrest-stripprefix"
       - "traefik.http.middlewares.postgrest-stripprefix.stripprefix.prefixes=/postgrest"
+{%- if tls %}
+      - "traefik.http.routers.postgrest.tls=true"
+      - "traefik.http.routers.postgrest.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.postgrest.tls.domains[0].main=${server_name}"
+{%- endif %}
     environment:
-      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@postgres:5432/appyters"
+      PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@appyters-postgres:5432/appyters"
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
-      PGRST_SERVER_PROXY_URI: "${nginx_server_scheme}://${nginx_server_name}/postgrest"
-  postgres:
+      PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${server_name}/postgrest"
+  appyters-postgres:
     build: ./postgres
-    image: maayanlab/appyters-postgres
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgres:{{ version }}
     restart: unless-stopped
     ports:
       - 5432:5432
@@ -61,25 +93,21 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
-  minio:
-    image: minio/minio
+  appyters-s3:
+    build: ./s3
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
-    entrypoint:
-    - /bin/sh
-    command:
-    - -c
-    - >
-      mkdir -p /data/storage;
-      minio server /data;
-      exit 0
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`s3.${nginx_server_name}`) || (Host(`${nginx_server_name}`) && (PathPrefix(`/storage`) || PathPrefix(`/minio`)))"
+      - "traefik.http.routers.minio.rule=Host(`s3.${server_name}`) || (Host(`${server_name}`) && (PathPrefix(`/storage`) || PathPrefix(`/minio`)))"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+{%- if tls %}
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.minio.tls.domains[0].main=${nginx_server_name}"
-      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.routers.minio.tls.domains[0].main=${server_name}"
+{%- endif %}
     environment:
+      MINIO_BUCKET: ${MINIO_BUCKET}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     ports:
@@ -94,21 +122,25 @@ services:
       dockerfile: Dockerfile
       args:
         - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
-    image: maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
     restart: unless-stopped
     environment:
-      - PREFIX=/{{ appyter['name'] }}/
-      - PORT=5000
-      - PROXY=true
+      - APPYTER_PREFIX=/{{ appyter['name'] }}/
+      - APPYTER_PORT=5000
+      - APPYTER_PROXY=true
+      - APPYTER_DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@appyters-s3:9000/storage/appyters/
+      - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
+      - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
+      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${nginx_server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
       - "traefik.http.services.{{ appyter['name'].lower() }}.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.{{ appyter['name'].lower() }}.headers.customrequestheaders.X-Forwarded-Proto=http{% if tls %}s{% endif %}"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.middlewares={{ appyter['name'].lower() }}@docker"
+{%- if tls %}
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${nginx_server_name}"
-      - "traefik.http.middlewares.{{ appyter['name'].lower() }}.headers.customrequestheaders.X-Forwarded-Proto=${nginx_server_scheme}"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.middlewares={{ appyter['name'].lower() }}@docker"
-    volumes:
-      - ./data/{{ appyter['name'].lower() }}/:/app/data
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${server_name}"
+{% endif %}
 {%- endfor %}
