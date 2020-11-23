@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import click
+import nbformat as nbf
 import traceback
 import jsonschema
 import urllib.request, urllib.error
@@ -78,6 +79,16 @@ def validate_appyter(appyter):
     print(f"{appyter}: WARNING `{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
+  #
+  print(f"{appyter}: Checking notebook for issues..")
+  nb = nbf.read(open(nbfile, 'r'), as_version=4)
+  for cell in nb.cells:
+    if cell['cell_type'] == 'code':
+      assert not cell.get('execution_count'), "Please clear all notebook output & metadata"
+      assert not cell.get('metadata'), "Please clear all notebook output & metadata"
+      assert not cell.get('outputs'), "Please clear all notebook output & metadata"
+  assert not nb['metadata'].get('widgets'), "Please clear all notebook output & metadata"
+  assert not nb['metadata'].get('execution_info'), "Please clear all notebook output & metadata"
   #
   print(f"{appyter}: Preparing docker to run `{nbfile}`...")
   assert os.path.isfile(os.path.join('appyters', appyter, nbfile)), f"Missing appyters/{appyter}/{nbfile}"
