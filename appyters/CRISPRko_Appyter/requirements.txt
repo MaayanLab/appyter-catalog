@@ -1,0 +1,9 @@
+git+git://github.com/Maayanlab/appyter.git
+pandas
+numpy
+scipy
+contextlib
+io
+Ipython
+requests
+json
