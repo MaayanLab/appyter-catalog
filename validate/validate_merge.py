@@ -79,9 +79,10 @@ def validate_appyter(appyter):
     print(f"{appyter}: WARNING `{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
+  nbpath = os.path.join('appyters', appyter, nbfile)
   #
   print(f"{appyter}: Checking notebook for issues..")
-  nb = nbf.read(open(nbfile, 'r'), as_version=4)
+  nb = nbf.read(open(nbpath, 'r'), as_version=4)
   for cell in nb.cells:
     if cell['cell_type'] == 'code':
       assert not cell.get('execution_count'), "Please clear all notebook output & metadata"
@@ -91,9 +92,9 @@ def validate_appyter(appyter):
   assert not nb['metadata'].get('execution_info'), "Please clear all notebook output & metadata"
   #
   print(f"{appyter}: Preparing docker to run `{nbfile}`...")
-  assert os.path.isfile(os.path.join('appyters', appyter, nbfile)), f"Missing appyters/{appyter}/{nbfile}"
+  assert os.path.isfile(nbpath), f"Missing {nbpath}"
   try:
-    json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
+    json.load(open(nbpath, 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
     print(f"{appyter}: {traceback.format_exc()}")
