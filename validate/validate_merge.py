@@ -119,8 +119,8 @@ def validate_appyter(appyter):
   print(f"{appyter}: Inspecting appyter...")
   with Popen([
     'docker', 'run',
+    '-e', 'APPYTER_PREFIX=', # hotfix because prefix is baked-in and necessary at production initialization time, but should be empty here
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
-    'env', 'APPYTER_PREFIX=', # hotfix because prefix is baked-in and necessary at production initialization time, but should be empty here
     'appyter', 'nbinspect',
     nbfile,
   ], stdout=PIPE, stderr=STDOUT) as p:
