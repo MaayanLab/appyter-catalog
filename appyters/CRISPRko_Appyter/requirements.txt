@@ -2,8 +2,5 @@ git+git://github.com/Maayanlab/appyter.git
 pandas
 numpy
 scipy
-contextlib2
-io
 ipython
 requests
-json
