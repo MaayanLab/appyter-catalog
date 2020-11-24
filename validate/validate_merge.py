@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import click
+import shutil
 import nbformat as nbf
 import traceback
 import jsonschema
@@ -151,17 +152,21 @@ def validate_appyter(appyter):
     default_file = default_args[file_field]
     if default_file:
       if default_file in field_examples:
-        print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
-        try:
-          _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
-          assert response.get_content_type() != 'text/html', 'Expected data, got html'
-        except AssertionError as e:
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
-          early_stopping = True
-        except urllib.error.HTTPError as e:
-          assert e.getcode() != 404, f"File not found on remote, reported 404"
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
-          early_stopping = True
+        if os.path.exists(os.path.join('appyters', appyter, field_examples[default_file])):
+          print(f"{appyter}: Copying example file {default_file} from {field_examples[default_file]}...")
+          shutil.copyfile(os.path.join('appyters', appyter, field_examples[default_file]), os.path.join(tmp_directory, default_file))
+        else:
+          print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
+          try:
+            _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
+            assert response.get_content_type() != 'text/html', 'Expected data, got html'
+          except AssertionError as e:
+            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+            early_stopping = True
+          except urllib.error.HTTPError as e:
+            assert e.getcode() != 404, f"File not found on remote, reported 404"
+            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+            early_stopping = True
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
