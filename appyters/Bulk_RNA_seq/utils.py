@@ -565,8 +565,8 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
     elif library_type == "pathway":
         # Libraries
         libraries = {
-            'KEGG_2016': 'KEGG Pathways',
-            'WikiPathways_2016': 'WikiPathways',
+            'KEGG_2019_Human': 'KEGG Pathways',
+            'WikiPathways_2019_Human': 'WikiPathways',
             'Reactome_2016': 'Reactome Pathways'
         }
 
