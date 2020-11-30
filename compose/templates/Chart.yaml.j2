@@ -1,0 +1,789 @@
+# Source: Chart.yaml
+apiVersion: v1
+appVersion: "0.0.1"
+description: Appyters Catalog
+name: appyters
+version: v1
+---
+# Source: questions.yaml
+questions:
+- variable: NAMESPACE
+  type: string
+  required: true
+  default: "appyters"
+  group: "Cluster Config"
+  description: "The kubernetes namespace to run this in"
+- variable: DOCKER_REGISTRY
+  type: string
+  required: true
+  default: "maayanlab"
+  group: "Cluster Config"
+  description: "The docker registry to use if not the public one"
+- variable: INGRESS_TYPE
+  type: string
+  required: true
+  default: "nginx"
+  group: "Cluster Config"
+  description: "The ingress type, supported types are `nginx` and `traefik`"
+- variable: INGRESS_CLASS
+  type: string
+  required: true
+  default: "nginx"
+  group: "Cluster Config"
+  description: "The ingress class name"
+- variable: TLS
+  type: string
+  required: true
+  default: "true"
+  group: "Cluster Config"
+  description: "Whether or not to use TLS"
+- variable: TLS_ISSUER
+  type: string
+  required: false
+  default: "letsencrypt-prod"
+  group: "Cluster Config"
+  description: "The cert-manager issuer name for automated TLS (mutually exclusive with TLS_CLUSTER_ISSUER)"
+- variable: TLS_CLUSTER_ISSUER
+  type: string
+  required: false
+  default: ""
+  group: "Cluster Config"
+  description: "The cert-manager cluster-issuer name for automated TLS (mutually exclusive with TLS_ISSUER)"
+- variable: TLS_ACME
+  type: string
+  required: false
+  default: "true"
+  group: "Cluster Config"
+  description: "Whether to add tls acme annotation on TLS ingress"
+- variable: APPYTERS_SERVER_NAME
+  type: string
+  required: false
+  default: "appyters.maayanlab.cloud"
+  group: Appyters
+  description: "The server name for the ingress"
+- variable: APPYTERS_TLS_SECRET
+  type: string
+  required: false
+  default: "appyters-maayanlab-cloud-tls"
+  group: Appyters
+  description: "The TLS secret to use, required for TLS"
+- variable: APPYTERS_ORCHESTRATOR_CONCURRENT_JOBS
+  type: string
+  required: true
+  default: "4"
+  group: Appyters
+  description: "The maximum number of concurrent execution jobs to run"
+- variable: POSTGREST
+  type: string
+  required: true
+  default: "true"
+  group: PostgREST
+  description: "Whether or not to setup PostgREST for API access to Postgres"
+- variable: POSTGRES
+  type: string
+  required: true
+  default: "true"
+  group: Postgres
+  description: "Whether or not to setup postgres"
+- variable: POSTGRES_HOSTNAME
+  type: string
+  required: true
+  default: "appyters-postgres"
+  group: Postgres
+  description: "Hostname of the postgres database (leave alone if POSTGRES is true)"
+- variable: POSTGRES_PORT
+  type: string
+  required: true
+  default: "5432"
+  group: Postgres
+  description: "Port of the postgres database (leave alone if default)"
+- variable: POSTGRES_DB
+  type: string
+  required: true
+  default: "appyters"
+  group: Postgres
+  description: "Database name for postgres database"
+- variable: POSTGRES_USER
+  type: string
+  required: true
+  default: "appyters"
+  group: Postgres
+  description: "Username for postgres database"
+- variable: POSTGRES_PASSWORD
+  type: password
+  required: true
+  default: ""
+  group: Postgres
+  description: "The password for the primary user on postgres"
+- variable: POSTGRES_ANON_ROLE
+  type: string
+  required: true
+  default: "guest"
+  group: Postgres
+  description: "Anonymous role (leave alone if using schema)"
+- variable: POSTGRES_API_SCHEMA
+  type: string
+  required: true
+  default: "api"
+  group: Postgres
+  description: "API Schema (leave alone if using schema)"
+- variable: POSTGRES_PV
+  type: string
+  required: true
+  default: "true"
+  group: Postgres
+  description: "Whether or not we should allocate a persistent volume for postgres"
+- variable: POSTGRES_PV_SIZE
+  type: string
+  required: false
+  default: "10G"
+  group: Postgres
+  description: "The size of the persistent volume to request"
+- variable: POSTGRES_PVC
+  type: string
+  required: false
+  default: "aws-ssd"
+  group: Postgres
+  description: "The optional persistent volume storage class"
+- variable: S3
+  type: string
+  required: true
+  default: "true"
+  group: S3
+  description: "Whether or not we should setup S3"
+- variable: S3_BUCKET
+  type: string
+  required: true
+  default: "storage"
+  group: S3
+  description: "The bucket to use for application storage on s3"
+- variable: S3_ACCESS_KEY
+  type: string
+  required: true
+  default: ""
+  group: S3
+  description: "The S3 access key, make sure to modify"
+- variable: S3_SECRET_KEY
+  type: password
+  required: true
+  default: ""
+  group: S3
+  description: "The S3 secret key, make sure to modify"
+- variable: S3_SERVER_NAME
+  type: string
+  required: false
+  default: "s3.appyters.maayanlab.cloud"
+  group: S3
+  description: "The server hostname for the s3 bucket (s3.amazonaws.com for AWS)"
+- variable: S3_NETLOC
+  type: string
+  required: false
+  default: "appyters-s3:9000"
+  group: S3
+  description: "The internal server hostname, leave at default if hosted in kubernetes, otherwise same as S3_SERVER_NAME"
+- variable: S3_TLS_SECRET
+  type: string
+  required: false
+  default: "s3-appyters-maayanlab-cloud-tls"
+  group: S3
+  description: "The TLS secret for S3"
+- variable: S3_PV
+  type: string
+  required: true
+  default: "true"
+  group: S3
+  description: "Whether or not to create a persistent volume for S3 data"
+- variable: S3_PV_SIZE
+  type: string
+  required: false
+  default: "10G"
+  group: S3
+  description: "The size of the storage that should be allocated for S3"
+- variable: S3_PVC
+  type: string
+  required: false
+  default: "aws-ssd"
+  group: S3
+  description: "The storage class to use for S3 data volume claims"
+---
+# Source: templates/appyters-catalog/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-catalog
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyters-catalog
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyters-catalog
+    spec:
+      containers:
+      - name: appyters-catalog
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-catalog:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+      restartPolicy: Always
+---
+# Source: templates/appyters-catalog/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-catalog
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-catalog
+---
+# Source: templates/appyters-catalog/ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-catalog
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+  annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: appyters-catalog
+          servicePort: 80
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgrest/deployment.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-postgrest
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
+    spec:
+      containers:
+      - name: appyters-postgrest
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-postgrest:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: PGRST_DB_URI
+          value: "{{ 'postgres://{{ .Values.POSTGRES_USER }}:{{ .Values.POSTGRES_PASSWORD }}@{{ .Values.POSTGRES_HOSTNAME }}/{{ .Values.POSTGRES_DB }}' }}"
+        - name: PGRST_DB_SCHEMA
+          value: "{{ '{{ .Values.POSTGRES_API_SCHEMA }}' }}"
+        - name: PGRST_DB_ANON_ROLE
+          value: "{{ '{{ .Values.POSTGRES_ANON_ROLE }}' }}"
+        - name: PGRST_SERVER_PROXY_URI
+          value: "{{ 'http{{ if eq .Values.TLS "true" }}s{{ end }}://{{ .Values.APPYTERS_SERVER_NAME }}/postgrest' }}"
+      restartPolicy: Always
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgrest/service.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgrest
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-postgrest
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgrest/ingress.yaml
+{{ '{{- if eq .Values.POSTGREST "true" }}' }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-postgrest
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+  annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "nginx" }}' }}
+    nginx.ingress.kubernetes.io/rewrite-target: $1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "traefik" }}' }}
+    traefik.ingress.kubernetes.io/rewrite-target: /
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: appyters-postgrest
+          servicePort: 3000
+{{ '{{- if eq .Values.INGRESS_TYPE "nginx" }}' }}
+        path: /postgrest(/.*)
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.INGRESS_TYPE "traefik" }}' }}
+        path: /postgrest
+{{ '{{- end }}' }}
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true"}}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgres/deployment.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-postgres
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyters-postgres
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyters-postgres
+    spec:
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+      volumes:
+      - name: appyters-postgres-data
+        persistentVolumeClaim:
+          claimName: appyters-postgres-data-claim
+{{ '{{- end }}' }}
+      containers:
+      - name: appyters-postgres
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-postgres:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: POSTGRES_DB
+          value: "{{ '{{ .Values.POSTGRES_DB }}' }}"
+        - name: POSTGRES_USER
+          value: "{{ '{{ .Values.POSTGRES_USER }}' }}"
+        - name: POSTGRES_PASSWORD
+          value: "{{ '{{ .Values.POSTGRES_PASSWORD }}' }}"
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql
+          name: appyters-postgres-data
+{{ '{{- end }}' }}
+      restartPolicy: Always
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgres/pvc.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+{{ '{{- if eq .Values.POSTGRES_PV "true" }}' }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-postgres-data-claim
+spec:
+{{ '{{- if .Values.POSTGRES_PVC }}' }}
+  storageClassName: {{ '{{ .Values.POSTGRES_PVC }}' }}
+{{ '{{- end }}' }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ '{{ .Values.POSTGRES_PV_SIZE }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-postgres/service.yaml
+{{ '{{- if eq .Values.POSTGRES "true" }}' }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgres
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: {{ '{{ .Values.POSTGRES_PORT }}' }}
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-postgres
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-s3/deployment.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-s3
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyters-s3
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyters-s3
+    spec:
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+      volumes:
+      - name: appyters-s3-data
+        persistentVolumeClaim:
+          claimName: appyters-s3-data-claim
+{{ '{{- end }}' }}
+      containers:
+      - name: appyters-s3
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyters-s3:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: MINIO_BUCKET
+          value: "{{ '{{ .Values.S3_BUCKET }}' }}"
+        - name: MINIO_ACCESS_KEY
+          value: "{{ '{{ .Values.S3_ACCESS_KEY }}' }}"
+        - name: MINIO_SECRET_KEY
+          value: "{{ '{{ .Values.S3_SECRET_KEY }}' }}"
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+        volumeMounts:
+        - mountPath: /data
+          name: appyters-s3-data
+{{ '{{- end }}' }}
+      restartPolicy: Always
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-s3/pvc.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
+{{ '{{- if eq .Values.S3_PV "true" }}' }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-s3-data-claim
+spec:
+{{ '{{- if .Values.S3_PVC }}' }}
+  storageClassName: {{ '{{ .Values.S3_PVC }}' }}
+{{ '{{- end }}' }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ '{{ .Values.S3_PV_SIZE }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-s3/service.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-s3
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-s3
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-s3/ingress.yaml
+{{ '{{- if eq .Values.S3 "true" }}' }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyters-s3
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+  annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: appyters-s3
+          servicePort: 9000
+{{ '{{- if .Values.S3_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.S3_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.S3_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.S3_TLS_SECRET }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+---
+# Source: templates/appyters-orchestrator/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: appyters-orchestrator-service-account
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+---
+# Source: templates/appyters-orchestrator/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: appyters-orchestrator-role
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+# Source: templates/appyters-orchestrator/role-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: appyters-orchestrator-role-binding
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+subjects:
+- kind: ServiceAccount
+  name: appyters-orchestrator-service-account
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+roleRef:
+  kind: Role
+  name: appyters-orchestrator-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: templates/appyters-orchestrator/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-orchestrator
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
+    spec:
+      containers:
+      - name: appyters-orchestrator
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter:{{ version }}
+        imagePullPolicy: Always
+        tty: true
+        command: ["appyter"]
+        args: ["orchestration", "dispatcher"]
+        env:
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "5000"
+        - name: JOBS
+          value: "{{ '{{ .Values.APPYTERS_ORCHESTRATOR_CONCURRENT_JOBS }}' }}"
+        - name: DISPATCH
+          value: "kubernetes"
+        - name: DEBUG
+          value: "false"
+        - name: KUBE_NAMESPACE
+          value: {{ '{{ .Values.NAMESPACE }}' }}
+      restartPolicy: Always
+      serviceAccount: appyters-orchestrator-service-account
+---
+# Source: templates/appyters-orchestrator/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-orchestrator
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
+{%- for appyter in appyters %}
+---
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+    spec:
+      containers:
+      - name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+        image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
+        imagePullPolicy: Always
+        tty: true
+        env:
+        - name: PROXY
+          value: "true"
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "80"
+        - name: PREFIX
+          value: "/{{ appyter['name'] }}/"
+        - name: DATA_DIR
+          value: "{{ 's3://{{ .Values.S3_ACCESS_KEY }}:{{ .Values.S3_SECRET_KEY }}@{{ .Values.S3_NETLOC }}/{{ .Values.S3_BUCKET }}' }}/{{ appyter['name'] }}/"
+        - name: DISPATCHER
+          value: "http://appyters-orchestrator"
+        - name: DISPATCHER_URL
+          value: "http://appyter-{{ appyter['name'].lower().replace('_', '-') }}/{{ appyter['name'] }}"
+        - name: DISPATCHER_IMAGE
+          value: "{{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}"
+      restartPolicy: Always
+---
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+---
+# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  namespace: {{ '{{ .Values.NAMESPACE }}' }}
+  annotations:
+    kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
+{{ '{{- if .Values.TLS_CLUSTER_ISSUER }}' }}
+    cert-manager.io/cluster-issuer: {{ '{{ .Values.TLS_CLUSTER_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if .Values.TLS_ISSUER }}' }}
+    cert-manager.io/issuer: {{ '{{ .Values.TLS_ISSUER }}' }}
+{{ '{{- if .Values.TLS_ACME }}' }}
+{{ '{{- if eq .Values.TLS_ACME "true" }}' }}
+    kubernetes.io/tls-acme: "true"
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+{{ '{{- end }}' }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+          servicePort: 80
+        path: /{{ appyter['name'] }}/
+{{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
+    host: {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+{{ '{{- end }}' }}
+{{ '{{- if eq .Values.TLS "true" }}' }}
+  tls:
+  - hosts:
+    - {{ '{{ .Values.APPYTERS_SERVER_NAME }}' }}
+    secretName: {{ '{{ .Values.APPYTERS_TLS_SECRET }}' }}
+{{ '{{- end }}' }}
+{%- endfor %}
