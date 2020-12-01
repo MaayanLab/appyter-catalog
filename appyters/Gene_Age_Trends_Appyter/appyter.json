@@ -15,7 +15,7 @@
   "tags": [
     "Aging"
   ],
-  "license": "MIT License",
+  "license": "MIT",
   "appyter": {
     "file": "Age_Gene_Appyter.ipynb",
     "profile": "biojupies"
