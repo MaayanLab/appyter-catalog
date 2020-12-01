@@ -1,0 +1,4 @@
+numpy
+odfpy
+pandas
+xlrd
