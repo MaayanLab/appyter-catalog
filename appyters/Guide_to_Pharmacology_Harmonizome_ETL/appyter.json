@@ -17,7 +17,7 @@
     "ETL Script",
     "Guide to Pharmacology"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Guide to Pharmacology.ipynb",
     "profile": "biojupies"

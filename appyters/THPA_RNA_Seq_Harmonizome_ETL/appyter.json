@@ -18,7 +18,7 @@
     "ETL Script",
     "RNA-seq"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "THPA (RNA-Seq).ipynb",
     "profile": "biojupies"

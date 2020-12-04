@@ -16,7 +16,7 @@
     "RNA-seq",
     "scRNA-seq"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Single_cell_RNA_seq_Analysis_Pipeline.ipynb",
     "profile": "biojupies"

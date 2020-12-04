@@ -4,7 +4,7 @@
   "title": "DrugShot",
   "version": "0.0.3",
   "description": "This appyter queries a search term and returns a list of associated drugs from the literature, with additional drugs predicted based on co-expression.",
-  "image":"drugshot_logo.png",
+  "image": "drugshot_logo.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
@@ -15,7 +15,7 @@
   "tags": [
     "DrugShot"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "DrugShot.ipynb",
     "profile": "biojupies",
