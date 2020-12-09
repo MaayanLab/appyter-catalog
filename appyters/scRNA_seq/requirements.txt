@@ -16,7 +16,7 @@ sklearn
 numpy
 chart_studio
 seaborn
-scanpy
+scanpy==1.5.1
 python-igraph
 anndata==0.7.3
 fa2

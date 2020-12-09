@@ -49,8 +49,6 @@ import anndata
 import DigitalCellSorter
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 
-
-
 def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
     df.to_csv(filename)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
