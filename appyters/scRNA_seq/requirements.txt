@@ -18,7 +18,7 @@ chart_studio
 seaborn
 scanpy
 python-igraph
-anndata
+anndata==0.7.3
 fa2
 leidenalg
 umap-learn
