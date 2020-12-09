@@ -1,6 +1,6 @@
 # Enrichr Consensus Terms
 
-This Appyter takes a set of signatures and returns the consensus enrichment terms associated to them. It performs gene set enrichment analysis on the following [Enrichr](https://maayanlab.cloud/Enrichr/) libraries ChEA 2016, GO Biological Process 2018 ,GWAS Catalog 2019 , KEGG 2019 Human. It then takes the top 50 consensus terms using the p-values scores from Enrichr. The terms are then visualized using [clustergrammer](https://amp.pharm.mssm.edu/clustergrammer/). A publication ready static heatmap is also provided for the users.
+This Appyter takes as input a collection of gene sets and returns the top consensus enrichment terms associated with them. The Appyter performs gene set enrichment analysis for all uploaded gene sets against gene set libraries that the user selects from all the libraries that are available in [Enrichr](https://maayanlab.cloud/Enrichr/). The top consensus terms are determined using p-values returned from the Enrichr enrichment results using the Fisher exact test. The enriched terms are then visualized using downloadable stacked bar plots and static heatmaps.
 
 ## File Format
 The appyter takes up and down gene sets gmt files with the following format:

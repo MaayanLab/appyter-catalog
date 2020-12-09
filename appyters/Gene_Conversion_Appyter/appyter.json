@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Gene_Conversion_Appyter",
+  "title": "Gene Conversion Appyter",
+  "version": "0.0.5",
+  "description": "Convert various gene or transcript identifiers to official NCBI Entrez Gene Symbols",
+  "image": "logo.png",
+  "authors": [
+    {
+      "name": "Daniel Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/Gene_Conversion_Appyter/",
+  "tags": [
+    "Genes"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "Gene_Conversion.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
+  }
+}

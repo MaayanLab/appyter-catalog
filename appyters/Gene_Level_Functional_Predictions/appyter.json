@@ -19,7 +19,7 @@
     "RNA-seq",
     "TCGA"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "public": true,
   "appyter": {
     "file": "rna_predictions.ipynb",

@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Enrichment_Analysis_Visualizer",
   "title": "Enrichment Analysis Visualization Appyter",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "An appyter that displays a variety of enrichment analysis visualizations for one library.",
   "image": "featured-image.png",
   "authors": [
@@ -17,14 +17,22 @@
     {
       "name": "Maxim Kuleshov",
       "email": "maxim.kuleshov@mssm.edu"
-    }    
+    },
+    {
+      "name": "Zhuorui (Sherry) Xie",
+      "email": "sxie04@gmail.com"
+    },
+    {
+      "name": "Daniel J. B. Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
+    }
   ],
-  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/Enrichment_Analysis_Visualizer",
   "tags": [
     "Enrichr",
     "Enrichment Analysis"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Enrichment-Appyter.ipynb",
     "profile": "biojupies",
