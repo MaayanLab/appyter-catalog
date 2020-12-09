@@ -6,4 +6,4 @@ Users that develop Jupyter notebooks for their Data Science and bioinformatics t
 
 <img class="img-fluid w-100 m-2 mb-4" src="../images/what-is-an-appyter-figure.svg" />
 
-Appyters extend BioJupies by permitting rapid construction of biojupies-like applications based on the same Jupyter notebook reports that are produced, helping to turn any data analysis workflow coded in a Jupyter notebook into a parameterized web-based application.
+Appyters extend [BioJupies](https://amp.pharm.mssm.edu/biojupies/) by permitting rapid construction of biojupies-like applications based on the same Jupyter notebook reports that are produced, helping to turn any data analysis workflow coded in a Jupyter notebook into a parameterized web-based application.
