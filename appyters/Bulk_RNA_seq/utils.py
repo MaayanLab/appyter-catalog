@@ -417,7 +417,7 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
     dds <- DESeqDataSetFromMatrix(countData = rawcount_dataframe, colData = colData, design=~(group))
 
     dds <- DESeq(dds)
-    res <- results(dds, independentFiltering=filter_genes)
+    res <- results(dds)
     
     res[which(is.na(res$padj)),] <- 1
     res <- as.data.frame(res)
