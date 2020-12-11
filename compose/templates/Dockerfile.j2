@@ -103,6 +103,10 @@ RUN set -x \
   && echo "Overriding appyter templates..." \
   && python3 /app/catalog_helper.py merge-j2 /app /app/override /app
 
+RUN set -x \
+  && echo "Inserting appyter info..." \
+  && python3 /app/catalog_helper.py insert-info "/app/{{ config['appyter']['file'] }}" < /app/appyter.json
+
 CMD [ \
   "appyter", \
   {%- if 'profile' in config['appyter'] %}

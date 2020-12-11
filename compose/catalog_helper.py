@@ -14,6 +14,25 @@ def cli():
 def merge_j2_cli(primary, override, merged):
   merge_j2_directories(primary, override, merged)
 
+@cli.command(name='insert-info')
+@click.option('-i', '--info', type=click.File('r'), default='-', help='File containing info json')
+@click.argument('ipynb', type=click.Path(file_okay=True, dir_okay=False))
+def insert_info_cli(ipynb, info):
+  import json
+  insert_info(ipynb, json.load(info))
+
+def insert_info(ipynb, info):
+  ''' Given an ipynb, insert { 'metadata': { 'appyter': 'info': info } } }
+  '''
+  import nbformat as nbf
+  with open(ipynb, 'r') as fr:
+    nb = nbf.read(fr, as_version=4)
+  if 'appyter' not in nb.metadata:
+    nb.metadata['appyter'] = {}
+  nb.metadata['appyter']['info'] = info
+  with open(ipynb, 'w') as fw:
+    nbf.write(nb, fw)
+
 def merge_j2(*j2s):
   ''' Given a set of independent jinja2 templates, under certain conditions, we can merge the two together into one template.
   '''
