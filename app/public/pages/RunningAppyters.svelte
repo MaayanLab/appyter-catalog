@@ -21,7 +21,8 @@
   }
 
   let slug_validity
-  let version_validity
+  let library_version_validity
+  let appyter_version_validity
   let docker_tag
   $: {
     let normalized_slug
@@ -42,19 +43,29 @@
     } else {
       docker_image = 'appyter'
     }
-    if ($hash.params.version) {
-      const m = /^(latest|v\d+\.\d+\.\d+)$/.exec($hash.params.version)
+    if ($hash.params.appyter_version) {
+      const m = /^(latest|\d+\.\d+\.\d+)$/.exec($hash.params.appyter_version)
       if (m === null) {
-        version_validity = false
+        appyter_version_validity = false
       } else {
-        version_validity = true
+        appyter_version_validity = true
       }
     } else {
-      version_validity = undefined
+      appyter_version_validity = undefined
+    }
+    if ($hash.params.library_version) {
+      const m = /^(latest|\d+\.\d+\.\d+)$/.exec($hash.params.library_version)
+      if (m === null) {
+        library_version_validity = false
+      } else {
+        library_version_validity = true
+      }
+    } else {
+      library_version_validity = undefined
     }
     let docker_version
-    if (version_validity === true) {
-      docker_version = `:${$hash.params.version}`
+    if (library_version_validity !== undefined && appyter_version_validity !== undefined) {
+      docker_version = `:${$hash.params.library_version}-${$hash.params.appyter_version}`
     } else {
       docker_version = `:latest`
     }
@@ -64,7 +75,7 @@
   let id_validity
   $: {
     if ($hash.params.id) {
-      const m = /^[0-9A-Za-z-]+$/.exec($hash.params.id)
+      const m = /^[0-9a-f]{40}$/.exec($hash.params.id)
       if (m === null) {
         id_validity = false
       } else {
@@ -76,13 +87,19 @@
   }
 </script>
 
+<style>
+  .form-control.has-warning {
+    border-color: #ffc107;
+  }
+</style>
+
 <div class="container content flex-grow">
   <StaticMarkdown data={require('./RunningAppyters.md')} />
   <div>
     <form>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <label for="appyterSlug">Appyter slug</label>
+          <label for="appyterSlug">Appyter Slug</label>
           <input
             bind:value={$hash.params.slug}
             class:is-valid={slug_validity === true}
@@ -93,38 +110,60 @@
             aria-describedby="appyterSlugHelp"
             placeholder="Example: Drugmonizome_ML"
           >
-          {#if version_validity === true}
+          {#if slug_validity === true}
             <div class="valid-feedback">
               Looks good!
             </div>
-          {:else}
-            <small id="appyterSlugHelp" class="form-text text-muted">As shown in the case-insensitive url-path of an appyter form or landing page.</small>
+          {:else if slug_validity === false}
             <div class="invalid-feedback">
               This doesn't look like a slug..
             </div>
+          {:else}
+            <small id="appyterSlugHelp" class="form-text text-muted">As shown in the case-insensitive url-path of an appyter form or landing page.</small>
           {/if}
         </div>
-        <div class="form-group col-md-6">
-          <label for="appyterVersion">Appyter version</label>
+        <div class="form-group col-sm-6 col-md-3">
+          <label for="appyterVersion">Appyter Version</label>
           <input
-            bind:value={$hash.params.version}
-            class:is-valid={version_validity === true}
-            class:is-invalid={version_validity === false}
+            bind:value={$hash.params.appyter_version}
+            class:is-valid={appyter_version_validity === true}
+            class:has-warning={appyter_version_validity === false}
             type="text"
             class="form-control"
             id="appyterVersion"
             aria-describedby="appyterVersionHelp"
-            placeholder="Example: v0.0.1"
+            placeholder="Example: 0.0.1"
           >
-          {#if version_validity === true}
+          {#if appyter_version_validity === true}
             <div class="valid-feedback">
               Looks good!
             </div>
+          {:else if appyter_version_validity === false}
+            <small id="appyterVersionHelp" class="form-text text-muted">All appyter versions usually look something like 0.0.1</small>
           {:else}
-            <small id="appyterVersionHelp" class="form-text text-muted">The version of the appyter you wish to use (defaults to latest)</small>
-            <div class="invalid-feedback">
-              All appyter versions look something like v0.0.1...
+            <small id="appyterVersionHelp" class="form-text text-muted">The version of the appyter</small>
+          {/if}
+        </div>
+        <div class="form-group col-sm-6 col-md-3">
+          <label for="libraryVersion">Appyter Library Version</label>
+          <input
+            bind:value={$hash.params.library_version}
+            class:is-valid={library_version_validity === true}
+            class:has-warning={library_version_validity === false}
+            type="text"
+            class="form-control"
+            id="libraryVersion"
+            aria-describedby="libraryVersionHelp"
+            placeholder="Example: 0.0.1"
+          >
+          {#if library_version_validity === true}
+            <div class="valid-feedback">
+              Looks good!
             </div>
+          {:else if library_version_validity === false}
+            <small id="libraryVersionHelp" class="form-text text-muted">All appyter library versions usually look something like 0.0.1</small>
+          {:else}
+            <small id="libraryVersionHelp" class="form-text text-muted">The version of the appyter library</small>
           {/if}
         </div>
       </div>
@@ -134,7 +173,7 @@
           <input
             bind:value={$hash.params.id}
             class:is-valid={id_validity === true}
-            class:is-invalid={id_validity === false}
+            class:has-warning={id_validity === false}
             type="text"
             class="form-control"
             id="appyterId"
@@ -142,14 +181,11 @@
             placeholder="Example: 725c5cde109032eaeef21bb16654fd922e1de130"
           >
           {#if id_validity === true}
-            <div class="valid-feedback">
-              Looks good!
-            </div>
+            <small id="appyterIdHelp" class="form-text text-muted">Looks good!</small>
+          {:else if id_validity === false}
+            <small id="appyterIdHelp" class="form-text text-muted">Usually it's a large high-entropy alpha-numeric string...</small>
           {:else}
-            <small id="appyterIdHelp" class="form-text text-muted">The identifier for your appyter as it appears at the end of the url (it's a large high-entropy alpha-numeric string)</small>
-            <div class="invalid-feedback">
-              This doesn't look right..
-            </div>
+            <small id="appyterIdHelp" class="form-text text-muted">The identifier for your appyter as it appears at the end of the url</small>
           {/if}
         </div>
       </div>
@@ -194,7 +230,7 @@
               which are listed in each appyter's public source code but this can be a challenge. Instead, you can use the appyter's docker container
               which was used to originally execute the notebook.
             </p>
-            {#if id_validity === true}
+            {#if id_validity !== undefined}
               <p>
                  The following command will fetch your notebook and serve it using a standard jupyter notebook.
               </p>
