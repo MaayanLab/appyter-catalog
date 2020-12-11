@@ -433,7 +433,9 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
 
                 limma = robjects.r['limma']
-                signature = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes))
+                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+                signature = pd.DataFrame(limma_results[0])
+                signature.index = limma_results[1]
                 signature = signature.sort_values("t", ascending=False)
 
             elif method == "characteristic_direction":
@@ -470,8 +472,12 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
 
                 limma = robjects.r['limma']
-                signature = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes))
+                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+                signature = pd.DataFrame(limma_results[0])
+                signature.index = limma_results[1]
                 signature = signature.sort_values("t", ascending=False)
+                
+                
 
             elif method == "characteristic_direction":
                 signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=True)
