@@ -65,7 +65,7 @@
     }
     let docker_version
     if (library_version_validity !== undefined && appyter_version_validity !== undefined) {
-      docker_version = `:${$hash.params.library_version}-${$hash.params.appyter_version}`
+      docker_version = `:${$hash.params.appyter_version}-${$hash.params.library_version}`
     } else {
       docker_version = `:latest`
     }
