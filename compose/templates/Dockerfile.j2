@@ -101,7 +101,7 @@ COPY --chown=app:app . /app
 
 RUN set -x \
   && echo "Overriding appyter templates..." \
-  && python3 /app/catalog_helper.py /app /app/override /app
+  && python3 /app/catalog_helper.py merge-j2 /app /app/override /app
 
 CMD [ \
   "appyter", \

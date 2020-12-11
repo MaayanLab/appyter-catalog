@@ -1,6 +1,18 @@
 import os
 import re
+import click
 import shutil
+
+@click.group()
+def cli():
+  pass
+
+@cli.command(name='merge-j2')
+@click.argument('primary', type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.argument('override', type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.argument('merged', type=click.Path(dir_okay=True, file_okay=False))
+def merge_j2_cli(primary, override, merged):
+  merge_j2_directories(primary, override, merged)
 
 def merge_j2(*j2s):
   ''' Given a set of independent jinja2 templates, under certain conditions, we can merge the two together into one template.
@@ -116,7 +128,4 @@ def merge_j2_directories(primary_dir, override_dir, merged_dir):
         )
 
 if __name__ == '__main__':
-  import sys
-  _, primary_dir, override_dir, merged_dir = sys.argv
-  merge_j2_directories(primary_dir, override_dir, merged_dir)
-
+  cli()
