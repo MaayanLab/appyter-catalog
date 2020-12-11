@@ -93,6 +93,13 @@ ENV APPYTER_PREFIX "/"
 ENV APPYTER_HOST "0.0.0.0"
 ENV APPYTER_PORT "5000"
 ENV APPYTER_DEBUG "false"
+ENV APPYTER_IPYNB "{{ config['appyter']['file'] }}"
+{%- if 'profile' in config['appyter'] %}
+ENV APPYTER_PROFILE "{{ config['appyter']['profile'] }}"
+{%- endif %}
+{%- if 'extras' in config['appyter'] %}
+ENV APPYTER_EXTRAS '{{ json.dumps(config["appyter"]["extras"]) }}'
+{%- endif %}
 
 ENV PATH "/app:$PATH"
 ENV PYTHONPATH "/app:$PYTHONPATH"
@@ -107,15 +114,4 @@ RUN set -x \
   && echo "Inserting appyter info..." \
   && python3 /app/catalog_helper.py insert-info "/app/{{ config['appyter']['file'] }}" < /app/appyter.json
 
-CMD [ \
-  "appyter", \
-  {%- if 'profile' in config['appyter'] %}
-  "--profile={{ config['appyter']['profile'] }}", \
-  {%- endif %}
-  {%- if 'extras' in config['appyter'] %}
-  {%- for extra in config['appyter']['extras'] %}
-  "--extras={{ extra }}", \
-  {%- endfor %}
-  {%- endif %}
-  "{{ config['appyter']['file'] }}" \
-]
+CMD [ "appyter", "flask-app" ]

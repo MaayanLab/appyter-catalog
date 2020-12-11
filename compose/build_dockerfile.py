@@ -8,6 +8,7 @@ def build_dockerfile(appyter_path, config):
   dockerfile = template.render(
     appyter_path=appyter_path,
     config=config,
+    json=json,
     os=os,
   )
   return dockerfile
