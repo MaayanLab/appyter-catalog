@@ -18,11 +18,10 @@
 <p>
 
 <h1>Peak Calling Genome Viewer</h1>
-
 <div id="igvDiv" style="padding-top: 10px;padding-bottom: 10px; border:1px solid lightgray"></div>
 
 <script type="text/javascript">
-
+    
     document.addEventListener("DOMContentLoaded", function () {
 
         var options =
@@ -52,7 +51,7 @@
                             name: "Your input data",
                             type: 'annotation',
                             format: 'bed',
-                            url: './peaks.bed',
+                            url: window.location.hash.slice(1), 
                             indexed: false,
                             displayMode: "COLLAPSED",
                             searchable: true,
