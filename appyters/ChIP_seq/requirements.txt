@@ -16,6 +16,6 @@ itables
 igv
 igv-jupyter
 seaborn
-shutil
+pytest-shutil
 subprocess
 MACS2
