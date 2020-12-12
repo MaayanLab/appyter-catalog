@@ -17,5 +17,4 @@ igv
 igv-jupyter
 seaborn
 pytest-shutil
-subprocess
 MACS2
