@@ -430,8 +430,8 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
 }
 ''')
 
-
 def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name):
+    tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
     expr_df = dataset['rawdata']
     meta_df = dataset["dataset_metadata"]
     
@@ -457,7 +457,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             signature = signature.sort_values("t", ascending=False)
             
         elif method == "characteristic_direction":
-            signature = characteristic_direction(dataset[normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
+            signature = characteristic_direction(dataset[tmp_normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
             signature = signature.sort_values("CD-coefficient", ascending=False)
         elif method == "edgeR":
             edgeR = robjects.r['edgeR']
@@ -467,6 +467,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             signature.index = edgeR_results[1]
             signature = signature.sort_values("logFC", ascending=False)
         elif method == "DESeq2":
+            # deseq2 receives raw counts
             DESeq2 = robjects.r['deseq2']
             DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
             
@@ -478,6 +479,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
         signatures[signature_label] = signature
 
     return signatures
+
 
 def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
     expr_df = dataset['rawdata']
