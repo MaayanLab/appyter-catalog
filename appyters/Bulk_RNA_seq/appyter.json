@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Bulk_RNA_seq",
   "title": "Bulk RNA-seq analysis pipeline",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Bulk RNA-seq analysis pipeline enables you to analyze and visualize datasets with state-of-the-art algorithms and visualization methods.",
   "image": "screenshot.png",
   "authors": [
