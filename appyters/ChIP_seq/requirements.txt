@@ -16,5 +16,4 @@ itables
 igv
 igv-jupyter
 seaborn
-pytest-shutil
 MACS2
