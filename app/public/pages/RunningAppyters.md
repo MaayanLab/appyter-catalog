@@ -9,6 +9,3 @@ You can run the appyter application as a Dockerized command-line application whi
 
 ## Step 1: Install Docker
 Download, install, and run Docker on your computer if you do not yet have it installed. Please follow the instructions provided from [the official Docker website](https://www.docker.com/community-edition).
-
-## Step 2. Collect the necessary information to construct the Appyter image
-This information should be pre-populated for you if you came to this page from an executed Appyter, alternatively you can enter it manually by yourself.
