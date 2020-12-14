@@ -282,14 +282,14 @@
                 <CodeSnippet
                   code={`
                     # Inspect an appyter for its available fields
-                    docker run -it ${docker_tag} appyter nbinspect
+                    docker run -i ${docker_tag} appyter nbinspect
                     
-                    # Inspect construct an appyter using your own input data
-                    docker run -it ${docker_tag} appyter nbconstruct < input.json > output.ipynb
+                    # Inspect construct an appyter using your own input data (input.json)
+                    docker run -v $(pwd):/app/data -i ${docker_tag} appyter nbconstruct -i data/input.json -o data/output.ipynb
                     
                     # Execute a constructed jupyter notebook on the CLI
                     # exit code 0 for success, 1 for failure
-                    docker run -it ${docker_tag} appyter nbexecute output.ipynb
+                    docker run -v $(pwd):/app/data -i ${docker_tag} appyter nbexecute data/output.ipynb
                     
                     # Review the appyter CLI options
                     docker run -it ${docker_tag} appyter --help
