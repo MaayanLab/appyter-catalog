@@ -81,7 +81,8 @@ RUN set -x \
   && useradd -ms /bin/bash -d /app app \
   && groupadd fuse \
   && adduser app fuse \
-  && chown -R app:app /app \
+  && mkdir -p /app /app/data /data \
+  && chown -R app:app /app /data \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 
 USER app
