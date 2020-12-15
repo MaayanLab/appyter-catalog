@@ -42,6 +42,15 @@ from maayanlab_bioinformatics.dge.characteristic_direction import characteristic
 import umap
 from sklearn.manifold import TSNE
 
+def check_files(fname):
+    if fname == "":
+        raise IOError
+    if fname.endswith(".txt") == False and fname.endswith(".csv") ==False and fname.endswith(".tsv")==False:
+        raise IOError
+def check_df(df, col):
+    if col not in df.columns:
+        raise IOError
+        
 def CPM(data):
 
     with warnings.catch_warnings():
