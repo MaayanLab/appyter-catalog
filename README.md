@@ -45,3 +45,4 @@ The appter-catalog does several things to permit integration of several independ
     3. `postgrest` exposes `postgres` tables, views, and functions on the `api` schema with the `guest` role over HTTP at `/postgrest`
     4. `app` facilitates showing all `appyters` and navigating users to the mount location of the actual `appyter` container.
     5. `data/<container_name>` contains all application data split up by container mounted from the host.
+
