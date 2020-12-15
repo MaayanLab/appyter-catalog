@@ -50,7 +50,15 @@ import DigitalCellSorter
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 
 
-
+def check_files(fname):
+    if fname == "":
+        raise IOError
+    if fname.endswith(".txt") == False and fname.endswith(".csv") ==False and fname.endswith(".tsv")==False:
+        raise IOError
+def check_df(df, col):
+    if col not in df.columns:
+        raise IOError
+        
 def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
     df.to_csv(filename)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
@@ -1117,7 +1125,7 @@ def plot_monocle(monocle_results, debug=False):
         plotly.offline.iplot(fig)
     else:
         py.image.ishow(fig)
-    plt.savefig("figures/monocle.pdf")
+    plt.savefig("monocle.pdf")
 
 def run_tempora(dataset, timepoint_labels_column_name, timepoint_labels):
     robjects.r('''
