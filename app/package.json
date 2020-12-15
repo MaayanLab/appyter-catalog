@@ -1,6 +1,6 @@
 {
   "name": "appyter-catalog",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A catalog of appyter notebooks",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/MaayanLab/appyter-catalog.git"
   },
   "author": "Daniel J. B. Clarke <u8sand@gmail.com>",
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "bugs": {
     "url": "https://github.com/MaayanLab/appyter-catalog/issues"
   },
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "bootstrap-icons": "^1.1.0",
     "js-search": "^2.0.0",
     "macy": "^2.5.1",
     "markdown-it": "^10.0.0"

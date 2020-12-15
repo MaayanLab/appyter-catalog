@@ -17,7 +17,7 @@
     "ETL Script",
     "DrugBank"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "DrugBank.ipynb",
     "profile": "biojupies"
