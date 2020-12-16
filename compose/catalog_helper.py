@@ -175,6 +175,18 @@ def entrypoint_cli():
   does not use the catalog-integration extra.
   '''
   from subprocess import run
+  if os.path.isdir('/app/templates'):
+    if not os.path.isdir('/app/templates.sav'):
+      click.echo('Backing up appyter template...')
+      shutil.copytree('/app/templates', '/app/templates.sav')
+    else:
+      click.echo('Restoring appyter template...')
+      shutil.rmtree('/app/templates')
+      shutil.copytree('/app/templates.sav', '/app/templates')
+  else:
+    os.mkdir('/app/templates')
+    os.mkdir('/app/templates.sav')
+  #
   click.echo('Overriding appyter template...')
   merge_j2_directories('/app', '/app/override', '/app')
   #
