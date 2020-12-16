@@ -123,6 +123,7 @@ services:
       args:
         - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_tag:-v}${appyter_version}
     image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
+    command: appyter-catalog-helper entrypoint
     restart: unless-stopped
     environment:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
