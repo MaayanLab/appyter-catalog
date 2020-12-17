@@ -94,7 +94,7 @@
         }
       }
     }
-    appyterList.sort((a, b) => (b.views||0) - (a.views||0))
+    appyterList.sort((a, b) => (b.persistent_views||0) - (a.persistent_views||0))
     appyterList = appyterList
   }
 
