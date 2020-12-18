@@ -1,8 +1,8 @@
 # Enrichment Analysis Visualization Appyter
 
-This appyter creates a variety of visualizations for enrichment analysis data for one selected Enrichr library. The scatter plot and hexagonal canvas may not be available for every library.
+This appyter creates a variety of visualizations for enrichment analysis data for one selected Enrichr library. 
 
-Here are the visualizations created: 
+The scatter plot and hexagonal canvas visualizations require pre-processed library files, which can be found in [this repo](https://github.com/MaayanLab/Enrichr-Viz-Appyter/tree/master/Enrichr-Processed-Library-Storage), along with the pre-processing scripts.
  
 * **Scatter Plot** 
 
