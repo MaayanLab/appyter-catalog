@@ -13,7 +13,7 @@
   const base_url = window.location.origin
 
   // store appyters as list and lookup table based on name slugs
-  let appyterList = require('../appyters.json')
+  let { appyters: appyterList } = require('../appyters.json')
   // assemble appyter lookup table
   let appyterLookup = {}
   for (const appyter of appyterList) {

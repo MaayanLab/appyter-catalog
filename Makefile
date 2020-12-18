@@ -25,7 +25,7 @@ $(BUILDAPPYTERS): docker-compose.yml $$(@D)/Dockerfile
 docker-compose.yml: compose/.build .env $(DOCKERFILES)
 	$(PYTHON) compose/build_compose.py $(COMPOSE_ARGS) > $@
 
-app/public/appyters.json: $(APPYTERFILES)
+app/public/appyters.json: compose/build_appyters.py .env $(APPYTERFILES)
 	$(PYTHON) compose/build_appyters.py > $@
 
 app/.build: app/public/appyters.json app/package.json $$(call +s,$$(shell find app/public -type f | sed 's/ /+/g'))

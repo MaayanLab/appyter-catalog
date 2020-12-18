@@ -3,8 +3,13 @@ import re
 import os
 import json
 import glob
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+docker_org = os.environ['DOCKER_REGISTRY']
+library_version = os.environ['appyter_version']
+
 appyter_path = os.path.join(root_dir, 'appyters')
 def get_appyters(appyter_path):
   for path in map(os.path.dirname, glob.glob(os.path.join(appyter_path, '*', 'appyter.json'))):
@@ -33,5 +38,10 @@ def get_appyters(appyter_path):
 
 appyters = list(get_appyters(appyter_path))
 
+config = json.load(open(os.path.join(os.path.dirname(__file__), 'templates', 'appyters.json'), 'r'))
+config['appyters'] = appyters
+config['docker_org'] = docker_org
+config['library_version'] = os.environ['appyter_version']
+
 if __name__ == '__main__':
-  print(json.dumps(appyters))
+  print(json.dumps(config))
