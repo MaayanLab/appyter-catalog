@@ -51,5 +51,6 @@
   </div>
   <div class="col-sm-12">
     <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
+    <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-secondary">Run Appyter Locally</a>
   </div>
 </div>
