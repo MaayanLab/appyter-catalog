@@ -42,7 +42,10 @@
     <p>
       <b>Authors:</b><br />
       {#each appyter.authors as author}
-        <span>{author.name} &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br />
+        <span>
+          {author.name}
+          <!-- &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br /> -->
+        </span>
       {/each}
     </p>
   </div>
