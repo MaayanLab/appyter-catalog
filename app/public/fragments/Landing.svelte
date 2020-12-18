@@ -44,7 +44,8 @@
       {#each appyter.authors as author}
         <span>
           {author.name}
-          <!-- &lt;<a href="mailto:{author.email}">{author.email}</a>&gt;</span><br /> -->
+          <!-- &lt;<a href="mailto:{author.email}">{author.email}</a>&gt; -->
+          <br />
         </span>
       {/each}
     </p>
