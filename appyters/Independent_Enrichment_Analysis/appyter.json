@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Independent_Enrichment_Analysis",
+  "title": "Independent Enrichment Analysis",
+  "version": "0.0.1",
+  "description": "Independent Enrichment Analysis Appyter performs enrichment analysis for given user inputs and visualizes the enrichment analysis results",
+  "image": "screenshot.png",
+  "authors": [
+    {
+      "name": "Minji Jeon",
+      "email": "minji.jeon1@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Enrichment Analysis"    
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "Independent_Enrichment_Analysis.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
+  }
+}
