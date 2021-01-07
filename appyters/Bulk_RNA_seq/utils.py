@@ -439,8 +439,10 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
 def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name, filter_genes):
     tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
     raw_expr_df = dataset['rawdata']
+    expr_df = dataset['rawdata']
     if filter_genes == True:
         expr_df = dataset['rawdata+filter_genes']
+        
     signatures = dict()
 
     for cls1, cls2 in combinations(classes, 2):
