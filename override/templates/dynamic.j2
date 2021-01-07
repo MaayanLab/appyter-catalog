@@ -1,8 +1,0 @@
-{% extends "biojupies/dynamic.j2" %}
-
-{% block script %}
-{{ super() }}
-<script>
-require(['pagehit'], function (pagehit) { pagehit('execute') })
-</script>
-{% endblock %}
