@@ -82,8 +82,8 @@ def qnormalization(data):
     X_quantile_norm = quantile_normalize(data)
     return X_quantile_norm  
 
-def normalize(dataset, logCPM_normalization, log_normalization, z_normalization, q_normalization):
-    normalization = 'rawdata'
+def normalize(dataset, current_dataset, logCPM_normalization, log_normalization, z_normalization, q_normalization):
+    normalization = current_dataset
     if logCPM_normalization == True:  
         data = dataset[normalization]
         normalization += '+logCPM'
@@ -351,35 +351,32 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
 
 
         
-        
-robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, adjust="BH") {
+robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
     # Load packages
     suppressMessages(require(limma))
     suppressMessages(require(edgeR))
-
     # Convert design matrix
     design <- as.matrix(design_dataframe)
+    
     # Create DGEList object
     dge <- DGEList(counts=rawcount_dataframe)
-
+    # Filter genes
+    if (filter_genes) {
+        keep <- filterByExpr(dge, design)
+        dge <- dge[keep,]
+    }
     # Calculate normalization factors
     dge <- calcNormFactors(dge)
-
     # Run VOOM
     v <- voom(dge, plot=FALSE)
-
     # Fit linear model
     fit <- lmFit(v, design)
-
     # Make contrast matrix
     cont.matrix <- makeContrasts(de=B-A, levels=design)
-
     # Fit
     fit2 <- contrasts.fit(fit, cont.matrix)
-
     # Run DE
     fit2 <- eBayes(fit2)
-
     # Get results
     limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
     
@@ -439,15 +436,15 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
 }
 ''')
 
-def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name):
+def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name, filter_genes):
     tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
-    expr_df = dataset['rawdata']
-    meta_df = dataset["dataset_metadata"]
-    
+    raw_expr_df = dataset['rawdata']
+    if filter_genes == True:
+        expr_df = dataset['rawdata+filter_genes']
     signatures = dict()
 
     for cls1, cls2 in combinations(classes, 2):
-
+        print(cls1, cls2)
         cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist() #control
         cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist() #case
         
@@ -455,11 +452,11 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
         if method == "limma":
             limma = robjects.r['limma']
-            design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in expr_df.columns]).set_index('index')
+            design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in raw_expr_df.columns]).set_index('index')
 
-            processed_data = {"expression": expr_df, 'design': design_dataframe}
+            processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
             limma = robjects.r['limma']
-            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
             
             signature = pd.DataFrame(limma_results[0])
             signature.index = limma_results[1]
@@ -489,11 +486,9 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
     return signatures
 
+        
 
 def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
-    expr_df = dataset['rawdata']
-    meta_df = dataset["dataset_metadata"]
-    
     color = []
     text = []
     for index, rowData in signature.iterrows():
