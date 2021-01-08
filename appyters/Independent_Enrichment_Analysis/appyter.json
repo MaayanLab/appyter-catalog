@@ -3,7 +3,7 @@
   "name": "Independent_Enrichment_Analysis",
   "title": "Independent Enrichment Analysis",
   "version": "0.0.1",
-  "description": "Independent Enrichment Analysis Appyter performs enrichment analysis for given user inputs and visualizes the enrichment analysis results",
+  "description": "This Appyter performs enrichment analysis without the need to use external libraries or API. The required inputs are a gene set, and a gene set library",
   "image": "screenshot.png",
   "authors": [
     {
