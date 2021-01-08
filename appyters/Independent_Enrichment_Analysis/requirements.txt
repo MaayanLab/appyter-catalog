@@ -6,3 +6,4 @@ seaborn
 numpy
 bokeh
 pybase64
+statsmodels
