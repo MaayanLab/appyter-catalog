@@ -19,7 +19,7 @@
     "RNA-seq",
     "TCGA"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "image": "main-image.png",
   "appyter": {
     "file": "Patient_Cohorts_RNASeq_Viewer.ipynb",

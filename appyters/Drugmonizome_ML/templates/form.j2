@@ -9,8 +9,7 @@
 <style>
 
 body {
-  font: 16px Arial;  
-  margin-top: 10%;
+  font: 16px Arial;
   text-align: center;
 }
 .autocomplete {
@@ -67,6 +66,8 @@ input[type=submit] {
 {% endblock %}
 
 {% block body %}
+<div class="row">
+<div class="col-sm-12">
 <div class="container">
     <div class="mt-3 row align-items-center">
         <div class="col-3">
@@ -77,6 +78,8 @@ input[type=submit] {
             <p class="my-0"> Construct a machine learning pipeline to predict novel drug indications or other attributes from perturbation studies and small molecule features. </p>
         </div>
     </div>
+</div>
+</div>
 </div>
 {{ super() }}
 {% endblock %}

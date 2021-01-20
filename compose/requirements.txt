@@ -1,2 +1,4 @@
+click
 jinja2
+python-dotenv
 sh

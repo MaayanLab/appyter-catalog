@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "ChIP_seq",
+  "title": "ChIP-seq analysis pipeline",
+  "version": "0.0.1",
+  "description": "ChIP-seq analysis pipeline enables you to analyze and visualize datasets with state-of-the-art algorithms and visualization methods.",
+  "image": "screenshot.png",
+  "authors": [
+    {
+      "name": "Minji Jeon",
+      "email": "minji.jeon1@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "ChIP-seq", "RNA-seq"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "ChIP_seq_analysis.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
+  }
+}

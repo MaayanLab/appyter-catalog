@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Enrichr_Consensus_Terms",
+  "title": "Enrichr Consensus Terms",
+  "version": "0.2.4",
+  "description": "This appyter returns consensus Enrichr terms using a set of gene sets",
+  "image": "screenshot.png",
+  "authors": [
+    {
+      "name": "John Erol Evangelists",
+      "email": "JohnErol.Evangelista@mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Enrichr",
+    "Gene Set Enrichment"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "EnrichrConsensus.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}
