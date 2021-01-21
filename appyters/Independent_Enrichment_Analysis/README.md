@@ -1,25 +1,25 @@
 # Independent Enrichment Analysis
 
-Independent Enrichment Analysis Appyter performs enrichment analysis without the need to use external libraries or API. The required inputs are a  set and a set library. The Appyter performs the Fisher exact test to compute enrichment p-value and q-values, and reports the results as a sorted table, a bar graph, and a Manhattan plot. 
+Independent Enrichment Analysis Appyter performs enrichment analysis without the need to use external libraries or API. The required inputs are a  set and a set library. The Appyter performs the Fisher exact test to compute enrichment p-value and q-values, and reports the results as a sorted table, a bar graph, and a Manhattan plot. Moreover, for ranked items, the appyter is able to return a bridge plot for each set in the library and to report its p-value by the Mann-Whiteney U test. 
 
 ## **File Format**
 To run the Appyter, a set of items and a library of sets are requiredas input. Background information input is optional.
 
-* Please input a set of items as follows:
-ITEM 1
-ITEM 2
-ITEM 3
+* Please input a set of items as follows:  
+ITEM 1  
+ITEM 2  
+ITEM 3  
 
-* Please input a library of sets in GMT file format as follows:
-SET 1\t\tITEM 1\tITEM 2\tITEM 3
-SET 2\t\tITEM 3\tITEM 4\tITEM 5
-SET 3\t\tITEM 2\tITEM 5\tITEM 6
-SET 4\t\tITEM 1\tITEM 2\tITEM 6
+* Please input a library of sets in GMT file format as follows:  
+SET 1\t\tITEM 1\tITEM 2\tITEM 3  
+SET 2\t\tITEM 3\tITEM 4\tITEM 5  
+SET 3\t\tITEM 2\tITEM 5\tITEM 6  
+SET 4\t\tITEM 1\tITEM 2\tITEM 6  
 
-* Please input a set of background as follows:
-ITEM 1
-ITEM 2
-ITEM 3
+* Please input a set of background as follows:  
+ITEM 1  
+ITEM 2  
+ITEM 3  
 
 
 ## **Examples**
