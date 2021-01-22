@@ -5,21 +5,21 @@ Independent Enrichment Analysis Appyter performs enrichment analysis without the
 ## **File Format**
 To run the Appyter, a set of items and a library of sets are requiredas input. Background information input is optional.
 
-* Please input a set of items as follows:\
-ITEM 1\
-ITEM 2\
-ITEM 3\
+* Please input a set of items as follows:  
+ITEM 1  
+ITEM 2  
+ITEM 3  
 
-* Please input a library of sets in GMT file format as follows:\
-SET 1\t\tITEM 1\tITEM 2\tITEM 3\
-SET 2\t\tITEM 3\tITEM 4\tITEM 5\
-SET 3\t\tITEM 2\tITEM 5\tITEM 6\
-SET 4\t\tITEM 1\tITEM 2\tITEM 6\
+* Please input a library of sets in GMT file format as follows:  
+SET 1\t\tITEM 1\tITEM 2\tITEM 3  
+SET 2\t\tITEM 3\tITEM 4\tITEM 5  
+SET 3\t\tITEM 2\tITEM 5\tITEM 6  
+SET 4\t\tITEM 1\tITEM 2\tITEM 6  
 
-* Please input a set of background as follows:\
-ITEM 1\
-ITEM 2\
-ITEM 3\
+* Please input a set of background as follows:  
+ITEM 1  
+ITEM 2  
+ITEM 3  
 
 
 ## **Examples**
