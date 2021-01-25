@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "PrismEXP",
   "title": "PrismEXP Appyter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An appyter that calulates gene function prediction for arbitrary gene set libraries using the PrismEXP algorithm and a pretrained model.",
   "image": "featured-image.png",
   "authors": [
