@@ -1,0 +1,8 @@
+git+git://github.com/Maayanlab/appyter.git
+git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
+numpy
+pandas
+scipy
+ipywidgets
+matplotlib
+statsmodels
