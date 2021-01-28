@@ -58,7 +58,52 @@ def check_files(fname):
 def check_df(df, col):
     if col not in df.columns:
         raise IOError
-        
+
+def load_seurat_files(mtx_filename, gene_filename, barcodes_filename):
+    
+    adata = anndata.read_mtx(mtx_filename).T
+    with open(barcodes_filename, "r") as f:
+        cells = f.readlines()
+        cells = [x.strip() for x in cells]
+    genes = pd.read_csv(
+        gene_filename,
+        header=None,
+        sep='\t',
+    )
+    
+    adata.var['gene_ids'] = genes.iloc[:, 0].values    
+    adata.var['gene_symbols'] = genes.iloc[:, 1].values
+    adata.var_names = adata.var['gene_symbols']
+    adata.var_names_make_unique(join="-")
+    
+    
+    adata.obs['barcode'] = cells
+    adata.obs_names = cells
+    adata.obs_names_make_unique(join="-")
+    return adata
+
+def load_metadata(adata, meta_data_filename, meta_class_column_name):
+    if meta_data_filename != "":
+        if meta_data_filename.endswith(".csv"):
+            meta_df = pd.read_csv(meta_data_filename, index_col=0)
+        else:
+            meta_df = pd.read_csv(meta_data_filename, sep="\t", index_col=0)
+        if meta_class_column_name == "":
+            raise Exception ("Run time error: Please provide a proper column name for sample classes in metadata")
+        try:
+            check_df(meta_df, meta_class_column_name)
+        except:
+            raise Exception (f"Error! Column '{meta_class_column_name}' is not in metadata")
+        adata.obs[meta_class_column_name] = meta_df.loc[:, meta_class_column_name]
+        adata.var_names_make_unique()
+
+    else:
+        meta_class_column_name = "Class"
+        adata.obs[meta_class_column_name] = ["Class0"]*adata.n_obs
+        adata.var_names_make_unique()
+    
+    return adata, meta_class_column_name    
+
 def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
     df.to_csv(filename)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
