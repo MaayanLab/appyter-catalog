@@ -6,3 +6,4 @@ scipy
 ipywidgets
 matplotlib
 statsmodels
+clustergrammer
