@@ -4,7 +4,6 @@
   "title": "Clustergrammer Appyter",
   "version": "0.0.1",
   "description": "A friendly appyter for visualizing data using Clustergrammer and Clustergrammer2",
-  "image": "clustergrammer_logo.png",
   "authors": [
     {
       "name": "Ingrid Shu",
