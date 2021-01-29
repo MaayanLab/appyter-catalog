@@ -17,7 +17,7 @@
     "ETL Script",
     "OFFSIDES"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "OFFSIDES.ipynb",
     "profile": "biojupies"

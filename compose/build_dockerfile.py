@@ -8,6 +8,7 @@ def build_dockerfile(appyter_path, config):
   dockerfile = template.render(
     appyter_path=appyter_path,
     config=config,
+    json=json,
     os=os,
   )
   return dockerfile
@@ -22,8 +23,8 @@ def prepare_appyter(appyter_path, config):
     os.path.join(appyter_path, 'override'),
   )
   shutil.copy(
-    os.path.join(os.path.dirname(__file__), 'merge_j2.py'),
-    os.path.join(appyter_path, 'merge_j2.py')
+    os.path.join(os.path.dirname(__file__), 'catalog_helper.py'),
+    os.path.join(appyter_path, 'catalog_helper.py')
   )
   return build_dockerfile(appyter_path, config)
 

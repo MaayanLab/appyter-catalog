@@ -42,6 +42,15 @@ from maayanlab_bioinformatics.dge.characteristic_direction import characteristic
 import umap
 from sklearn.manifold import TSNE
 
+def check_files(fname):
+    if fname == "":
+        raise IOError
+    if fname.endswith(".txt") == False and fname.endswith(".csv") ==False and fname.endswith(".tsv")==False:
+        raise IOError
+def check_df(df, col):
+    if col not in df.columns:
+        raise IOError
+        
 def CPM(data):
 
     with warnings.catch_warnings():
@@ -73,8 +82,8 @@ def qnormalization(data):
     X_quantile_norm = quantile_normalize(data)
     return X_quantile_norm  
 
-def normalize(dataset, logCPM_normalization, log_normalization, z_normalization, q_normalization):
-    normalization = 'rawdata'
+def normalize(dataset, current_dataset, logCPM_normalization, log_normalization, z_normalization, q_normalization):
+    normalization = current_dataset
     if logCPM_normalization == True:  
         data = dataset[normalization]
         normalization += '+logCPM'
@@ -250,7 +259,7 @@ def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, count
     # Configs for layout and axes
     
     layout=dict(height=1000, width=1000, 
-                title=caption,
+                title='3D {} plot for samples'.format(pca_results["method"]),
                 scene=dict(
                     xaxis=dict(title=axis[0]),
                     yaxis=dict(title=axis[1]),
@@ -315,77 +324,6 @@ def plot_clustergrammar(clustergrammer_url):
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
 
-robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
-    # Load packages
-    suppressMessages(require(limma))
-    suppressMessages(require(edgeR))
-
-    # Convert design matrix
-    design <- as.matrix(design_dataframe)
-    
-    # Create DGEList object
-    dge <- DGEList(counts=rawcount_dataframe)
-
-    # Filter genes
-    if (filter_genes) {
-        keep <- filterByExpr(dge, design)
-        dge <- dge[keep,]
-    }
-
-    # Calculate normalization factors
-    dge <- calcNormFactors(dge)
-
-    # Run VOOM
-    v <- voom(dge, plot=FALSE)
-
-    # Fit linear model
-    fit <- lmFit(v, design)
-
-    # Make contrast matrix
-    cont.matrix <- makeContrasts(de=B-A, levels=design)
-
-    # Fit
-    fit2 <- contrasts.fit(fit, cont.matrix)
-
-    # Run DE
-    fit2 <- eBayes(fit2)
-
-    # Get results
-    limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
-    
-    # Return
-    results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
-    return (results)
-}
-''')
-def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name):
-    expr_df = dataset['rawdata']
-    meta_df = dataset["dataset_metadata"]
-    signatures = dict()
-
-    for cls1, cls2 in combinations(classes, 2):
-        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist()
-        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist()
-        signature_label = " vs. ".join([cls1, cls2])
-
-        if method == "limma":
-            design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in expr_df.columns]).set_index('index')
-
-            processed_data = {"expression": expr_df, 'design': design_dataframe}
-            limma = robjects.r['limma']
-            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=True))
-            
-            signature = pd.DataFrame(limma_results[0])
-            signature.index = limma_results[1]
-            signature = signature.sort_values("t", ascending=False)
-            
-        elif method == "characteristic_direction":
-            signature = characteristic_direction(dataset[normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
-        
-        signatures[signature_label] = signature
-
-    return signatures
-
 def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False, labels=False, plot_type='interactive', de_type='ma'):
     range_x = [-max(abs(x))-pad, max(abs(x))+pad]if symmetric_x else None
     range_y = [-max(abs(y))-pad, max(abs(y))+pad]if symmetric_y else None
@@ -411,22 +349,169 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
     else:
         py.image.ishow(fig)
 
-def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
-    expr_df = dataset['rawdata']
-    meta_df = dataset["dataset_metadata"]
+
+        
+robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
+    # Load packages
+    suppressMessages(require(limma))
+    suppressMessages(require(edgeR))
+    # Convert design matrix
+    design <- as.matrix(design_dataframe)
     
+    # Create DGEList object
+    dge <- DGEList(counts=rawcount_dataframe)
+    # Filter genes
+    if (filter_genes) {
+        keep <- filterByExpr(dge, design)
+        dge <- dge[keep,]
+    }
+    # Calculate normalization factors
+    dge <- calcNormFactors(dge)
+    # Run VOOM
+    v <- voom(dge, plot=FALSE)
+    # Fit linear model
+    fit <- lmFit(v, design)
+    # Make contrast matrix
+    cont.matrix <- makeContrasts(de=B-A, levels=design)
+    # Fit
+    fit2 <- contrasts.fit(fit, cont.matrix)
+    # Run DE
+    fit2 <- eBayes(fit2)
+    # Get results
+    limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
+    
+    # Return
+    results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
+    return (results)
+}
+''')
+robjects.r('''edgeR <- function(rawcount_dataframe, g1, g2) {
+    # Load packages
+    suppressMessages(require(limma))
+    suppressMessages(require(edgeR))
+    
+    colData <- as.data.frame(c(rep(c("Control"),length(g1)),rep(c("Condition"),length(g2))))
+    rownames(colData) <- c(g1,g2)
+    colnames(colData) <- c("group")
+    colData$group = relevel(as.factor(colData$group), "Control")
+    
+    y <- DGEList(counts=rawcount_dataframe, group=colData$group)
+    y <- calcNormFactors(y)
+    y <- estimateCommonDisp(y)
+    y <- estimateTagwiseDisp(y)
+    et <- exactTest(y)
+    res <- topTags(et, n=Inf)
+    # Return
+    res <- as.data.frame(res)
+    results <- list("edgeR_dataframe"= res, "rownames"=rownames(res))
+    return (results)
+    
+    
+    
+}
+
+
+''')
+
+robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
+    # Load packages
+    suppressMessages(require(DESeq2))
+    colData <- as.data.frame(c(rep(c("Control"),length(g1)),rep(c("Condition"),length(g2))))
+    rownames(colData) <- c(g1,g2)
+    colnames(colData) <- c("group")
+    colData$group = relevel(as.factor(colData$group), "Control")
+    dds <- DESeqDataSetFromMatrix(countData = rawcount_dataframe, colData = colData, design=~(group))
+
+    dds <- DESeq(dds)
+    res <- results(dds)
+    
+    res[which(is.na(res$padj)),] <- 1
+    res <- as.data.frame(res)
+    
+    results <- list("DESeq_dataframe"= res, "rownames"=rownames(res))
+    return(results)
+    
+    
+    
+}
+''')
+
+def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name, filter_genes):
+    tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
+    raw_expr_df = dataset['rawdata']
+    expr_df = dataset['rawdata']
+    if filter_genes == True:
+        expr_df = dataset['rawdata+filter_genes']
+        
+    signatures = dict()
+
+    for cls1, cls2 in combinations(classes, 2):
+        print(cls1, cls2)
+        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist() #control
+        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist() #case
+        
+        signature_label = " vs. ".join([cls1, cls2])
+
+        if method == "limma":
+            limma = robjects.r['limma']
+            design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in raw_expr_df.columns]).set_index('index')
+
+            processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
+            limma = robjects.r['limma']
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
+            
+            signature = pd.DataFrame(limma_results[0])
+            signature.index = limma_results[1]
+            signature = signature.sort_values("t", ascending=False)
+            
+        elif method == "characteristic_direction":
+            signature = characteristic_direction(dataset[tmp_normalization].loc[:, cls1_sample_ids], dataset[normalization].loc[:, cls2_sample_ids], calculate_sig=True)
+            signature = signature.sort_values("CD-coefficient", ascending=False)
+        elif method == "edgeR":
+            edgeR = robjects.r['edgeR']
+            edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+            
+            signature = pd.DataFrame(edgeR_results[0])
+            signature.index = edgeR_results[1]
+            signature = signature.sort_values("logFC", ascending=False)
+        elif method == "DESeq2":
+            # deseq2 receives raw counts
+            DESeq2 = robjects.r['deseq2']
+            DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+            
+            signature = pd.DataFrame(DESeq2_results[0])
+            signature.index = DESeq2_results[1]
+            signature = signature.sort_values("log2FoldChange", ascending=False)
+                        
+            
+        signatures[signature_label] = signature
+
+    return signatures
+
+def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
     color = []
     text = []
     for index, rowData in signature.iterrows():
-
+        if "AveExpr" in rowData.index: # limma
+            expr_colname = "AveExpr"
+            pval_colname = "P.Value"
+            logfc_colname = "logFC"
+        elif "logCPM" in rowData.index: #edgeR
+            expr_colname = "logCPM"
+            pval_colname = "PValue"
+            logfc_colname = "logFC"
+        elif "baseMean" in rowData.index: #DESeq2
+            expr_colname = "baseMean"
+            pval_colname = "pvalue"
+            logfc_colname = "log2FoldChange"
         # Text
-        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData['AveExpr'], ndigits=2))+'<br>logFC = '+str(round(rowData['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['P.Value'])+'<br>FDR = '+'{:.2e}'.format(rowData['adj.P.Val']))
+        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData[expr_colname], ndigits=2))+'<br>logFC = '+str(round(rowData[logfc_colname], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData[pval_colname])+'<br>FDR = '+'{:.2e}'.format(rowData[pval_colname]))
 
         # Color
-        if rowData['P.Value'] < pvalue_threshold:
-            if rowData['logFC'] < -logfc_threshold:
+        if rowData[pval_colname] < pvalue_threshold:
+            if rowData[logfc_colname] < -logfc_threshold:
                 color.append('blue')
-            elif rowData['logFC'] > logfc_threshold:
+            elif rowData[logfc_colname] > logfc_threshold:
                 color.append('red')
             else:
                 color.append('black')
@@ -434,8 +519,9 @@ def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_thr
         else:
             color.append('black')
 
-    volcano_plot_results = {'x': signature['logFC'], 'y': -np.log10(signature['P.Value']), 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
+    volcano_plot_results = {'x': signature[logfc_colname], 'y': -np.log10(signature[pval_colname]), 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
     return volcano_plot_results
+        
 
 def plot_volcano(volcano_plot_results):
     spacer = ' '*50
@@ -459,15 +545,26 @@ def run_maplot(signature, signature_label='', pvalue_threshold=0.05, logfc_thres
     color = []
     text = []
     for index, rowData in signature.iterrows():
-
+        if "AveExpr" in rowData.index: # limma
+            expr_colname = "AveExpr"
+            pval_colname = "adj.P.Val"
+            logfc_colname = "logFC"
+        elif "logCPM" in rowData.index: #edgeR
+            expr_colname = "logCPM"
+            pval_colname = "PValue"
+            logfc_colname = "logFC"
+        elif "baseMean" in rowData.index: #DESeq2
+            expr_colname = "baseMean"
+            pval_colname = "padj"
+            logfc_colname = "log2FoldChange"
         # Text
-        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData['AveExpr'], ndigits=2))+'<br>logFC = '+str(round(rowData['logFC'], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData['P.Value'])+'<br>FDR = '+'{:.2e}'.format(rowData['adj.P.Val']))
+        text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData[expr_colname], ndigits=2))+'<br>logFC = '+str(round(rowData[logfc_colname], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData[pval_colname])+'<br>FDR = '+'{:.2e}'.format(rowData[pval_colname]))
 
         # Color
-        if rowData['adj.P.Val'] < pvalue_threshold:
-            if rowData['logFC'] < -logfc_threshold:
+        if rowData[pval_colname] < pvalue_threshold:
+            if rowData[logfc_colname] < -logfc_threshold:
                 color.append('blue')
-            elif rowData['logFC'] > logfc_threshold:
+            elif rowData[logfc_colname] > logfc_threshold:
                 color.append('red')
             else:
                 color.append('black')
@@ -476,7 +573,7 @@ def run_maplot(signature, signature_label='', pvalue_threshold=0.05, logfc_thres
             color.append('black')
     
     # Return 
-    volcano_plot_results = {'x': signature['AveExpr'], 'y': signature['logFC'], 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
+    volcano_plot_results = {'x': signature[expr_colname], 'y': signature[logfc_colname], 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
     return volcano_plot_results
 
 def plot_maplot(volcano_plot_results):    
@@ -494,6 +591,23 @@ def plot_maplot(volcano_plot_results):
     )
 
 
+def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logFC', sort_genes_by='t', ascending=True):
+
+    # Sort signature
+    up_signature = signature[signature[fc_colname] > 0].sort_values(sort_genes_by, ascending=ascending)
+    down_signature = signature[signature[fc_colname] < 0].sort_values(sort_genes_by, ascending=ascending)
+    
+    # Get genesets
+    genesets = {
+        'upregulated': up_signature.index[:geneset_size],
+        'downregulated': down_signature.index[:geneset_size:]
+    }
+
+    # Submit to Enrichr
+    enrichr_ids = {geneset_label: submit_enrichr_geneset(geneset=geneset, label=signature_label+', '+geneset_label+', from Bulk RNA-seq Appyter') for geneset_label, geneset in genesets.items()}
+    enrichr_ids['signature_label'] = signature_label
+    return enrichr_ids
+
 def submit_enrichr_geneset(geneset, label=''):
     ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/addList'
     genes_str = '\n'.join(geneset)
@@ -508,21 +622,7 @@ def submit_enrichr_geneset(geneset, label=''):
     data = json.loads(response.text)
     return data
 
-def run_enrichr(signature, signature_label, geneset_size=500, sort_genes_by='t'):
 
-    # Sort signature
-    signature = signature.sort_values(sort_genes_by, ascending=False)
-
-    # Get genesets
-    genesets = {
-        'upregulated': signature.index[:geneset_size],
-        'downregulated': signature.index[-geneset_size:]
-    }
-
-    # Submit to Enrichr
-    enrichr_ids = {geneset_label: submit_enrichr_geneset(geneset=geneset, label=signature_label+', '+geneset_label+', from Bulk RNA-seq Appyter') for geneset_label, geneset in genesets.items()}
-    enrichr_ids['signature_label'] = signature_label
-    return enrichr_ids
 
 def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
     ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
@@ -565,8 +665,8 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
     elif library_type == "pathway":
         # Libraries
         libraries = {
-            'KEGG_2016': 'KEGG Pathways',
-            'WikiPathways_2016': 'WikiPathways',
+            'KEGG_2019_Human': 'KEGG Pathways',
+            'WikiPathways_2019_Human': 'WikiPathways',
             'Reactome_2016': 'Reactome Pathways'
         }
 

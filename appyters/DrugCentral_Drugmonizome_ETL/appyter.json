@@ -17,7 +17,7 @@
     "ETL Script",
     "DrugCentral"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "DrugCentral.ipynb",
     "profile": "biojupies"

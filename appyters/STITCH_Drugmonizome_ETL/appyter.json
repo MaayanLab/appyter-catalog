@@ -17,7 +17,7 @@
     "ETL Script",
     "STITCH"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "STITCH.ipynb",
     "profile": "biojupies"

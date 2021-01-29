@@ -21,7 +21,7 @@
     "Kinase Enrichment Analysis",
     "Kinome"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "KEA3-Appyter.ipynb",
     "profile": "biojupies",
