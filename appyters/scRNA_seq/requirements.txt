@@ -21,7 +21,7 @@ python-igraph
 anndata==0.7.3
 fa2
 leidenalg
-umap-learn
+umap-learn==0.4.6
 digitalcellsorter
 datetime
 pytest-shutil

@@ -488,15 +488,13 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
     return signatures
 
-        
-
 def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
     color = []
     text = []
     for index, rowData in signature.iterrows():
         if "AveExpr" in rowData.index: # limma
             expr_colname = "AveExpr"
-            pval_colname = "adj.P.Val"
+            pval_colname = "P.Value"
             logfc_colname = "logFC"
         elif "logCPM" in rowData.index: #edgeR
             expr_colname = "logCPM"
@@ -504,7 +502,7 @@ def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_thr
             logfc_colname = "logFC"
         elif "baseMean" in rowData.index: #DESeq2
             expr_colname = "baseMean"
-            pval_colname = "padj"
+            pval_colname = "pvalue"
             logfc_colname = "log2FoldChange"
         # Text
         text.append('<b>'+index+'</b><br>Avg Expression = '+str(round(rowData[expr_colname], ndigits=2))+'<br>logFC = '+str(round(rowData[logfc_colname], ndigits=2))+'<br>p = '+'{:.2e}'.format(rowData[pval_colname])+'<br>FDR = '+'{:.2e}'.format(rowData[pval_colname]))
@@ -523,6 +521,7 @@ def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_thr
 
     volcano_plot_results = {'x': signature[logfc_colname], 'y': -np.log10(signature[pval_colname]), 'text':text, 'color': color, 'signature_label': signature_label, 'plot_type': plot_type}
     return volcano_plot_results
+        
 
 def plot_volcano(volcano_plot_results):
     spacer = ' '*50
