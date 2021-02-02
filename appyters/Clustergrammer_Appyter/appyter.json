@@ -15,7 +15,7 @@
     "Clustergrammer"
   ],
   "license": "CC-BY-NC-SA-4.0",
-  "public": false,
+  "public": true,
   "appyter": {
     "file": "clustergrammer.ipynb",
     "profile": "biojupies",
