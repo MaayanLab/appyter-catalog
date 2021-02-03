@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Clustergrammer_Appyter",
   "title": "Clustergrammer Appyter",
-  "version": "0.0.1",
-  "description": "A friendly appyter for visualizing data using Clustergrammer and Clustergrammer2",
+  "version": "0.0.2",
+  "description": "A friendly appyter for visualizing data using Clustergrammer",
+  "image": "clustergrammer_thumbnail.png",
   "authors": [
     {
       "name": "Ingrid Shu",
