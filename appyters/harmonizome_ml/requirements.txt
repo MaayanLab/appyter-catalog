@@ -4,5 +4,7 @@ jupyter
 matplotlib
 numpy
 pandas
+plotly
 scipy
 sklearn
+umap-learn
