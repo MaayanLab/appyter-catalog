@@ -4,4 +4,4 @@ Thanks to technological advances in genomics, transcriptomics, proteomics, metab
 
 Harmonizome-ML facilitates interactive on-the-fly imputation of knowledge about genes and proteins with machine learning. This appyter allows you to build and evaluate machine learning pipelines with [Harmonizome](https://maayanlab.cloud/Harmonizome/) data. For more information about the selections, follow the help tool-tips.
 
-<sup>1</sup> Rouillard AD, Gundersen GW, Fernandez NF, Wang Z, Monteiro CD, McDermott MG, Ma'ayan A. *The harmonizome: a collection of processed datasets gathered to serve and mine knowledge about genes and proteins*. Database (Oxford). 2016 Jul 3;2016. pii: baw100.
+Rouillard AD, Gundersen GW, Fernandez NF, Wang Z, Monteiro CD, McDermott MG, Ma'ayan A. *The harmonizome: a collection of processed datasets gathered to serve and mine knowledge about genes and proteins*. Database (Oxford). 2016 Jul 3;2016. pii: baw100. PMID: [27374120](https://pubmed.ncbi.nlm.nih.gov/27374120/).
