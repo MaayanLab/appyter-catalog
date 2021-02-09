@@ -1,0 +1,3 @@
+# Enrichr Volcano Plot Visualization Appyter
+
+An appyter that generates volcano plot visualizations from Enrichr results. Enrichment analysis is first performed for the input up- and down-regulated gene lists, against a selected background library. Each gene set from the library is then plotted on a volcano plot based on the corresponding odds ratio (x-position) and p-value (y-position) from the results. Significantly enriched gene sets are highlighted in color. Plots may be downloaded as SVG files. 
