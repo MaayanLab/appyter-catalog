@@ -1,0 +1,6 @@
+git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+pandas
+numpy
+requests
+matplotlib
+bokeh

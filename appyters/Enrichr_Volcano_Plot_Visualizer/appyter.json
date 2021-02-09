@@ -1,0 +1,31 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "name": "Enrichr_Volcano_Plot_Visualizer",
+    "title": "Enrichr Volcano Plot Visualizer",
+    "version": "0.0.1",
+    "description": "An appyter that generates volcano plots from enrichment analysis results.",
+    "image": "featured.png",
+    "authors": [
+      {
+        "name": "Sherry Xie",
+        "email": "sxie04@gmail.com"
+      }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/Enrichr_Volcano_Plot_Visualizer",
+    "tags": [
+      "Enrichr",
+      "Enrichment Analysis",
+      "Volcano Plot",
+      "Visualization"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "appyter": {
+      "file": "Enrichr_Volcano_Plot_Visualizer.ipynb",
+      "profile": "biojupies",
+      "extras": [
+        "hide-code",
+        "toggle-code"
+      ]
+    }
+  }
+  
