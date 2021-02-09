@@ -210,6 +210,7 @@ DATASET_TO_LINK = {
     'SIDER Indications': LINK_BASE + 'SIDER/SIDER_indications_drugsetlibrary.gmt',
     'SIDER Side Effects': LINK_BASE + 'SIDER/SIDER_side_effects_drugsetlibrary.gmt',
     'RDKIT MACCS Chemical Fingerprints': LINK_BASE + 'RDKIT/RDKIT_maccs_fingerprints_drugsetlibrary_updated.gmt',
+    'PubChem Chemical Fingerprints': LINK_BASE + 'RDKIT/PubChem_fingerprints_drugsetlibrary.gmt'
 }
 
 # Drugmonizome class
