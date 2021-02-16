@@ -5,7 +5,7 @@
   import CodeSnippet from '../components/CodeSnippet.svelte'
 
   // constants
-  let docker_org = 'maayanlab'
+  let { docker_org, library_version } = require('../appyters.json')
   let public_url = window.location.origin
   
   // derived values
@@ -64,8 +64,8 @@
       library_version_validity = undefined
     }
     let docker_version
-    if (library_version_validity !== undefined && appyter_version_validity !== undefined) {
-      docker_version = `:${$hash.params.appyter_version}-${$hash.params.library_version}`
+    if (appyter_version_validity !== undefined) {
+      docker_version = `:${$hash.params.appyter_version}-${$hash.params.library_version || library_version}`
     } else {
       docker_version = `:latest`
     }

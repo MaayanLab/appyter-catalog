@@ -44,8 +44,8 @@ services:
     build:
       context: ./appyter
       args:
-        - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${appyter_version}
+        - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_tag:-v}${appyter_version}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${appyter_tag:-}${appyter_version}
     restart: unless-stopped
     ports:
       - 5000:5000
@@ -121,8 +121,9 @@ services:
       context: {{ os.path.relpath(appyter['path'], root_dir) }}
       dockerfile: Dockerfile
       args:
-        - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_version}
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
+        - appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git@${appyter_tag:-v}${appyter_version}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
+    command: appyter-catalog-helper entrypoint
     restart: unless-stopped
     environment:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
@@ -131,7 +132,7 @@ services:
       - APPYTER_DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@appyters-s3:9000/storage/appyters/
       - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
       - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
-      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_version}
+      - APPYTER_DISPATCHER_IMAGE=${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"

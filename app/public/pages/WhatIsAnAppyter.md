@@ -7,3 +7,15 @@ Users that develop Jupyter notebooks for their Data Science and bioinformatics t
 <img class="img-fluid w-100 m-2 mb-4" src="../images/what-is-an-appyter-figure.svg" />
 
 Appyters extend [BioJupies](https://amp.pharm.mssm.edu/biojupies/) by permitting rapid construction of biojupies-like applications based on the same Jupyter notebook reports that are produced, helping to turn any data analysis workflow coded in a Jupyter notebook into a parameterized web-based application.
+
+## Video Introduction
+
+Check out this LINCS Symposium Workshop where we discuss several appyters and demonstrate how to build your own.
+
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <a href="https://www.youtube.com/watch?v=Ps8X5wfOzE8&t=21m">
+      <img class="img-fluid w-100" src="https://img.youtube.com/vi/Ps8X5wfOzE8/0.jpg" />
+    </a>
+  </div>
+</div>

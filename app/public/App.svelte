@@ -21,6 +21,7 @@
     display: flex;
     min-height: 100vh;
     flex-direction: column;
+    min-width: 540px;
   }
 
   :global(.flex-grow) {

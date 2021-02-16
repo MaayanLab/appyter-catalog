@@ -1,25 +1,11 @@
+#!/usr/bin/env python3
+
 import os
 import re
+import sys
+import json
 import click
 import shutil
-
-@click.group()
-def cli():
-  pass
-
-@cli.command(name='merge-j2')
-@click.argument('primary', type=click.Path(exists=True, dir_okay=True, file_okay=False))
-@click.argument('override', type=click.Path(exists=True, dir_okay=True, file_okay=False))
-@click.argument('merged', type=click.Path(dir_okay=True, file_okay=False))
-def merge_j2_cli(primary, override, merged):
-  merge_j2_directories(primary, override, merged)
-
-@cli.command(name='insert-info')
-@click.option('-i', '--info', type=click.File('r'), default='-', help='File containing info json')
-@click.argument('ipynb', type=click.Path(file_okay=True, dir_okay=False))
-def insert_info_cli(ipynb, info):
-  import json
-  insert_info(ipynb, json.load(info))
 
 def insert_info(ipynb, info):
   ''' Given an ipynb, insert { 'metadata': { 'appyter': 'info': info } } }
@@ -145,6 +131,72 @@ def merge_j2_directories(primary_dir, override_dir, merged_dir):
           os.path.join(override_dir, file_path),
           os.path.join(merged_dir, file_path)
         )
+
+@click.group()
+def cli():
+  pass
+
+@cli.command(name='merge-j2')
+@click.argument('primary', type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.argument('override', type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.argument('merged', type=click.Path(dir_okay=True, file_okay=False))
+def merge_j2_cli(primary, override, merged):
+  merge_j2_directories(primary, override, merged)
+
+@cli.command(name='insert-info')
+@click.option('-i', '--info', type=click.File('r'), default='-', help='File containing info json')
+@click.argument('ipynb', type=click.Path(file_okay=True, dir_okay=False))
+def insert_info_cli(ipynb, info):
+  insert_info(ipynb, json.load(info))
+
+@cli.command(name='setup')
+def setup_cli():
+  ''' This will be used to setup the docker image
+  '''
+  import tempfile
+  click.echo('Loading `appyter.json`...')
+  appyter = json.load(open('/app/appyter.json', 'r'))
+  #
+  click.echo('Inserting appyter info into ipynb...')
+  insert_info(appyter['appyter']['file'], appyter)
+  #
+  click.echo('Testing appyter override...')
+  # this will perform merge_j2_directories *now* at docker build time
+  #  but throw away the result and do it in-place at docker run time.
+  with tempfile.TemporaryDirectory() as tmpdir:
+    merge_j2_directories('/app', '/app/override', tmpdir)
+  #
+  click.echo('Done')
+
+@cli.command(name='entrypoint')
+def entrypoint_cli():
+  ''' The catalog will use this entrypoint so that the standard
+  docker image does not contain the overrides and
+  does not use the catalog-integration extra.
+  '''
+  from subprocess import run
+  if os.path.isdir('/app/templates'):
+    if not os.path.isdir('/app/templates.sav'):
+      click.echo('Backing up appyter template...')
+      shutil.copytree('/app/templates', '/app/templates.sav')
+    else:
+      click.echo('Restoring appyter template...')
+      shutil.rmtree('/app/templates')
+      shutil.copytree('/app/templates.sav', '/app/templates')
+  else:
+    os.mkdir('/app/templates')
+    os.mkdir('/app/templates.sav')
+  #
+  click.echo('Overriding appyter template...')
+  merge_j2_directories('/app', '/app/override', '/app')
+  #
+  click.echo('Injecting `catalog-integration` extra...')
+  extras = json.loads(os.environ.get('APPYTER_EXTRAS', '[]'))
+  extras.append('catalog-integration')
+  os.environ['APPYTER_EXTRAS'] = json.dumps(extras)
+  #
+  click.echo('Starting appyter...')
+  sys.exit(run(['appyter', 'flask-app'], env=os.environ).returncode)
 
 if __name__ == '__main__':
   cli()

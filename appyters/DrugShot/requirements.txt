@@ -3,3 +3,4 @@ numpy
 git+git://github.com/Maayanlab/appyter.git
 requests
 plotly
+scikit-learn

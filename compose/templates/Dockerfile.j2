@@ -76,6 +76,11 @@ RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --no-cache-dir --upgrade ${appyter_version}
 
+COPY catalog_helper.py /bin/appyter-catalog-helper
+RUN set -x \
+  && echo "Installing catalog helper..." \
+  && chmod 755 /bin/appyter-catalog-helper
+
 RUN set -x \
   && echo "Preparing user..." \
   && useradd -ms /bin/bash -d /app app \
@@ -107,12 +112,6 @@ ENV PYTHONPATH "/app:$PYTHONPATH"
 
 COPY --chown=app:app . /app
 
-RUN set -x \
-  && echo "Overriding appyter templates..." \
-  && python3 /app/catalog_helper.py merge-j2 /app /app/override /app
-
-RUN set -x \
-  && echo "Inserting appyter info..." \
-  && python3 /app/catalog_helper.py insert-info "/app/{{ config['appyter']['file'] }}" < /app/appyter.json
+RUN appyter-catalog-helper setup
 
 CMD [ "appyter", "flask-app" ]
