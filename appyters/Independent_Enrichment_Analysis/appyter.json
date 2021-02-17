@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Independent_Enrichment_Analysis",
+  "title": "Independent Enrichment Analysis",
+  "version": "0.0.5",
+  "description": "This Appyter performs enrichment analysis without the need to use external libraries. The required inputs are a set and a library of sets",
+  "image": "screenshot.png",
+  "authors": [
+    {
+      "name": "Minji Jeon",
+      "email": "minji.jeon1@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Enrichment Analysis",
+    "Enrichr"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "Independent_Enrichment_Analysis.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
+  }
+}

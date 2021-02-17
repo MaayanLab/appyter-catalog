@@ -1,0 +1,13 @@
+git+git://github.com/Maayanlab/appyter.git
+requests
+pandas
+numpy
+git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+fastcluster
+seaborn
+matplotlib
+umap-learn
+scipy
+sklearn
+git+git://github.com/maayanlab/react-scatter-board
+git+git://github.com/maayanlab/react-GSEA.git@simplified

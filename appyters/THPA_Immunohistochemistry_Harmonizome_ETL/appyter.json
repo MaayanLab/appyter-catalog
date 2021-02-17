@@ -18,7 +18,7 @@
     "Immunihistochemistry",
     "The Human Protein Atlas"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "THPA (Immunohistochemistry).ipynb",
     "profile": "biojupies"

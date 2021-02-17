@@ -1,0 +1,6 @@
+build-essential
+gcc
+libcurl4-gnutls-dev
+libssl-dev
+libxml2-dev
+make

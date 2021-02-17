@@ -1,0 +1,58 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+
+body {
+  font: 16px Arial;
+  text-align: center;
+}
+
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <div class="mt-3 row">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='prismexp-icon.png') }}" style="width:180px" class="img-fluid float-right">
+        </div>
+        <div class="col-7 text-left">
+            <h1> PrismEXP </h1>
+          
+            <div>
+              This Appyter calculates predictions using the PrismEXP algorithm. It utilizes precomputed correlation scores and a pretrained model. The correlation scores are computed for 50 gene expression clusters in ARCHS4.
+              <br><br>
+              To start the prediction, choose a gene of interest and provide a GMT file. To provide a GMT file either select one from the Enrichr database or upload a custom file.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

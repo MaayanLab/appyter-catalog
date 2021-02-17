@@ -17,7 +17,7 @@
     "ETL Script",
     "Geneshot"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Geneshot.ipynb",
     "profile": "biojupies"
