@@ -1,7 +1,6 @@
 <script>
   import Macy from 'macy'
   import { tick } from 'svelte'
-  import { wait } from '../utils'
 
   export let items
 
@@ -30,7 +29,6 @@
   $: if (masonry && items) {
     tick()
       .then(_ => masonry.recalculate(true, true))
-      .then(_ => wait(100))
       .then(_ => tick())
       .then(_ => masonry.recalculate(true, true))
   }
