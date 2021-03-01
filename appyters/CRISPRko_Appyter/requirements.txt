@@ -1,5 +1,5 @@
-git+git://bitbucket.org/liulab/mageck.git
-git+git://github.com/Maayanlab/appyter.git
+git+https://bitbucket.org/liulab/mageck.git
+git+https://github.com/Maayanlab/appyter.git
 ipython
 numpy
 pandas
