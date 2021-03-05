@@ -3,7 +3,7 @@ install.packages("tibble")
 install.packages("Matrix")
 install.packages("VGAM")
 install.packages("igraph")
-
+install.packages("devtools", dependencies=TRUE)
 install.packages("usethis")
 install.packages("gh")
 
@@ -12,8 +12,10 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 
 BiocManager::install("limma")
 BiocManager::install("edgeR")
+BiocManager::install("DESeq2")
+
 install.packages("https://cran.r-project.org/src/contrib/Archive/XML/XML_3.98-1.20.tar.gz")
-install.packages("devtools")
+
 devtools::install_github("cole-trapnell-lab/monocle-release")
 
 install.packages("hdf5r")

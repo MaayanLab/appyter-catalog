@@ -1,0 +1,31 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <div>
+        <img src="{{ url_for('static', filename='leftplot.png') }}" style="width:100px" class="float-left">
+        <img src="{{ url_for('static', filename='rightplot.png') }}" style="width:100px" class="float-right">
+    </div>
+    <h1>Enrichr Volcano Plot Visualization Appyter</h1>
+    <p style="margin:15px; text-align:center;"> Generate volcano plot visualizations of enrichment results from Enrichr.</p>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

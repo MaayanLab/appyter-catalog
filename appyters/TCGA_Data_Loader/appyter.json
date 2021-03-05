@@ -15,7 +15,7 @@
     "TCGA",
     "RNA-seq"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "image": "TCGA-thumbnail.png",
   "appyter": {
     "file": "TCGA_Data_Loader.ipynb",

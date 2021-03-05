@@ -2,6 +2,51 @@
 
 {% block head %}
 {{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+  /* sticky footer */
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    min-height: 100vh;
+    min-width: 540px;
+    flex-direction: column;
+  }
+
+  .flex-grow {
+    flex: 1 0 auto;
+  }
+
+  body {
+    background-color: #f5f5f5;
+  }
+
+  #_primary {
+    background-color: #ffffff;
+  }
+
+  /* header */
+  span.text-muted > a {
+    text-decoration: none;
+    color: inherit;
+  }
+  span.text-muted > a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+</style>
+{% endblock %}
+
+{% block script_head %}
+{{ super() }}
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-6277639-47"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -9,7 +54,104 @@
   gtag('js', new Date());
   gtag('config', 'UA-6277639-47');
 </script>
-{% endblock head %}
+{% endblock %}
+
+{% block header %}
+<div class="container-fluid bg-white pb-2 mb-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 col-lg-4">
+        <h1 class="m-0">
+          <a href="/#/">
+            <img
+              src="/images/appyters_logo.svg"
+              class="img-fluid w-100 p-4"
+              alt="Appyters"
+            />
+          </a>
+        </h1>
+      </div>
+      <div class="col-sm-12 col-lg-8 offset-xl-1 col-xl-7 text-center my-4" style="white-space: nowrap">
+        <span class="text-muted">
+          <a
+            href="/#/what-is-an-appyter/"
+          >
+            What is an Appyter?
+          </a>
+            |
+          <a
+            href="/#/creating-appyters/"
+          >
+            Creating Appyters
+          </a>
+          | 
+          <a
+            href="/#/publishing-appyters/"
+          >
+            Publishing Appyters
+          </a>
+          | 
+          <a
+            href="/#/about/"
+          >
+            About
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid flex-grow">
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+</div>
+<div class="footer mt-4 pt-4 bg-white">
+  <div class="row justify-content-center align-content-center" style="margin: 0">
+    <div class="d-flex col-md-3 col-sm-12 justify-content-center align-items-center">
+      <p class="d-inline-block text-left">
+        <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
+        <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
+        <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
+      </p>
+    </div>
+    <div class="col-md-2 col-xs-3 text-center">
+      <a href="https://icahn.mssm.edu/research/bioinformatics" target="_blank">
+        <img class="rounded" src="/images/icahn_cb.png" style="height: 5rem;">
+      </a>
+    </div>
+    <div class="col-md-2 col-xs-3 text-center">
+      <a href="https://labs.icahn.mssm.edu/maayanlab/" target="_blank">
+        <img class="rounded" src="/images/maayanlab_logo.png" style="height: 5rem;">
+      </a>
+    </div>
+    <div class="d-flex-column col-md-2 col-xs-3 text-center">
+      <div class="my-2">
+        <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog" target="_blank">
+          <span class="badge badge-light">
+            <img src="/images/GitHub-Mark.png" style="width: 1rem;">
+          </span>
+          View source code
+        </a>
+      </div>
+      <div class="my-2">
+        <a class="badge badge-secondary px-2" href="https://github.com/MaayanLab/appyter-catalog/issues/new" target="_blank">
+          <span class="badge badge-light">
+            <img src="/images/GitHub-Mark.png" style="width: 1rem;">
+          </span>
+          Submit an issue
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
 {% block script %}
 {{ super() }}

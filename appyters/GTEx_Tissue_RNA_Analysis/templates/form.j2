@@ -6,11 +6,22 @@
 
 {% block style %}
 {{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px
+    }
+</style>
 {% endblock %}
 
 {% block body %}
+<div class="row">
+<div class="col-sm-12">
 <div class="container">
-<h1>GTEx Tissue RNAseq Analysis</h1>
+    <h1>GTEx Tissue RNA-seq Analysis</h1>
+    <p style="margin:15px; text-align:center;"> Visualize, process, and perform enrichment analysis on gene expression data from pre-processed GTEx tissue-specific datasets, or from user-uploaded RNA-seq data and metadata. </p>
+</div>
+</div>
 </div>
 {{ super() }}
 {% endblock %}

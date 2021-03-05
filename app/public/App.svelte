@@ -9,6 +9,7 @@
     '/what-is-an-appyter': require('./pages/WhatIsAnAppyter.svelte').default,
     '/creating-appyters': require('./pages/CreatingAppyters.svelte').default,
     '/publishing-appyters': require('./pages/PublishingAppyters.svelte').default,
+    '/running-appyters': require('./pages/RunningAppyters.svelte').default,
     '/about': require('./pages/About.svelte').default,
     [undefined]: require('./pages/NotFound.svelte').default,
   }
@@ -20,6 +21,7 @@
     display: flex;
     min-height: 100vh;
     flex-direction: column;
+    min-width: 540px;
   }
 
   :global(.flex-grow) {

@@ -1,4 +1,5 @@
 git+git://github.com/Maayanlab/appyter.git
+fastcluster
 requests
 pandas
 numpy
