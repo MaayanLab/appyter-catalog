@@ -10,8 +10,8 @@ def build_compose(tls):
   from itertools import count
   from jinja2 import Environment, FileSystemLoader
   #
-  version = '0.0.1'
   root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+  version = open(os.path.join(root_dir, 'VERSION'), 'r').read().strip()
   appyter_path = os.path.join(root_dir, 'appyters')
   appyters = [
     dict(

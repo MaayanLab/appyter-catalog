@@ -17,7 +17,7 @@ while [ ${SUCCESS} -ne 0 ]; do
   sleep 5
 
   echo "Setting up client..."
-  mc alias set s3 http://localhost:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
+  mc config host add s3 http://localhost:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
   let SUCCESS=$?
 
   echo "Setting bucket policy..."

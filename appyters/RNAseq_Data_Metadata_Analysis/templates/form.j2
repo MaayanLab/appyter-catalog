@@ -6,11 +6,31 @@
 
 {% block style %}
 {{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
+<div class="row">
+<div class="col-sm-12">
 <div class="container">
-<h1>RNA-seq Data and Metadata Analysis</h1>
+    <h1>General RNA-seq Data and Metadata Viewer</h1>
+    <p style="margin:15px;"> 
+        A pipeline for visualizing and analyzing general RNA-seq profile data. The input files should include an RNA-seq data file containing read counts of genes (rows) from various samples (columns), and a rich metadata file describing different attributes (columns) for each sample (rows). The data is processed as follows: 
+    </p>
+    <ol>
+        <li>Normalization of RNA-seq data</li>
+        <li>Dimensionality reduction and k-means clustering</li>
+        <li>Characteristic direction calculation of differential gene expression</li>
+        <li>Enrichment analysis via Enrichr</li>
+        <li>Signature querying via L1000FWD</li>
+    </ol>
+</div>
+</div>
 </div>
 {{ super() }}
 {% endblock %}

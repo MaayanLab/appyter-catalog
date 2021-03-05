@@ -20,7 +20,7 @@
     "Enrichr",
     "Enrichment Analysis"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Enrichr-Canvas-Appyter.ipynb",
     "profile": "biojupies",

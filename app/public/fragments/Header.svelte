@@ -20,7 +20,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12 col-lg-4">
-        <h1>
+        <h1 class="m-0">
           <a href="#/">
             <img
               src="{require('../images/appyters_logo.svg')}"
