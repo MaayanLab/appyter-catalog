@@ -35,5 +35,11 @@
         </a>
       </div>
     </div>
+    <div class="w-100"></div>
+    <div class="col-sm-12 text-center">
+      <small class="text-muted">
+        <a href="https://www.sciencedirect.com/science/article/pii/S2666389921000234">Appyters: turning Jupyter Notebooks into data-driven web apps. Clarke, et al. Patterns, 2021, 100213</a>
+      </small>
+    </div>
   </div>
 </div>
