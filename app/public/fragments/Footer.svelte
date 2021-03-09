@@ -1,5 +1,5 @@
 <div class="footer mt-4 pt-4 bg-white">
-  <div class="row justify-content-center align-content-center" style="margin: 0">
+  <div class="row justify-content-center align-content-center mx-0 pb-3">
     <div class="d-flex col-md-3 col-sm-12 justify-content-center align-items-center">
       <p class="d-inline-block text-left">
         <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
@@ -34,6 +34,12 @@
           Submit an issue
         </a>
       </div>
+    </div>
+    <div class="w-100"></div>
+    <div class="col-sm-12 text-center">
+      <small class="text-muted">
+        <a href="https://www.sciencedirect.com/science/article/pii/S2666389921000234">Appyters: turning Jupyter Notebooks into data-driven web apps. Clarke, et al. Patterns, 2021, 100213</a>
+      </small>
     </div>
   </div>
 </div>

@@ -6,3 +6,10 @@ Jupyter notebooks have transformed the communication of data analysis pipelines 
 The Appyter Catalog is actively being developed in the [Ma'ayan Lab](https://labs.icahn.mssm.edu/maayanlab/) at the [Icahn School of Medicine at Mount Sinai](https://icahn.mssm.edu/) in the [Mount Sinai Center for Bioinformatics](https://icahn.mssm.edu/research/bioinformatics) by:
 
 __List of contributors__: Daniel J. B. Clarke, Minji Jeon, Daniel J. Stein, Nicole Moiseyev, Eryk Kropiwnicki, Charles Dai, Megan L. Wojciechowicz, Skylar Litz, Jason Hom, John Erol Evangelista, Lucas Goldman, Zhuorui Xie, Ingrid Shu, Serena Zhang, Christine Yoon, Tahmid Ahamed, Alexander Lachmann, Samantha Bhuiyan, Minxuan Cheng, Julie Karam, Kathleen M. Jagodnik, Sam Ayling, Sherry L. Jenkins, Avi Ma’ayan
+
+## Citation
+
+<p class="text-left">
+<b>Please acknowledge Appyters in your publications by citing the following reference</b>:<br />
+Daniel J.B. Clarke, Minji Jeon, Daniel J. Stein, Nicole Moiseyev, Eryk Kropiwnicki, Charles Dai, Zhuorui Xie, Megan L. Wojciechowicz, Skylar Litz, Jason Hom, John Erol Evangelista, Lucas Goldman, Serena Zhang, Christine Yoon, Tahmid Ahamed, Samantha Bhuiyan, Minxuan Cheng, Julie Karam, Kathleen M. Jagodnik, Ingrid Shu, Alexander Lachmann, Sam Ayling, Sherry L. Jenkins, Avi Ma'ayan. Appyters: turning Jupyter Notebooks into data-driven web apps. Patterns, 2021, 100213, ISSN 2666-3899, <a href="https://doi.org/10.1016/j.patter.2021.100213">https://doi.org/10.1016/j.patter.2021.100213</a>.
+(<a href="https://www.sciencedirect.com/science/article/pii/S2666389921000234">https://www.sciencedirect.com/science/article/pii/S2666389921000234</a>)</p>

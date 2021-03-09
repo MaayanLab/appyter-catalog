@@ -2,9 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "DrugShot",
   "title": "DrugShot",
-  "version": "0.0.4",
-  "description": "This appyter queries a search term and returns a list of associated drugs from the literature, with additional drugs predicted based on co-expression.",
-  "image": "drugshot_logo.png",
+  "version": "0.0.5",
+  "description": "This appyter queries search terms in PubMed and returns a list of drugs that share PMIDs, with additional drugs prioritized from prediction matrices.",
+  "image":"drugshot_logo.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",

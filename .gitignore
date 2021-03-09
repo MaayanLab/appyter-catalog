@@ -1,5 +1,7 @@
 __pycache__
 .build
+.deploy
+.publish
 .env
 .pyc
 app/public/appyters.json
