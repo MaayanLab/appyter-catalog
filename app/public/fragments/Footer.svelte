@@ -4,7 +4,7 @@
       <p class="d-inline-block text-left">
         <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
         <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
-        <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
+        <a style="color: #555;" href="/#/what-is-an-appyter/">Appyter Documentation</a><br />
       </p>
     </div>
     <div class="col-md-2 col-xs-3 text-center">
