@@ -484,9 +484,9 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in expr_df.columns]).set_index('index')
                 # limma takes raw data
                 processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
-
                 limma = robjects.r['limma']
                 limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+
                 signature = pd.DataFrame(limma_results[0])
                 signature.index = limma_results[1]
                 signature = signature.sort_values("t", ascending=False)
@@ -1068,8 +1068,9 @@ def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='intera
     # Run Monocle
     results_monocle = runMonoclePipeline(pandas2ri.conversion.py2rpy(data), ordering=ordering)
     monocle_results = {}
-    for key in list(results_monocle.names):
-        df = pandas2ri.conversion.rpy2py(results_monocle[int(np.where(results_monocle.names==key)[0][0])])
+    for key_idx in range(len(list(results_monocle.names))):
+        key = list(results_monocle.names)[key_idx]
+        df = pandas2ri.conversion.rpy2py(results_monocle[key_idx])
         monocle_results[key] = df
 
     monocle_results['data_df'].set_index('sample_name', inplace=True)
