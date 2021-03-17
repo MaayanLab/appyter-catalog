@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name": "CRISPRko_Appyter",
     "title": "CRISPR knockout analysis pipeline",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "CRISPRko analysis pipeline using MaGeCK and Enrichr",
     "image": "CRISPRko_screenshot.png",
     "authors": [
