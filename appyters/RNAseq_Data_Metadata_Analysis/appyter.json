@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "RNAseq_Data_Metadata_Analysis",
-  "title": "RNA-seq Data and Metadata Analysis",
-  "version": "0.0.1",
-  "description": "An appyter for the visualization and analysis of RNA-seq data and associated metadata categories.",
+  "title": "General RNA-seq Data and Metadata Viewer",
+  "version": "0.0.2",
+  "description": "An appyter for the generalized visualization and analysis of RNA-seq patient profiles.",
   "image": "screenshot.png",
   "authors": [
     {
