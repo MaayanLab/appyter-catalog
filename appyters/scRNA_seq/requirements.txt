@@ -1,6 +1,7 @@
 git+git://github.com/Maayanlab/appyter.git
 git+git://github.com/Maayanlab/geode.git
 git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+numba==0.50.1
 ipykernel==5.3.4
 matplotlib_venn==0.11.5
 rpy2==3.4.2
