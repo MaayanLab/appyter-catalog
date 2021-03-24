@@ -10,11 +10,14 @@ Currently, because this application deals with several independent appyters, we 
 # Download the catalog locally
 git clone git@github.com:MaayanLab/appyter-catalog.git
 
-# Run only no build
-make docker-compose.yml && docker-compose pull && docker-compose up -d --remove-orphans
+# Build+run everything
+make deploy
 
-# Build and run
-make build && docker-compose up -d --remove-orphans
+# Build+run specific components
+make appyters/example/.deploy app/.deploy
+
+# Publish specific component
+make appyters/example/.publish
 ```
 
 ## Details

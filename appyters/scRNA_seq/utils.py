@@ -58,7 +58,52 @@ def check_files(fname):
 def check_df(df, col):
     if col not in df.columns:
         raise IOError
-        
+
+def load_seurat_files(mtx_filename, gene_filename, barcodes_filename):
+    
+    adata = anndata.read_mtx(mtx_filename).T
+    with open(barcodes_filename, "r") as f:
+        cells = f.readlines()
+        cells = [x.strip() for x in cells]
+    genes = pd.read_csv(
+        gene_filename,
+        header=None,
+        sep='\t',
+    )
+    
+    adata.var['gene_ids'] = genes.iloc[:, 0].values    
+    adata.var['gene_symbols'] = genes.iloc[:, 1].values
+    adata.var_names = adata.var['gene_symbols']
+    adata.var_names_make_unique(join="-")
+    
+    
+    adata.obs['barcode'] = cells
+    adata.obs_names = cells
+    adata.obs_names_make_unique(join="-")
+    return adata
+
+def load_metadata(adata, meta_data_filename, meta_class_column_name):
+    if meta_data_filename != "":
+        if meta_data_filename.endswith(".csv"):
+            meta_df = pd.read_csv(meta_data_filename, index_col=0)
+        else:
+            meta_df = pd.read_csv(meta_data_filename, sep="\t", index_col=0)
+        if meta_class_column_name == "":
+            raise Exception ("Run time error: Please provide a proper column name for sample classes in metadata")
+        try:
+            check_df(meta_df, meta_class_column_name)
+        except:
+            raise Exception (f"Error! Column '{meta_class_column_name}' is not in metadata")
+        adata.obs[meta_class_column_name] = meta_df.loc[:, meta_class_column_name]
+        adata.var_names_make_unique()
+
+    else:
+        meta_class_column_name = "Class"
+        adata.obs[meta_class_column_name] = ["Class0"]*adata.n_obs
+        adata.var_names_make_unique()
+    
+    return adata, meta_class_column_name    
+
 def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
     df.to_csv(filename)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
@@ -439,9 +484,9 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in expr_df.columns]).set_index('index')
                 # limma takes raw data
                 processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
-
                 limma = robjects.r['limma']
                 limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+
                 signature = pd.DataFrame(limma_results[0])
                 signature.index = limma_results[1]
                 signature = signature.sort_values("t", ascending=False)
@@ -1023,8 +1068,9 @@ def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='intera
     # Run Monocle
     results_monocle = runMonoclePipeline(pandas2ri.conversion.py2rpy(data), ordering=ordering)
     monocle_results = {}
-    for key in list(results_monocle.names):
-        df = pandas2ri.conversion.rpy2py(results_monocle[int(np.where(results_monocle.names==key)[0][0])])
+    for key_idx in range(len(list(results_monocle.names))):
+        key = list(results_monocle.names)[key_idx]
+        df = pandas2ri.conversion.rpy2py(results_monocle[key_idx])
         monocle_results[key] = df
 
     monocle_results['data_df'].set_index('sample_name', inplace=True)
