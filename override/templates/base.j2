@@ -177,5 +177,24 @@ define('pagehit', ['jquery'], function ($) {
     })
   }
 })
+define('report_error', ['jquery'], function ($) {
+  return function (error) {
+    var base_url = window.location.origin
+    var app = window.location.pathname.split('/')[1]
+    $.ajax({
+      url: base_url + '/postgrest/rpc/report_error',
+      method: 'POST',
+      cache: false,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(error),
+    }).done(function (response, textStatus) {
+      if (textStatus !== 'success') {
+        console.error('Error ' + textStatus)
+      }
+    })
+  }
+})
 </script>
 {% endblock %}
