@@ -124,7 +124,7 @@ def display_object(counter, caption, df=None, istable=True):
     counter += 1
     return counter
 
-def run_dimension_reduction(dataset, meta_id_column_name, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
+def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
     # Get data
     before_norm = normalization.replace("+z_norm", "").replace("+q_norm", "")
     top_genes = dataset[before_norm].var(axis=1).sort_values(ascending=False)
@@ -172,13 +172,13 @@ def run_dimension_reduction(dataset, meta_id_column_name, method='PCA', normaliz
 
     # Return
     results = {'method': method, 'result': result, 'axis': axis, 
-                   'dataset_metadata': dataset['dataset_metadata'][dataset['dataset_metadata'][meta_id_column_name] == expression_dataframe.columns], 
+                   'dataset_metadata': dataset['dataset_metadata'][dataset['dataset_metadata'].index == expression_dataframe.columns], 
                    'nr_genes': nr_genes, 
                    'normalization': normalization, 'signature_metadata': dataset.get('signature_metadata'), 
                    'plot_type': plot_type}
     return results
 
-def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, counter, plot_type='interactive',):
+def plot_samples(pca_results, meta_class_column_name, counter, plot_type='interactive',):
     pca_transformed = pca_results['result']
     axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
@@ -243,14 +243,13 @@ def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, count
             y = meta_df_sub['y'],
             z = meta_df_sub['z'],
 
-            text=meta_df_sub[meta_id_column_name],
+            text=meta_df_sub.index,
             mode='markers',
             marker=dict(
                 size=10,
                 color=COLORS[classes.index(cls)], # Color by infection status
                 opacity=.8,
             ),
-#             name=meta_df_sub[meta_id_column_name]
             name=display_name,
         )
 
@@ -350,7 +349,6 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
         py.image.ishow(fig)
 
 
-        
 robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
     # Load packages
     suppressMessages(require(limma))
@@ -436,7 +434,7 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
 }
 ''')
 
-def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name, filter_genes):
+def get_signatures(classes, dataset, normalization, method, meta_class_column_name, filter_genes):
     tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
     raw_expr_df = dataset['rawdata']
     expr_df = dataset['rawdata']
@@ -447,19 +445,20 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
     for cls1, cls2 in combinations(classes, 2):
         print(cls1, cls2)
-        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist() #control
-        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist() #case
+        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, :].index.tolist() #control
+        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2,:].index.tolist() #case
         
         signature_label = " vs. ".join([cls1, cls2])
-
+        
         if method == "limma":
             limma = robjects.r['limma']
+
             design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in raw_expr_df.columns]).set_index('index')
 
             processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
-            limma = robjects.r['limma']
-            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
             
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
+                        
             signature = pd.DataFrame(limma_results[0])
             signature.index = limma_results[1]
             signature = signature.sort_values("t", ascending=False)
@@ -469,6 +468,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             signature = signature.sort_values("CD-coefficient", ascending=False)
         elif method == "edgeR":
             edgeR = robjects.r['edgeR']
+            
             edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
             
             signature = pd.DataFrame(edgeR_results[0])
@@ -486,7 +486,8 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             
         signatures[signature_label] = signature
 
-    return signatures
+    return signatures        
+
 
 def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
     color = []
