@@ -39,4 +39,4 @@ begin
 end
 $$
 language 'plpgsql' security definer;
-grant execute on function api.report_error(jsonb) to guest;
+grant execute on function api.report_error(jsonb, varchar, varchar, jsonb) to guest;
