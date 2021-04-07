@@ -5,14 +5,10 @@ import pandas as pd
 import os
 import urllib3
 import requests, json
-import sys
-import geode
 import random
-from time import sleep
 import time
 import numpy as np
 import warnings
-import base64  
 
 # Visualization
 import plotly
