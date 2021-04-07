@@ -4,7 +4,7 @@
       <p class="d-inline-block text-left">
         <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
         <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
-        <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
+        <a style="color: #555;" href="/#/what-is-an-appyter/">Appyter Documentation</a><br />
       </p>
     </div>
     <div class="col-md-2 col-xs-3 text-center">
@@ -34,12 +34,6 @@
           Submit an issue
         </a>
       </div>
-    </div>
-    <div class="w-100"></div>
-    <div class="col-sm-12 text-center">
-      <small class="text-muted">
-        <a href="https://www.sciencedirect.com/science/article/pii/S2666389921000234">Appyters: turning Jupyter Notebooks into data-driven web apps. Clarke, et al. Patterns, 2021, 100213</a>
-      </small>
     </div>
   </div>
 </div>
