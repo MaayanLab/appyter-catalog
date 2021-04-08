@@ -593,8 +593,7 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
     elif library_type == "celltype":
         # Libraries
         libraries = {
-            'GTEx_Tissue_Sample_Gene_Expression_Profiles_up': 'GTEx Tissue Sample Gene Expression Profiles up',
-            'GTEx_Tissue_Sample_Gene_Expression_Profiles_down': 'GTEx Tissue Sample Gene Expression Profiles down',
+            'ARCHS4_Tissues': 'ARCHS4 Tissues',
             'Human_Gene_Atlas': 'Human Gene Atlas'
         }
     # Get Enrichment Results
