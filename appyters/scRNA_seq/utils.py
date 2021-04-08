@@ -596,6 +596,7 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
             'ARCHS4_Tissues': 'ARCHS4 Tissues',
             'Human_Gene_Atlas': 'Human Gene Atlas'
         }
+        
     # Get Enrichment Results
     enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
     enrichment_results['signature_label'] = signature_label
