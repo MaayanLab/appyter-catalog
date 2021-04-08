@@ -360,7 +360,6 @@ def plot_clustergrammar(clustergrammer_url):
     # Embed
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
-import psutil
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
              
     robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, adjust="BH") {
