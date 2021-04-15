@@ -76,12 +76,18 @@ RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --no-cache-dir --upgrade ${appyter_version}
 
+COPY catalog_helper.py /bin/appyter-catalog-helper
+RUN set -x \
+  && echo "Installing catalog helper..." \
+  && chmod 755 /bin/appyter-catalog-helper
+
 RUN set -x \
   && echo "Preparing user..." \
   && useradd -ms /bin/bash -d /app app \
   && groupadd fuse \
   && adduser app fuse \
-  && chown -R app:app /app \
+  && mkdir -p /app /app/data /data \
+  && chown -R app:app /app /data \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 
 USER app
@@ -93,25 +99,19 @@ ENV APPYTER_PREFIX "/"
 ENV APPYTER_HOST "0.0.0.0"
 ENV APPYTER_PORT "5000"
 ENV APPYTER_DEBUG "false"
+ENV APPYTER_IPYNB "{{ config['appyter']['file'] }}"
+{%- if 'profile' in config['appyter'] %}
+ENV APPYTER_PROFILE "{{ config['appyter']['profile'] }}"
+{%- endif %}
+{%- if 'extras' in config['appyter'] %}
+ENV APPYTER_EXTRAS '{{ json.dumps(config["appyter"]["extras"]) }}'
+{%- endif %}
 
 ENV PATH "/app:$PATH"
 ENV PYTHONPATH "/app:$PYTHONPATH"
 
 COPY --chown=app:app . /app
 
-RUN set -x \
-  && echo "Overriding appyter templates..." \
-  && python3 /app/merge_j2.py /app /app/override /app
+RUN appyter-catalog-helper setup
 
-CMD [ \
-  "appyter", \
-  {%- if 'profile' in config['appyter'] %}
-  "--profile={{ config['appyter']['profile'] }}", \
-  {%- endif %}
-  {%- if 'extras' in config['appyter'] %}
-  {%- for extra in config['appyter']['extras'] %}
-  "--extras={{ extra }}", \
-  {%- endfor %}
-  {%- endif %}
-  "{{ config['appyter']['file'] }}" \
-]
+CMD [ "appyter", "flask-app" ]

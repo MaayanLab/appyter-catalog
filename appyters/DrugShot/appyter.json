@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "DrugShot",
   "title": "DrugShot",
-  "version": "0.0.2",
-  "description": "This appyter queries a search term and returns a list of associated drugs from the literature, with additional drugs predicted based on co-expression.",
+  "version": "0.1.1",
+  "description": "This appyter queries search terms in PubMed and returns a list of drugs that share PMIDs, with additional drugs prioritized from prediction matrices.",
   "image":"drugshot_logo.png",
   "authors": [
     {
@@ -15,7 +15,7 @@
   "tags": [
     "DrugShot"
   ],
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "DrugShot.ipynb",
     "profile": "biojupies",

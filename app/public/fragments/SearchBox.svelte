@@ -1,7 +1,7 @@
 <script>
   import { hash } from '../stores'
 
-  let { global_tags } = require('../config.json')
+  let { global_tags } = require('../appyters.json')
 </script>
 
 <div class="container">

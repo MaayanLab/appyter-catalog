@@ -1,0 +1,30 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "name": "CRISPRko_Appyter",
+    "title": "CRISPR knockout analysis pipeline",
+    "version": "0.0.2",
+    "description": "CRISPRko analysis pipeline using MaGeCK and Enrichr",
+    "image": "CRISPRko_screenshot.png",
+    "authors": [
+      {
+        "name": "Ingrid Shu",
+        "email": "ingridshu0@gmail.com"
+      }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog",
+    "tags": [
+      "Enrichr",
+      "CRISPR"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "public": true,
+    "appyter": {
+      "file": "CRISPRko_appyter.ipynb",
+      "profile": "biojupies",
+      "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+    }
+  }

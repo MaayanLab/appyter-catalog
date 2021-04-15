@@ -1,11 +1,14 @@
 # Creating Appyters
 
-Users can contribute their pipelines to the Appyters Catalog by authoring an Appyter. To author an Appyter, you will need to convert your Jupyter Notebook into an Appyter. This can be done by adding Jupyter Notebook “magics” to your notebook. The Appyter module can enable you to turn your Jupyter Notebook into a jinja2 template-driven web application.
+Users can contribute their piplines to the Appyter Catalog by authoring an Appyter using the Appyter library.
+
+The Appyter library is developed independently of the set of appyters that make up this catalog and is also on github (<https://github.com/MaayanLab/appyter>). Documentation is automatically generated from the code-base, which may be useful for developers of appyters, this documentation can be found [here](https://maayanlab.github.io/appyter/).
+
+To author an Appyter, you will need to convert your Jupyter Notebook into an Appyter. This can be done by adding Jupyter Notebook “magics” to your notebook. The Appyter module can enable you to turn your Jupyter Notebook into a jinja2 template-driven web application.
 
 The first step is to install the Appyter package
 ```bash
-# Install package from github repository master
-pip3 install --user --upgrade git+git://github.com/Maayanlab/appyter.git
+pip3 install appyter
 ```
 
 The Appyter package enables you to serve that notebook on an executable webapp. Once the package is installed, simply type on the command line:
@@ -13,12 +16,10 @@ The Appyter package enables you to serve that notebook on an executable webapp. 
 appyter jupyter_notebook.ipynb
 ```
 
-If Appyter is not in your PATH environment variable, you can alternatively type:
+If the Appyter binary is not in your PATH (the above fails), you can instead try:
 ```bash
 python3 -m appyter jupyter_notebook.ipynb
 ```
-
-A dotenv file (.env) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.
 
 Appyters have several mechanisms for extension. Some of these extensions involve built-in features, and others involve overriding or extending built-in features. “Profiles” are template presets for the default application-defined fields; these enable quick beautification of the Appyter with little effort. “Extras” are feature flags that can be used to enable certain opt-in features such as table of contents, or code toggling. The “extra” independent of the profile. But all existing fields or pages can be overridden or extended by means of a documented directory and file structure; overrides placed in the proper location are automatically loaded by appyters making it quite easy to define new fields or fine-tune the application styling without having to make modifications to appyter itself. Static files, appyter fields, jinja2 filters, jinja2 templates, and even flask blueprints or dash apps can all be defined, integrated, extended, and overridden.
 
@@ -70,7 +71,7 @@ The appyter command line interface (CLI) can be used to easily interact with the
 
 Check out this lecture where we introduce appyters and describe how to extend it.
 
-<div class="row">
+<div class="row mb-4">
   <div class="col-sm-12 col-md-6">
     <a href="https://www.youtube.com/watch?v=IWyjxvDg8JQ">
       <img class="img-fluid w-100" src="https://img.youtube.com/vi/IWyjxvDg8JQ/0.jpg" />

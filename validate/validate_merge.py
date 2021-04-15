@@ -3,6 +3,8 @@ import re
 import sys
 import json
 import click
+import shutil
+import nbformat as nbf
 import traceback
 import jsonschema
 import urllib.request, urllib.error
@@ -78,11 +80,22 @@ def validate_appyter(appyter):
     print(f"{appyter}: WARNING `{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
+  nbpath = os.path.join('appyters', appyter, nbfile)
+  #
+  print(f"{appyter}: Checking notebook for issues..")
+  nb = nbf.read(open(nbpath, 'r'), as_version=4)
+  for cell in nb.cells:
+    if cell['cell_type'] == 'code':
+      assert not cell.get('execution_count'), "Please clear all notebook output & metadata"
+      assert not cell.get('metadata'), "Please clear all notebook output & metadata"
+      assert not cell.get('outputs'), "Please clear all notebook output & metadata"
+  assert not nb['metadata'].get('widgets'), "Please clear all notebook output & metadata"
+  assert not nb['metadata'].get('execution_info'), "Please clear all notebook output & metadata"
   #
   print(f"{appyter}: Preparing docker to run `{nbfile}`...")
-  assert os.path.isfile(os.path.join('appyters', appyter, nbfile)), f"Missing appyters/{appyter}/{nbfile}"
+  assert os.path.isfile(nbpath), f"Missing {nbpath}"
   try:
-    json.load(open(os.path.join('appyters', appyter, nbfile), 'r'))
+    json.load(open(nbpath, 'r'))
   except Exception as e:
     print(f"{nbfile} is not valid json")
     print(f"{appyter}: {traceback.format_exc()}")
@@ -107,6 +120,7 @@ def validate_appyter(appyter):
   print(f"{appyter}: Inspecting appyter...")
   with Popen([
     'docker', 'run',
+    '-e', 'APPYTER_PREFIX=', # hotfix because prefix is baked-in and necessary at production initialization time, but should be empty here
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbinspect',
     nbfile,
@@ -138,17 +152,21 @@ def validate_appyter(appyter):
     default_file = default_args[file_field]
     if default_file:
       if default_file in field_examples:
-        print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
-        try:
-          _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
-          assert response.get_content_type() != 'text/html', 'Expected data, got html'
-        except AssertionError as e:
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
-          early_stopping = True
-        except urllib.error.HTTPError as e:
-          assert e.getcode() != 404, f"File not found on remote, reported 404"
-          print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
-          early_stopping = True
+        if os.path.exists(os.path.join('appyters', appyter, field_examples[default_file])):
+          print(f"{appyter}: Copying example file {default_file} from {field_examples[default_file]}...")
+          shutil.copyfile(os.path.join('appyters', appyter, field_examples[default_file]), os.path.join(tmp_directory, default_file))
+        else:
+          print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
+          try:
+            _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
+            assert response.get_content_type() != 'text/html', 'Expected data, got html'
+          except AssertionError as e:
+            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+            early_stopping = True
+          except urllib.error.HTTPError as e:
+            assert e.getcode() != 404, f"File not found on remote, reported 404"
+            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+            early_stopping = True
       else:
         print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:

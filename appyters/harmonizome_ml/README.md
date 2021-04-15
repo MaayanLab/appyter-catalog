@@ -1,3 +1,7 @@
 # Harmonizome-ML
 
-Interactive On-the-Fly Imputation of Knowledge about Genes and Proteins with Machine Learning. This form allows you to build and evaluate machine learning pipelines with Harmonizome data. For more information about the selections, follow the help tool-tips.
+Thanks to technological advances in genomics, transcriptomics, proteomics, metabolomics, and related fields, projects that generate a large number of measurements of the properties of cells, tissues, model organisms, and patients are becoming commonplace in biomedical research. In addition, curation projects are making great progress mining biomedical literature to extract and aggregate decades worth of research findings into online databases. Such projects are generating a wealth of information that potentially can guide research toward novel biomedical discoveries and advances in healthcare. To facilitate access to and learning from biomedical Big Data, we created the Harmonizome: a collection of information about genes and proteins from 114 datasets provided by 66 online resources.
+
+Harmonizome-ML facilitates interactive on-the-fly imputation of knowledge about genes and proteins with machine learning. This appyter allows you to build and evaluate machine learning pipelines with [Harmonizome](https://maayanlab.cloud/Harmonizome/) data. For more information about the selections, follow the help tool-tips.
+
+Rouillard AD, Gundersen GW, Fernandez NF, Wang Z, Monteiro CD, McDermott MG, Ma'ayan A. *The harmonizome: a collection of processed datasets gathered to serve and mine knowledge about genes and proteins*. Database (Oxford). 2016 Jul 3;2016. pii: baw100. PMID: [27374120](https://pubmed.ncbi.nlm.nih.gov/27374120/).

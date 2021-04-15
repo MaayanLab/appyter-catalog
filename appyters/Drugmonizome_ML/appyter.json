@@ -2,13 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Drugmonizome_ML",
   "title": "Drugmonizome-ML",
-  "version": "0.0.10",
+  "version": "0.1.1",
   "description": "Machine learning pipeline to predict novel drug indications from small molecule attributes",
   "image": "screenshot.png",
   "authors": [
     {
       "name": "Daniel Stein",
       "email": "djs31415@gmail.com"
+    },
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
@@ -16,7 +20,7 @@
     "Machine Learning",
     "Drugmonizome"
   ],
-  "license": "Apache-2.0",
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Drugmonizome-ML.ipynb",
     "profile": "biojupies",
@@ -26,4 +30,3 @@
     ]
   }
 }
-
