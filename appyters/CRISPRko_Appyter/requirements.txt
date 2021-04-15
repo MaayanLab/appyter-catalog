@@ -1,0 +1,7 @@
+git+https://bitbucket.org/liulab/mageck.git
+git+https://github.com/Maayanlab/appyter.git
+ipython
+numpy
+pandas
+requests
+scipy

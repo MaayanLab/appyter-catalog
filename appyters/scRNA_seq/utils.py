@@ -1,19 +1,9 @@
 # Basic libraries
 import pandas as pd
-import os
-import urllib3
 import requests, json
-import sys
-import math
-from collections import OrderedDict
-import random
-from time import sleep
 import time
-import operator
 import numpy as np
 import warnings
-import shutil
-from datetime import datetime
 
 # Visualization
 import seaborn as sns
@@ -29,7 +19,6 @@ from matplotlib_venn import venn2, venn3
 import IPython
 from IPython.display import HTML, display, Markdown, IFrame, FileLink
 from itertools import combinations
-import base64  
 from scipy import stats
 import chart_studio
 import chart_studio.plotly as py
@@ -46,7 +35,6 @@ from rpy2.robjects import r, pandas2ri
 from magic import MAGIC
 import scanpy as sc
 import anndata
-import DigitalCellSorter
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 
 
@@ -372,41 +360,30 @@ def plot_clustergrammar(clustergrammer_url):
     # Embed
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
-
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
-    
-         
+             
     robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, adjust="BH") {
         # Load packages
         suppressMessages(require(limma))
         suppressMessages(require(edgeR))
-
         # Convert design matrix
         design <- as.matrix(design_dataframe)
         # Create DGEList object
         dge <- DGEList(counts=rawcount_dataframe)
-
         # Calculate normalization factors
         dge <- calcNormFactors(dge)
-
         # Run VOOM
         v <- voom(dge, plot=FALSE)
-
         # Fit linear model
         fit <- lmFit(v, design)
-
         # Make contrast matrix
         cont.matrix <- makeContrasts(de=B-A, levels=design)
-
         # Fit
         fit2 <- contrasts.fit(fit, cont.matrix)
-
         # Run DE
         fit2 <- eBayes(fit2)
-
         # Get results
         limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
-
         # Return
         results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
         return (results)
@@ -416,12 +393,10 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         # Load packages
         suppressMessages(require(limma))
         suppressMessages(require(edgeR))
-
         colData <- as.data.frame(c(rep(c("Control"),length(g1)),rep(c("Condition"),length(g2))))
         rownames(colData) <- c(g1,g2)
         colnames(colData) <- c("group")
         colData$group = relevel(as.factor(colData$group), "Control")
-
         y <- DGEList(counts=rawcount_dataframe, group=colData$group)
         y <- calcNormFactors(y)
         y <- estimateCommonDisp(y)
@@ -432,12 +407,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         res <- as.data.frame(res)
         results <- list("edgeR_dataframe"= res, "rownames"=rownames(res))
         return (results)
-
-
-
     }
-
-
     ''')
 
     robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
@@ -448,18 +418,12 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         colnames(colData) <- c("group")
         colData$group = relevel(as.factor(colData$group), "Control")
         dds <- DESeqDataSetFromMatrix(countData = rawcount_dataframe, colData = colData, design=~(group))
-
         dds <- DESeq(dds)
         res <- results(dds)
-
         res[which(is.na(res$padj)),] <- 1
         res <- as.data.frame(res)
-
         results <- list("DESeq_dataframe"= res, "rownames"=rownames(res))
         return(results)
-
-
-
     }
     ''')
     expr_df = dataset.to_df().T
@@ -478,36 +442,34 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
             non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1].index.tolist() #control
             sample_ids = non_cls1_sample_ids.copy()
             sample_ids.extend(cls1_sample_ids)
-            raw_expr_df = raw_expr_df[sample_ids]
-            
+            tmp_raw_expr_df = raw_expr_df[sample_ids]
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in expr_df.columns]).set_index('index')
+                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
                 # limma takes raw data
-                processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
-
+                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
                 limma = robjects.r['limma']
                 limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
+
                 signature = pd.DataFrame(limma_results[0])
                 signature.index = limma_results[1]
                 signature = signature.sort_values("t", ascending=False)
-
+        
             elif method == "characteristic_direction":
                 signature = characteristic_direction(expr_df.loc[:, non_cls1_sample_ids], expr_df.loc[:, cls1_sample_ids], calculate_sig=True)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
-                edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
+                edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
 
                 signature = pd.DataFrame(edgeR_results[0])
                 signature.index = edgeR_results[1]
                 signature = signature.sort_values("logFC", ascending=False)
             elif method == "DESeq2":
                 DESeq2 = robjects.r['deseq2']
-                DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
+                DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
 
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
-
             signatures[signature_label] = signature
     else:
         for cls1, cls2 in combinations(classes, 2):
@@ -517,12 +479,11 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
             cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2].index.tolist() #case
             sample_ids = cls1_sample_ids.copy()
             sample_ids.extend(cls2_sample_ids)
-            raw_expr_df = raw_expr_df[sample_ids]
-            
+            tmp_raw_expr_df = raw_expr_df[sample_ids]
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in expr_df.columns]).set_index('index')
+                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
                 # limma takes raw data
-                processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
+                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
 
                 limma = robjects.r['limma']
                 limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
@@ -536,19 +497,18 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=True)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
-                edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+                edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
 
                 signature = pd.DataFrame(edgeR_results[0])
                 signature.index = edgeR_results[1]
                 signature = signature.sort_values("logFC", ascending=False)
             elif method == "DESeq2":
                 DESeq2 = robjects.r['deseq2']
-                DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+                DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
 
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
-        
             signatures[signature_label] = signature
     return signatures
 
@@ -611,6 +571,7 @@ def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True,
     return concatenatedDataframe
 
 
+
 def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='interactive', library_type='go', version='2018', sort_results_by='pvalue'):
 
     # Libraries
@@ -628,7 +589,13 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
             'WikiPathways_2016': 'WikiPathways',
             'Reactome_2016': 'Reactome Pathways'
         }
-
+    elif library_type == "celltype":
+        # Libraries
+        libraries = {
+            'ARCHS4_Tissues': 'ARCHS4 Tissues',
+            'Human_Gene_Atlas': 'Human Gene Atlas'
+        }
+        
     # Get Enrichment Results
     enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
     enrichment_results['signature_label'] = signature_label
@@ -637,6 +604,7 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
 
     # Return
     return enrichment_results
+
 
 def get_enrichr_result_tables_by_library(enrichr_results, signature_label, library_type='tf'):
 
@@ -1068,8 +1036,9 @@ def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='intera
     # Run Monocle
     results_monocle = runMonoclePipeline(pandas2ri.conversion.py2rpy(data), ordering=ordering)
     monocle_results = {}
-    for key in list(results_monocle.names):
-        df = pandas2ri.conversion.rpy2py(results_monocle[int(np.where(results_monocle.names==key)[0][0])])
+    for key_idx in range(len(list(results_monocle.names))):
+        key = list(results_monocle.names)[key_idx]
+        df = pandas2ri.conversion.rpy2py(results_monocle[key_idx])
         monocle_results[key] = df
 
     monocle_results['data_df'].set_index('sample_name', inplace=True)

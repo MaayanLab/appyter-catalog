@@ -1,38 +1,42 @@
 <script>
   import Macy from 'macy'
-  import { onMount, afterUpdate } from 'svelte'
+  import { tick } from 'svelte'
+
+  export let items
 
   let masonry
   let container
 
-  onMount(() => {
+  $: if (container) {
     masonry = new Macy({
       container,
       trueOrder: true,
       waitForImages: false,
       useOwnImageLoader: false,
-      debug: true,
       mobileFirst: true,
-      columns: 1,
+      useContainerForBreakpoints: true,
       margin: {
         y: 16,
         x: '2%',
       },
       breakAt: {
-        1200: 3,
-        992: 2,
-        576: 1
+        1000: 3,
+        800: 2,
+        400: 1
       },
     })
-  })
+  }
 
-  afterUpdate(() => {
-    if (masonry !== undefined) {
-      masonry.recalculate(true)
-    }
-  })
+  $: if (masonry && items) {
+    tick()
+      .then(_ => masonry.recalculate(true, true))
+      .then(_ => tick())
+      .then(_ => masonry.recalculate(true, true))
+  }
 </script>
 
 <div bind:this={container}>
-  <slot></slot>
+  {#each items as item}
+    <slot item={item}></slot>
+  {/each}
 </div>
