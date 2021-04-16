@@ -3,4 +3,3 @@ pandas
 matplotlib
 bokeh==2.3.0
 requests
-base64
