@@ -26,3 +26,5 @@ umap-learn==0.4.6
 digitalcellsorter==1.3.6.9
 datetime==4.3
 pytest-shutil==1.7.0
+colorcet
+bokeh

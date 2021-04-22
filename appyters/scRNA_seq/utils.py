@@ -37,6 +37,14 @@ import scanpy as sc
 import anndata
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 
+# Bokeh
+from bokeh.io import output_notebook
+from bokeh.plotting import figure, show
+from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Span, Select, Legend, PreText, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
+from bokeh.layouts import layout, row, column, gridplot
+from bokeh.palettes import all_palettes
+import colorcet as cc
+from bokeh.palettes import Category20
 
 def check_files(fname):
     if fname == "":
@@ -708,8 +716,98 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, ca
     else:
         py.image.ishow(fig)
 
+def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, location='right', category=True, dropdown=False, figure_counter=0):
+    
+    # init plot
+    source = ColumnDataSource(data=dict(x=umap_df["x"], y=umap_df["y"], values=values_dict[option_list[0]], names=sample_names))
+    if location == 'right':
+        plot = figure(plot_width=800, plot_height=600)   
+    else:
+        plot = figure(plot_width=700, plot_height=800)   
+    if category == True:
+        unique_category_dict = dict()
+        for option in option_list:
+            unique_category_dict[option] = sorted(list(set(values_dict[option])))
+        
+        color_mapper = CategoricalColorMapper(factors=unique_category_dict[option_list[0]], palette=Category20[min(len(unique_category_dict[option_list[0]]), 20)])
+        legend = Legend()
+        
+        plot.add_layout(legend, location)
+        scatter = plot.scatter('x', 'y', source=source, color={'field': 'values', 'transform': color_mapper}, legend_field="values")
+        plot.legend.label_width = 30
+        plot.legend.click_policy='hide'
+        plot.legend.spacing = 1
+        if location == 'below':
+            location = 'bottom_left'
+        plot.legend.location = location
+        plot.legend.label_text_font_size = '10pt'
+    else:
+        color_mapper = LinearColorMapper(palette=cc.CET_D1A, low=min(values_dict[option_list[0]]), high=max(values_dict[option_list[0]]))
+        color_bar = ColorBar(color_mapper=color_mapper, label_standoff=12)
+        plot.add_layout(color_bar, 'right')
+        plot.scatter('x', 'y', source=source, color={'field': 'values', 'transform': color_mapper})
+    
+    tooltips = [
+        ("Sample", "@names"),
+        ("Value", "@values"),
+    ]
+    plot.add_tools(HoverTool(tooltips=tooltips))
+    plot.output_backend = "svg"
+    plot.scatter('x', 'y', source=source, color={'field': 'values', 'transform': color_mapper})
+    
+    plot.xaxis.axis_label = "UMAP_1"
+    plot.yaxis.axis_label = "UMAP_2"
+    plot.xaxis.major_tick_line_color = None  # turn off x-axis major ticks
+    plot.xaxis.minor_tick_line_color = None  # turn off x-axis minor ticks
+    plot.yaxis.major_tick_line_color = None  # turn off y-axis major ticks
+    plot.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
+    plot.xaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
+    plot.yaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
 
+    default_text = "Figure {}. {}{}"
+    pre = Paragraph(text = default_text.format(figure_counter, caption_text, option_list[0]), width=500, height=100, style={"font-family":'Helvetica', "font-style": "italic"})
+    figure_counter += 1
+    if dropdown == True:
+        if category == True:
+            callback_adt = CustomJS(args=dict(source=source, \
+                                              pre=pre, \
+                                              values_dict=values_dict, \
+                                              figure_counter=figure_counter, \
+                                              color_mapper=color_mapper,\
+                                              unique_category_dict=unique_category_dict,\
+                                              plot=plot,\
+                                              scatter=scatter,
+                                              caption_text=caption_text
+                                             ), code="""        
+                const val = cb_obj.value;    
+                source.data.values = values_dict[val]    
+                color_mapper.factors = unique_category_dict[val]
+                plot.legend = unique_category_dict[val]
+                pre.text = "Figure "+figure_counter+". "+caption_text+val+".";    
+                source.change.emit();
+            """)
+        else:
+            callback_adt = CustomJS(args=dict(source=source, \
+                                              pre=pre, \
+                                              values_dict=values_dict, \
+                                              figure_counter=figure_counter,
+                                              caption_text=caption_text), code="""        
+                const val = cb_obj.value;    
+                source.data.values = values_dict[val]    
+                pre.text = "Figure "+figure_counter+". "+caption_text+val+".";  
+                source.change.emit();
+            """)
 
+        # init dropdown menu
+        select = Select(title="Select an option:", value=option_list[0], options=option_list)
+        select.js_on_change('value', callback_adt)
+
+        col = column(select, row(column(plot, pre)))
+        show(col)
+    else:
+        col = column(plot, pre)
+        show(col)
+    return figure_counter
 def results_table(enrichment_dataframe, source_label, target_label, table_counter):
 
     # Get libraries
