@@ -1,6 +1,6 @@
 git+git://github.com/Maayanlab/appyter.git
 pandas
-pytables
+tables
 bokeh
 requests
 bs4
