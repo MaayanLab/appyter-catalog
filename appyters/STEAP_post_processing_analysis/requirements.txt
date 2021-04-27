@@ -4,8 +4,6 @@ pytables
 bokeh
 requests
 bs4
-re
-zipfile
 upsetplot
 matplotlib
 numpy

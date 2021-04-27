@@ -4,13 +4,14 @@
     "title": "STEAP Post-Processing Analysis",
     "version": "0.0.1",
     "description": "An appyter which performs GSEA and correlation analysis on the prioritization.csv files from STEAP.",
+    "image": "pipeline.png",
     "authors": [
       {
         "name": "Erwin Erdem",
         "email": "erwin.erdem@outlook.com"
       }
     ],
-    "url": "https://github.com/MaayanLab/appyter-catalog",
+    "url": "https://github.com/erwinerdem/STEAP",
     "tags": [
       "GWAS",
       "scRNA-seq",
