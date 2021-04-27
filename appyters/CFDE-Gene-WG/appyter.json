@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "GeneWG",
+  "name": "CFDE-Gene-WG",
   "title": "CFDE Gene-WG",
   "version": "0.0.2",
   "description": "This Appyter uses FAIR APIs from different DCCs to find and present gene-centric knowledge.",
