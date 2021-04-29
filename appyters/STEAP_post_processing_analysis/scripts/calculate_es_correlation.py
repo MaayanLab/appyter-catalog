@@ -12,7 +12,7 @@ import pandas as pd
 import itertools
 from scipy.stats import spearmanr
 from pathlib import Path
-
+from typing import List
 
 def calculate_spearmanr(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
@@ -46,7 +46,7 @@ def correct_pval_correlation(corr_df: pd.DataFrame) -> pd.DataFrame:
     return correct_df
 
 
-def calculate_es_corr(datasets: list[str]) -> pd.DataFrame:
+def calculate_es_corr(datasets: List[str]) -> pd.DataFrame:
     """
     Calculates the expression specificity (ES) gene correlation between
     all celltypes in the input datasets.

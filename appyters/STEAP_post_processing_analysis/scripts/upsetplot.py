@@ -12,10 +12,10 @@ import pandas as pd
 import re
 import upsetplot
 import matplotlib.pyplot as plt
-from typing import Union
+from typing import Union, List, Dict
 
 
-def create_group(gwas: str, gwas_group_dict: dict[str, list[str]]) -> str:
+def create_group(gwas: str, gwas_group_dict: Dict[str, List[str]]) -> str:
     """
     Finds the input string in the gwas_group_dict values and returns
     the key if found.
@@ -30,8 +30,8 @@ def create_group(gwas: str, gwas_group_dict: dict[str, list[str]]) -> str:
 
 def add_count_to_group_dict(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]]
-) -> dict[str, list[str]]:
+    gwas_group_dict: Dict[str, List[str]]
+) -> Dict[str, List[str]]:
     """
     Adds the number of gwas phenotypes in the group to the
     group name (key in dictionary).
@@ -55,7 +55,7 @@ def add_count_to_group_dict(
 
 def make_df_sliced(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     sign_threshold: int
 ) -> pd.DataFrame:
     """
@@ -83,7 +83,7 @@ def make_df_sliced(
 
 def make_df_upset(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     sign_threshold: int,
     sort_categories_by: Union[str, None]
 ) -> pd.DataFrame:
@@ -113,7 +113,7 @@ def make_df_upset(
 
 def get_shared_celltypes(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     sign_threshold: int = len(constants.METHODS)-1,
     save_to_excel: bool = False,
     filename: str = 'upsetplot.xlsx'
@@ -166,7 +166,7 @@ def get_shared_celltypes(
 
 def plot_upset(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     sign_threshold: int = len(constants.METHODS)-1,
     save: bool = False,
     filename: str = 'upsetplot.png',

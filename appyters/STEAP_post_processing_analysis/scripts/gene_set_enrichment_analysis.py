@@ -13,7 +13,8 @@ import pandas as pd
 import mygene
 import gseapy
 from pathlib import Path
-from typing import Union
+from typing import Union, List, Dict
+
 
 class HiddenPrints:
     def __enter__(self):
@@ -24,13 +25,12 @@ class HiddenPrints:
         sys.stdout.close()
         sys.stdout = self._original_stdout
 
-
 def get_annot_list(
     df: pd.DataFrame,
     name: str,
-    param_list: list[str],
+    param_list: List[str],
     rank: Union[int, None],
-) -> list[list[str]]:
+) -> List[List[str]]:
     """
     Returns a list of celltypes to be analyzed.
     """
@@ -87,7 +87,7 @@ def get_annot_list(
     return annot_list
 
 
-def get_top_genes(annot_list: list[list[str]]) -> dict[str, list[str]]:
+def get_top_genes(annot_list: List[List[str]]) -> Dict[str, List[str]]:
     """
     Returns the top genes specific to the celltype and converts
     the gene Enseble ID to Gene Symbol.
@@ -131,7 +131,7 @@ def get_top_genes(annot_list: list[list[str]]) -> dict[str, list[str]]:
 
 
 def summarize_gsea(
-    gsea_dict: dict[str, pd.DataFrame],
+    gsea_dict: Dict[str, pd.DataFrame],
     correct_pval: bool = True,
     min_count: int = 0,
     save_to_excel: bool = False,
@@ -194,10 +194,10 @@ def summarize_gsea(
 
 def gsea(
     df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
-    gene_set_list: list[str] = constants.GENE_SET_LIST,
+    gwas_group_dict: Dict[str, List[str]],
+    gene_set_list: List[str] = constants.GENE_SET_LIST,
     rank: Union[int, None] = constants.TOP_ANNOT
-) -> dict[str, pd.DataFrame]:
+) -> Dict[str, pd.DataFrame]:
     '''
     Performs gene-set enrichment analysis (GSEA) on enriched cell types.
 
