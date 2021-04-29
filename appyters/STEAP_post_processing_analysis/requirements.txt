@@ -11,3 +11,4 @@ scipy
 mygene
 gseapy
 statsmodels
+openpyxl
