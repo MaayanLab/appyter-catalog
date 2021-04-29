@@ -11,9 +11,10 @@ import constants
 import pandas as pd
 from pathlib import Path
 from statsmodels.stats.multitest import multipletests
+from typing import Dict
 
 
-def find_csv_file(directory: str) -> dict[str, dict[str, str]]:
+def find_csv_file(directory: str) -> Dict[str, Dict[str, str]]:
     """
     Finds the priorirization.csv file in the input directory and uses the
     directory names to determine which method was used. This information is

@@ -15,7 +15,7 @@ import matplotlib.patches as mpatches
 from matplotlib import cm
 import re
 import pandas as pd
-from typing import Union
+from typing import Union, List, Dict, Tuple
 
 
 def get_links_and_nodes(
@@ -23,7 +23,7 @@ def get_links_and_nodes(
     pivot_corr_df: pd.DataFrame,
     pattern: str,
     sign_threshold: int
-) -> tuple[pd.DataFrame, list[str]]:
+) -> Tuple[pd.DataFrame, List[str]]:
     """
     Generates the links and nodes for the circosplot.
     """
@@ -74,8 +74,8 @@ def get_gwas_links(
 def chord_plot_pandas(
     gcircle: Gcircle,
     row: pd.Series,
-    gwas_group_dict: dict[str, list[str]],
-    corr_limit: tuple[float, float],
+    gwas_group_dict: Dict[str, List[str]],
+    corr_limit: Tuple[float, float],
     bottom: float,
 ):
     """
@@ -100,7 +100,7 @@ def chord_plot_pandas(
 def annotation_layer(
     gcircle: Gcircle,
     links: pd.DataFrame,
-    nodes: list[str],
+    nodes: List[str],
     color_bar: str,
     bottom: float,
     axis_color: str = 'k',
@@ -161,10 +161,10 @@ def annotation_layer(
 
 def preprocessing(
     corr_df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     gwas_name: Union[str, None],
     sign_threshold: int,
-) -> tuple[pd.DataFrame, list[str], Union[pd.DataFrame, None]]:
+) -> Tuple[pd.DataFrame, List[str], Union[pd.DataFrame, None]]:
     """
     Return links, nodes and gwas_links. The links (correlations) and
     nodes are used for the inner chord plot. The gwas links are used
@@ -194,14 +194,14 @@ def preprocessing(
 
 def plot(
     corr_df: pd.DataFrame,
-    gwas_group_dict: dict[str, list[str]],
+    gwas_group_dict: Dict[str, List[str]],
     gwas_name: Union[str, None] = None,
     sign_threshold: int = len(constants.METHODS),
-    corr_limit: tuple[float, float] = (0, 0),
+    corr_limit: Tuple[float, float] = (0, 0),
     bottom: float = 1200,
     ylim: float = 5000,
     color_map: str = 'tab10',
-    figsize: tuple[float, float] = (10, 10),
+    figsize: Tuple[float, float] = (10, 10),
     color_bar: str = 'tab:green',
     save: bool = False,
     filename: str = 'circosplot.png'
