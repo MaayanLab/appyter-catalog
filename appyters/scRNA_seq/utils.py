@@ -36,7 +36,7 @@ from magic import MAGIC
 import scanpy as sc
 import anndata
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
-
+from maayanlab_bioinformatics.dge.limma_voom import limma_voom_differential_expression
 # Bokeh
 from bokeh.io import output_notebook
 from bokeh.plotting import figure, show
@@ -268,16 +268,16 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
         fig.show()
 
 
-def normalize_magic(dataset, k=10, a=15, t='auto', n_pca=100, knn_dist='euclidean'):
+def normalize_magic(dataset, k=10, a=15, t='auto', n_pca=100, knn_dist='euclidean', solver='exact'):
     
-    magic_op = MAGIC(k=k, a=a, t=t, n_pca=n_pca, knn_dist=knn_dist)
+    magic_op = MAGIC(k=k, a=a, t=t, n_pca=n_pca, knn_dist=knn_dist, solver=solver)
     data_magic = magic_op.fit_transform(dataset)
     return data_magic.transpose()
 
 
-def run_magic(dataset, dim_reduction_method, meta_class_column_name, plot_type='interactive'):
+def run_magic(dataset, solver='exact'):
     # Run imputation
-    dataset.uns['magic'] = normalize_magic(dataset.to_df()).T
+    dataset.uns['magic'] = normalize_magic(dataset.to_df(), solver=solver).T
     return dataset
     
 def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=False, nr_genes=800, metadata_cols=None, filter_samples=True,gene_list=None):
@@ -337,34 +337,7 @@ def plot_clustergrammar(clustergrammer_url):
 
 
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
-             
-    robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, adjust="BH") {
-        # Load packages
-        suppressMessages(require(limma))
-        suppressMessages(require(edgeR))
-        # Convert design matrix
-        design <- as.matrix(design_dataframe)
-        # Create DGEList object
-        dge <- DGEList(counts=rawcount_dataframe)
-        # Calculate normalization factors
-        dge <- calcNormFactors(dge)
-        # Run VOOM
-        v <- voom(dge, plot=FALSE)
-        # Fit linear model
-        fit <- lmFit(v, design)
-        # Make contrast matrix
-        cont.matrix <- makeContrasts(de=B-A, levels=design)
-        # Fit
-        fit2 <- contrasts.fit(fit, cont.matrix)
-        # Run DE
-        fit2 <- eBayes(fit2)
-        # Get results
-        limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
-        # Return
-        results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
-        return (results)
-    }
-    ''')
+           
     robjects.r('''edgeR <- function(rawcount_dataframe, g1, g2) {
         # Load packages
         suppressMessages(require(limma))
@@ -409,30 +382,21 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
     
     signatures = dict()
 
-
+    
     if cluster == True:
         # cluster 0 vs rest
         for cls1 in classes:
             signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
-            print("Analyzing.. ",signature_label)
+            print("Analyzing.. {} using {}".format(signature_label, method))
             cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #case
             non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1].index.tolist() #control
             sample_ids = non_cls1_sample_ids.copy()
             sample_ids.extend(cls1_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
-                # limma takes raw data
-                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
-                limma = robjects.r['limma']
-                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
-
-                signature = pd.DataFrame(limma_results[0])
-                signature.index = limma_results[1]
-                signature = signature.sort_values("t", ascending=False)
-        
+                signature = limma_voom_differential_expression(tmp_raw_expr_df.loc[:, non_cls1_sample_ids], tmp_raw_expr_df.loc[:, cls1_sample_ids])
             elif method == "characteristic_direction":
-                signature = characteristic_direction(expr_df.loc[:, non_cls1_sample_ids], expr_df.loc[:, cls1_sample_ids], calculate_sig=True)
+                signature = characteristic_direction(expr_df.loc[:, non_cls1_sample_ids], expr_df.loc[:, cls1_sample_ids], calculate_sig=False)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
                 edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
@@ -447,34 +411,29 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
-            elif method == "wilcox":   
-                sc.tl.rank_genes_groups(dataset, 'leiden', method='wilcoxon', use_raw=False)
+            elif method == "wilcoxon":   
+                sc.tl.rank_genes_groups(dataset, 'leiden', method='t-test', use_raw=True)
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls1).set_index('names').sort_values('pvals', ascending=True)
+                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
+                dedf.replace([np.inf, -np.inf], np.nan, inplace=True)
+                dedf = dedf.dropna()
                 signature = dedf
                 
             signatures[signature_label] = signature
     else:
         for cls1, cls2 in combinations(classes, 2):
             signature_label = " vs. ".join([cls1, cls2])
-            print("Analyzing.. ",signature_label)
+            print("Analyzing.. {} using {}".format(signature_label, method))
             cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #control
             cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2].index.tolist() #case
             sample_ids = cls1_sample_ids.copy()
             sample_ids.extend(cls2_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
-                # limma takes raw data
-                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
-
-                limma = robjects.r['limma']
-                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
-                signature = pd.DataFrame(limma_results[0])
-                signature.index = limma_results[1]
-                signature = signature.sort_values("t", ascending=False)
+                signature = limma_voom_differential_expression(tmp_raw_expr_df.loc[:, cls1_sample_ids], tmp_raw_expr_df.loc[:, cls2_sample_ids])
                 
             elif method == "characteristic_direction":
-                signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=True)
+                signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=False)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
                 edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
@@ -489,12 +448,15 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
-            elif method == "wilcox":   
-                sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=False)
+            elif method == "wilcoxon":   
+                sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=True)
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls2).set_index('names').sort_values('pvals', ascending=True)
+                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
+                dedf = dedf.dropna()
                 signature = dedf
             signatures[signature_label] = signature
     return signatures
+
 
 
 def submit_enrichr_geneset(geneset, label):
