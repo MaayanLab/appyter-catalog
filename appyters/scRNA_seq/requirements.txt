@@ -2,6 +2,7 @@ git+git://github.com/Maayanlab/appyter.git
 git+git://github.com/Maayanlab/geode.git
 git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
 numba==0.50.1
+ipython==7.22.0
 ipykernel==5.3.4
 matplotlib_venn==0.11.5
 rpy2==3.4.2
@@ -15,7 +16,6 @@ scipy==1.5.2
 stats==0.1.2a0
 scikit-learn==0.23.2
 numpy==1.20.1
-chart_studio==1.1.0
 seaborn==0.10.1
 scanpy==1.5.1
 python-igraph==0.8.2
