@@ -1,0 +1,14 @@
+git+git://github.com/Maayanlab/appyter.git
+pandas
+tables
+bokeh
+requests
+bs4
+upsetplot
+matplotlib
+numpy
+scipy
+mygene
+gseapy
+statsmodels
+openpyxl
