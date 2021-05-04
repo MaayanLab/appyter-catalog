@@ -20,8 +20,6 @@ import IPython
 from IPython.display import HTML, display, Markdown, IFrame, FileLink
 from itertools import combinations
 from scipy import stats
-# import chart_studio
-# import chart_studio.plotly as py
 
 # Data analysis
 from sklearn.decomposition import PCA
