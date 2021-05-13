@@ -420,8 +420,8 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         for cls1 in classes:
             signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
             print("Analyzing.. {} using {}".format(signature_label, method))
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #case
-            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1].index.tolist() #control
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #case
+            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1, :].index.tolist() #control
             sample_ids = non_cls1_sample_ids.copy()
             sample_ids.extend(cls1_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
@@ -458,8 +458,8 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         for cls1, cls2 in combinations(classes, 2):
             signature_label = " vs. ".join([cls1, cls2])
             print("Analyzing.. {} using {}".format(signature_label, method))
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #control
-            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2].index.tolist() #case
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #control
+            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2, :].index.tolist() #case
             sample_ids = cls1_sample_ids.copy()
             sample_ids.extend(cls2_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
