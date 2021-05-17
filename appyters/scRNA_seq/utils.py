@@ -366,6 +366,7 @@ def plot_clustergrammar(clustergrammer_url):
 
 
 
+
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
            
     robjects.r('''edgeR <- function(rawcount_dataframe, g1, g2) {
@@ -446,9 +447,8 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = signature.sort_values("log2FoldChange", ascending=False)
             elif method == "wilcoxon":   
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls1).set_index('names').sort_values('pvals', ascending=True)
-                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
-                dedf.replace([np.inf, -np.inf], np.nan, inplace=True)
-                dedf = dedf.dropna()
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()              
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
                 signature = dedf
                 
             signatures[signature_label] = signature
@@ -484,11 +484,12 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = signature.sort_values("log2FoldChange", ascending=False)
             elif method == "wilcoxon":   
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls2).set_index('names').sort_values('pvals', ascending=True)
-                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
-                dedf = dedf.dropna()
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
                 signature = dedf
             signatures[signature_label] = signature
     return signatures
+
 
 
 
