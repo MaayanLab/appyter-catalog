@@ -1,9 +1,15 @@
 git+git://github.com/Maayanlab/appyter.git
+git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
 ipython
 jupyter
 pandas==1.0.3
 numpy
 scipy
+matplotlib
 seaborn
 fastcluster
 requests
+plotly-express
+tqdm
+scikit-learn
+umap
