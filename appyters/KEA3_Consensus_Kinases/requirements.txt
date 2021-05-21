@@ -12,4 +12,4 @@ requests
 plotly-express
 tqdm
 scikit-learn
-umap
+umap-learn
