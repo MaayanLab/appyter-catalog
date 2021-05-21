@@ -35,6 +35,37 @@ import scanpy as sc
 import anndata
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 from maayanlab_bioinformatics.dge.limma_voom import limma_voom_differential_expression
+import pandas as pd
+import sys, h5py, time
+import scanpy as sc
+import anndata
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+import umap.umap_ as umap
+from sklearn.decomposition import NMF
+from statsmodels.stats.multitest import multipletests
+
+from IPython.display import display, HTML
+from maayanlab_bioinformatics.enrichment.crisp import enrich_crisp, fisher_overlap
+
+# Bokeh
+from bokeh.io import output_notebook
+from bokeh.plotting import figure, show
+from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Span, Select, Legend, PreText, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
+from bokeh.layouts import layout, row, column, gridplot
+from bokeh.palettes import all_palettes
+import colorcet as cc
+from bokeh.palettes import Category20
+
+from plotly.offline import init_notebook_mode
+from magic import MAGIC
+init_notebook_mode(connected = False)
+output_notebook()
+
+
+pd.set_option('display.max_columns', 1000)  
+pd.set_option('display.max_rows', 1000)
+
 # Bokeh
 from bokeh.io import output_notebook
 from bokeh.plotting import figure, show
@@ -334,6 +365,8 @@ def plot_clustergrammar(clustergrammer_url):
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
 
+
+
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
            
     robjects.r('''edgeR <- function(rawcount_dataframe, g1, g2) {
@@ -383,14 +416,17 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
     
     if cluster == True:
         # cluster 0 vs rest
+        sc.tl.rank_genes_groups(dataset, 'leiden', method='t-test', use_raw=True)
+            
         for cls1 in classes:
             signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
             print("Analyzing.. {} using {}".format(signature_label, method))
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #case
-            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1].index.tolist() #control
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #case
+            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1, :].index.tolist() #control
             sample_ids = non_cls1_sample_ids.copy()
             sample_ids.extend(cls1_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
+                
             if method == "limma":
                 signature = limma_voom_differential_expression(tmp_raw_expr_df.loc[:, non_cls1_sample_ids], tmp_raw_expr_df.loc[:, cls1_sample_ids])
             elif method == "characteristic_direction":
@@ -410,20 +446,20 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
             elif method == "wilcoxon":   
-                sc.tl.rank_genes_groups(dataset, 'leiden', method='t-test', use_raw=True)
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls1).set_index('names').sort_values('pvals', ascending=True)
-                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
-                dedf.replace([np.inf, -np.inf], np.nan, inplace=True)
-                dedf = dedf.dropna()
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()              
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
                 signature = dedf
                 
             signatures[signature_label] = signature
     else:
+        sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=True)
+                
         for cls1, cls2 in combinations(classes, 2):
             signature_label = " vs. ".join([cls1, cls2])
             print("Analyzing.. {} using {}".format(signature_label, method))
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #control
-            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2].index.tolist() #case
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #control
+            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2, :].index.tolist() #case
             sample_ids = cls1_sample_ids.copy()
             sample_ids.extend(cls2_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
@@ -447,13 +483,13 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
             elif method == "wilcoxon":   
-                sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=True)
                 dedf = sc.get.rank_genes_groups_df(dataset, group=cls2).set_index('names').sort_values('pvals', ascending=True)
-                dedf = dedf.loc[dataset.var.index, :].sort_values("logfoldchanges", ascending=False)
-                dedf = dedf.dropna()
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
                 signature = dedf
             signatures[signature_label] = signature
     return signatures
+
 
 
 
@@ -591,7 +627,73 @@ def get_enrichr_result_tables_by_library(enrichr_results, signature_label, libra
     enrichment_dataframe = pd.concat(results)
 
     return {'enrichment_dataframe': enrichment_dataframe, 'signature_label': signature_label}
+
+# enrichment analysis for uploaded gmt
+def get_library(filename):
+    # processes library data
+    raw_library_data = []
+    library_data = []
+
     
+    with open(filename, "r") as f:
+        for line in f.readlines():
+            raw_library_data.append(line.split("\t\t"))
+    name = []
+    gene_list = []
+
+    for i in range(len(raw_library_data)):
+        name += [raw_library_data[i][0]]
+        raw_genes = raw_library_data[i][1].replace('\t', ' ')
+        gene_list += [raw_genes[:-1]]
+
+    library_data = [list(a) for a in zip(name, gene_list)]
+    
+    return library_data
+
+def library_to_dict(library_data):
+    dictionary = dict()
+    for i in range(len(library_data)):
+        row = library_data[i]
+        dictionary[row[0]] = [x.upper() for x in row[1].split(" ")]
+    return dictionary
+
+def get_library_iter(library_data):
+    for term in library_data.keys():
+        single_set = library_data[term]
+        yield term, single_set
+
+def get_enrichment_results(items, library_data):
+    return sorted(enrich_crisp(items, get_library_iter(library_data), n_background_entities=20000, preserve_overlap=True), key=lambda r: r[1].pvalue)
+
+# Call enrichment results and return a plot and dataframe for Scatter Plot
+def get_values(obj_list):
+    pvals = []
+    odds_ratio = []
+    n_overlap = []
+    overlap = []
+    for i in obj_list:
+        pvals.append(i.pvalue)
+        odds_ratio.append(i.odds_ratio)
+        n_overlap.append(i.n_overlap)
+        overlap.append(i.overlap)
+    return pvals, odds_ratio, n_overlap, overlap
+
+def get_qvalue(p_vals):
+    r = multipletests(p_vals, method="fdr_bh")
+    return r[1]
+
+
+def enrichment_analysis(items, library_data):    
+    items = [x.upper() for x in items]
+    all_results = get_enrichment_results(items, library_data)
+    unzipped_results = list(zip(*all_results))
+    pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
+    df = pd.DataFrame({"term_name":unzipped_results[0], "p value": pvals, \
+                       "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
+    df["-log(p value)"] = -np.log10(df["p value"])
+    df["q value"] = get_qvalue(df["p value"].tolist())
+    return [list(unzipped_results[0])], [pvals], df
+
 
 def plot_library_barchart(enrichr_results, gene_set_library, signature_label, case_name, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
     sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
@@ -654,21 +756,48 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, ca
     
     fig.show()
 
+import hashlib
+def str_to_int(string, mod):
 
-def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, location='right', category=True, dropdown=False, figure_counter=0):
+    byte_string = bytearray(string, "utf8")
+    return int(hashlib.sha256(byte_string).hexdigest(), base=16)%mod
+
+def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, category_list_dict=None, location='right', category=True, dropdown=False, figure_counter=0):
     
     # init plot
     source = ColumnDataSource(data=dict(x=umap_df["x"], y=umap_df["y"], values=values_dict[option_list[0]], names=sample_names))
     if location == 'right':
         plot = figure(plot_width=800, plot_height=600)   
     else:
-        plot = figure(plot_width=700, plot_height=900)   
+        plot = figure(plot_width=600, plot_height=600+20*len(category_list_dict[option_list[0]]))   
     if category == True:
         unique_category_dict = dict()
         for option in option_list:
             unique_category_dict[option] = sorted(list(set(values_dict[option])))
         
-        color_mapper = CategoricalColorMapper(factors=unique_category_dict[option_list[0]], palette=Category20[20])
+        # map category to color
+        # color is mapped by its category name 
+        # if a color is used by other categories, use another color
+        factors_dict = dict()
+        colors_dict = dict()
+        for key in values_dict.keys():
+            unused_color = list(Category20[20])
+            factors_dict[key] = category_list_dict[key]
+            colors_dict[key] = list()
+            for category_name in factors_dict[key]:
+                color_for_category = Category20[20][str_to_int(category_name, 20)]
+                
+                if color_for_category not in unused_color:
+                    if len(unused_color) > 0:
+                        color_for_category = unused_color[0]                        
+                    else:
+                        color_for_category = Category20[20][19]
+                
+                colors_dict[key].append(color_for_category)
+                if color_for_category in unused_color:
+                    unused_color.remove(color_for_category)
+                    
+        color_mapper = CategoricalColorMapper(factors=factors_dict[option_list[0]], palette=colors_dict[option_list[0]])
         legend = Legend()
         
         plot.add_layout(legend, location)
@@ -691,7 +820,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         ("Value", "@values"),
     ]
     plot.add_tools(HoverTool(tooltips=tooltips))
-    plot.output_backend = "svg"
+    plot.output_backend = "webgl"
     plot.scatter('x', 'y', source=source, color={'field': 'values', 'transform': color_mapper})
     
     plot.xaxis.axis_label = "UMAP_1"
@@ -714,15 +843,20 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
                                               figure_counter=figure_counter, \
                                               color_mapper=color_mapper,\
                                               unique_category_dict=unique_category_dict,\
+                                              category_list_dict=category_list_dict,\
+                                              factors_dict=factors_dict,\
+                                              colors_dict=colors_dict,\
                                               plot=plot,\
                                               scatter=scatter,
                                               caption_text=caption_text
                                              ), code="""        
-                const val = cb_obj.value;    
+                const val = cb_obj.value;                    
                 source.data.values = values_dict[val]    
-                color_mapper.factors = unique_category_dict[val]
+                color_mapper.factors = category_list_dict[val]
+                color_mapper.palette = colors_dict[val]
                 plot.legend = unique_category_dict[val]
-                pre.text = "Figure "+figure_counter+". "+caption_text+val+".";    
+                pre.text = "Figure "+figure_counter+". "+caption_text+val+"."; 
+                plot.height = 600+20*(category_list_dict[val].length)
                 source.change.emit();
             """)
         else:
@@ -747,6 +881,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         col = column(plot, pre)
         show(col)
     return figure_counter
+
 def results_table(enrichment_dataframe, source_label, target_label, label, table_counter):
 
     # Get libraries
