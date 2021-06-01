@@ -1,0 +1,7 @@
+datapackage
+matplotlib
+pandas
+requests
+seaborn
+sqlalchemy
+tqdm
