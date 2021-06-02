@@ -416,7 +416,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
     
     if cluster == True:
         # cluster 0 vs rest
-        sc.tl.rank_genes_groups(dataset, 'leiden', method='t-test', use_raw=True)
+        sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='t-test', use_raw=True)
             
         for cls1 in classes:
             signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
