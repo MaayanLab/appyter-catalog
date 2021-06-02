@@ -1,0 +1,33 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "name": "STEAP_post_processing_analysis",
+    "title": "STEAP Post-Processing Analysis",
+    "version": "0.0.1",
+    "description": "An appyter which performs GSEA and correlation analysis on the prioritization.csv files from STEAP.",
+    "image": "pipeline.png",
+    "authors": [
+      {
+        "name": "Erwin Erdem",
+        "email": "erwin.erdem@outlook.com"
+      }
+    ],
+    "url": "https://github.com/erwinerdem/STEAP",
+    "tags": [
+      "GWAS",
+      "scRNA-seq",
+      "Correlation",
+      "Enrichr",
+      "GSEA"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "public": true,
+    "appyter": {
+      "file": "STEAP_post_processing_analysis.ipynb",
+      "profile": "biojupies",
+      "extras": [
+        "toc",
+        "hide-code",
+        "toggle-code"
+      ]
+    }
+  }

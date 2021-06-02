@@ -20,8 +20,6 @@ import IPython
 from IPython.display import HTML, display, Markdown, IFrame, FileLink
 from itertools import combinations
 from scipy import stats
-import chart_studio
-import chart_studio.plotly as py
 
 # Data analysis
 from sklearn.decomposition import PCA
@@ -36,6 +34,37 @@ from magic import MAGIC
 import scanpy as sc
 import anndata
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
+from maayanlab_bioinformatics.dge.limma_voom import limma_voom_differential_expression
+import pandas as pd
+import sys, h5py, time
+import scanpy as sc
+import anndata
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+import umap.umap_ as umap
+from sklearn.decomposition import NMF
+from statsmodels.stats.multitest import multipletests
+
+from IPython.display import display, HTML
+from maayanlab_bioinformatics.enrichment.crisp import enrich_crisp, fisher_overlap
+
+# Bokeh
+from bokeh.io import output_notebook
+from bokeh.plotting import figure, show
+from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Span, Select, Legend, PreText, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
+from bokeh.layouts import layout, row, column, gridplot
+from bokeh.palettes import all_palettes
+import colorcet as cc
+from bokeh.palettes import Category20
+
+from plotly.offline import init_notebook_mode
+from magic import MAGIC
+init_notebook_mode(connected = False)
+output_notebook()
+
+
+pd.set_option('display.max_columns', 1000)  
+pd.set_option('display.max_rows', 1000)
 
 # Bokeh
 from bokeh.io import output_notebook
@@ -112,13 +141,13 @@ def display_link(url, title=None):
    
     return display(HTML(raw_html))
 
-def display_object(counter, caption, df=None, istable=True):
+def display_object(counter, caption, df=None, istable=True, subcounter=""):
     if df is not None:
         display(df)
     if istable == True:
-        display(Markdown("*Table {}. {}*".format(counter, caption)))
+        display(Markdown("*Table {}{}. {}*".format(counter, subcounter, caption)))
     else:
-        display(Markdown("*Figure {}. {}*".format(counter, caption)))
+        display(Markdown("*Figure {}{}. {}*".format(counter, subcounter, caption)))
     counter += 1
     return counter
 
@@ -147,8 +176,8 @@ def autoselect_color_by(sample_metadata):
     return color_by, color_type
 
 
+
 def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_name, magic_normalization=False, nr_genes=500, color_by='auto', color_type='categorical', plot_type='interactive'):
-    # top_genes = dataset.raw.to_adata().to_df().T.var(axis=1).sort_values(ascending=False)
     if magic_normalization == False:
         expression_dataframe = dataset.to_df()
         
@@ -157,25 +186,23 @@ def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_nam
     
     top_genes = expression_dataframe.T.var(axis=1).sort_values(ascending=False)
     
-    # Filter rows    
-    expression_dataframe = expression_dataframe.loc[:, top_genes.index[:nr_genes]].T
-    # expression_dataframe is gene x sample
-
+    # Filter columns         # sample x gene
+    expression_dataframe = expression_dataframe.loc[:, top_genes.index[:nr_genes]]
+    
     # Run PCA
     if dim_reduction_method == "PCA":
         dim_red=PCA(n_components=3)
-        dim_red.fit(expression_dataframe)
-
+        embedding = dim_red.fit_transform(expression_dataframe) 
         # Get Variance
         var_explained = ['PC'+str((i+1))+'('+str(round(e*100, 1))+'% var. explained)' for i, e in enumerate(dim_red.explained_variance_ratio_)]
+        
     elif dim_reduction_method == "t-SNE":
         dim_red = TSNE(n_components=3)
-        dim_red.fit(expression_dataframe)
-        
+        embedding = dim_red.fit_transform(expression_dataframe)
         var_explained = ['t-SNE 1', 't-SNE 2', 't-SNE 3']
     elif dim_reduction_method == "UMAP":
         dim_red = umap.UMAP(n_components=3)
-        dim_red.fit(expression_dataframe)
+        embedding = dim_red.fit_transform(expression_dataframe)
         var_explained = ['UMAP 1', 'UMAP 2', 'UMAP 3']
         
     sample_metadata = pd.DataFrame(dataset.obs.loc[:, meta_class_column_name])
@@ -185,18 +212,20 @@ def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_nam
 
     # Return
     dimension_reduction_results = {'result': dim_red, 'var_explained': var_explained, 'dim_reduction_method': dim_reduction_method,
-        'sample_metadata': sample_metadata, 
+        'sample_metadata': sample_metadata, 'embedding': embedding,
         'color_by': color_by, 'color_type': color_type, 'nr_genes': nr_genes, 
         'plot_type': plot_type}
     return dimension_reduction_results
+
 
 #############################################
 ########## 2. Plot
 #############################################
 
+
 def plot_dimension_reduction(dimension_reduction_results, return_data=False):
     # Get results
-    dimension_reduction = dimension_reduction_results['result']
+    dimension_reduction_embedding = dimension_reduction_results['embedding']
     var_explained = dimension_reduction_results['var_explained']
     sample_metadata = dimension_reduction_results['sample_metadata']
     color_by = dimension_reduction_results.get('color_by')
@@ -210,25 +239,16 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
     
     if color_by and color_type == 'continuous':
         marker = dict(size=5, color=color_column, colorscale='Viridis', showscale=True)
-        if dim_reduction_method == "PCA":
-            trace = go.Scatter3d(x=dimension_reduction.components_[0],
-                                 y=dimension_reduction.components_[1],
-                                 z=dimension_reduction.components_[2],
-                                 mode='markers',
-                                 hoverinfo='text',
-                                 text=sample_titles,
-                                 marker=marker)
-        elif dim_reduction_method == "t-SNE" or dim_reduction_method == "UMAP":
-            trace = go.Scatter3d(x=dimension_reduction.embedding_[:,0],
-                                 y=dimension_reduction.embedding_[:,1],
-                                 z=dimension_reduction.embedding_[:,2],
-                                 mode='markers',
-                                 hoverinfo='text',
-                                 text=sample_titles,
-                                 marker=marker)
+        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
+                             y=dimension_reduction_embedding[category_indices, 1],
+                             z=dimension_reduction_embedding[category_indices, 2],
+                             mode='markers',
+                             hoverinfo='text',
+                             text=sample_titles,
+                             marker=marker)
+        
         data = [trace]
     elif color_by and color_type == 'categorical' and len(color_column.unique()) <= len(colors):
-
         # Get unique categories
         unique_categories = color_column.unique()
         # Define empty list
@@ -236,7 +256,6 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
             
         # Loop through the unique categories
         for i, category in enumerate(unique_categories):
-            
             # Get the color corresponding to the category     
             category_color = colors[i]
 
@@ -244,44 +263,26 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
             category_indices = [i for i, sample_category in enumerate(color_column) if sample_category == category]
             
             # Create new trace
-            if dim_reduction_method == "PCA":
-                trace = go.Scatter3d(x=dimension_reduction.components_[0][category_indices],
-                                     y=dimension_reduction.components_[1][category_indices],
-                                     z=dimension_reduction.components_[2][category_indices],
-                                     mode='markers',
-                                     hoverinfo='text',
-                                     text=[sample_titles[x] for x in category_indices],
-                                     name = category,
-                                     marker=dict(size=5, color=category_color))
-            elif dim_reduction_method == "t-SNE" or dim_reduction_method == "UMAP":
-                trace = go.Scatter3d(x=dimension_reduction.embedding_[category_indices, 0],
-                                     y=dimension_reduction.embedding_[category_indices, 1],
-                                     z=dimension_reduction.embedding_[category_indices, 2],
-                                     mode='markers',
-                                     hoverinfo='text',
-                                     text=[sample_titles[x] for x in category_indices],
-                                     name = category,
-                                     marker=dict(size=5, color=category_color))
+            trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
+                                 y=dimension_reduction_embedding[category_indices, 1],
+                                 z=dimension_reduction_embedding[category_indices, 2],
+                                 mode='markers',
+                                 hoverinfo='text',
+                                 text=[sample_titles[x] for x in category_indices],
+                                 name = category,
+                                 marker=dict(size=5, color=category_color))
             # Append trace to data list
             data.append(trace)
-    else:
-        marker = dict(size=5)
-        if dim_reduction_method == "PCA":
-            trace = go.Scatter3d(x=dimension_reduction.components_[0],
-                        y=dimension_reduction.components_[1],
-                        z=dimension_reduction.components_[2],
-                        mode='markers',
-                        hoverinfo='text',
-                        text=sample_titles,
-                        marker=marker)
-        elif dim_reduction_method == "t-SNE" or dim_reduction_method =="UMAP":
-            trace = go.Scatter3d(x=dimension_reduction.embedding_[:,0],
-                        y=dimension_reduction.embedding_[:,1],
-                        z=dimension_reduction.embedding_[:,2],
-                        mode='markers',
-                        hoverinfo='text',
-                        text=sample_titles,
-                        marker=marker)
+    else: 
+        marker = dict(size=5)        
+        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
+                             y=dimension_reduction_embedding[category_indices, 1],
+                             z=dimension_reduction_embedding[category_indices, 2],
+                            mode='markers',
+                            hoverinfo='text',
+                            text=sample_titles,
+                            marker=marker)
+        
         data = [trace]
     
     colored = '' if str(color_by) == 'None' else 'Colored by {}'.format(color_by)
@@ -293,24 +294,19 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
         return data, layout
     else:
         fig = go.Figure(data=data, layout=layout)
-
-        if dimension_reduction_results['plot_type'] == 'interactive':
-            plotly.offline.iplot(fig)
-        else:
-            py.image.ishow(fig)
+        fig.show()
 
 
-
-def normalize_magic(dataset, k=10, a=15, t='auto', n_pca=100, knn_dist='euclidean'):
+def normalize_magic(dataset, k=10, a=15, t='auto', n_pca=100, knn_dist='euclidean', solver='exact'):
     
-    magic_op = MAGIC(k=k, a=a, t=t, n_pca=n_pca, knn_dist=knn_dist)
+    magic_op = MAGIC(k=k, a=a, t=t, n_pca=n_pca, knn_dist=knn_dist, solver=solver)
     data_magic = magic_op.fit_transform(dataset)
     return data_magic.transpose()
 
 
-def run_magic(dataset, dim_reduction_method, meta_class_column_name, plot_type='interactive'):
+def run_magic(dataset, solver='exact'):
     # Run imputation
-    dataset.uns['magic'] = normalize_magic(dataset.to_df()).T
+    dataset.uns['magic'] = normalize_magic(dataset.to_df(), solver=solver).T
     return dataset
     
 def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=False, nr_genes=800, metadata_cols=None, filter_samples=True,gene_list=None):
@@ -368,35 +364,11 @@ def plot_clustergrammar(clustergrammer_url):
     # Embed
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
+
+
+
 def get_signatures(classes, dataset, method, meta_class_column_name, cluster=True, filter_genes=True):
-             
-    robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, adjust="BH") {
-        # Load packages
-        suppressMessages(require(limma))
-        suppressMessages(require(edgeR))
-        # Convert design matrix
-        design <- as.matrix(design_dataframe)
-        # Create DGEList object
-        dge <- DGEList(counts=rawcount_dataframe)
-        # Calculate normalization factors
-        dge <- calcNormFactors(dge)
-        # Run VOOM
-        v <- voom(dge, plot=FALSE)
-        # Fit linear model
-        fit <- lmFit(v, design)
-        # Make contrast matrix
-        cont.matrix <- makeContrasts(de=B-A, levels=design)
-        # Fit
-        fit2 <- contrasts.fit(fit, cont.matrix)
-        # Run DE
-        fit2 <- eBayes(fit2)
-        # Get results
-        limma_dataframe <- topTable(fit2, adjust=adjust, number=nrow(rawcount_dataframe))
-        # Return
-        results <- list("limma_dataframe"= limma_dataframe, "rownames"=rownames(limma_dataframe))
-        return (results)
-    }
-    ''')
+           
     robjects.r('''edgeR <- function(rawcount_dataframe, g1, g2) {
         # Load packages
         suppressMessages(require(limma))
@@ -434,36 +406,31 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         return(results)
     }
     ''')
+    
     expr_df = dataset.to_df().T
     raw_expr_df = dataset.raw.to_adata().to_df().T
     meta_df = dataset.obs
     
     signatures = dict()
 
-
+    
     if cluster == True:
         # cluster 0 vs rest
+        sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='t-test', use_raw=True)
+            
         for cls1 in classes:
             signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
-            
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #case
-            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1].index.tolist() #control
+            print("Analyzing.. {} using {}".format(signature_label, method))
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #case
+            non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1, :].index.tolist() #control
             sample_ids = non_cls1_sample_ids.copy()
             sample_ids.extend(cls1_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
+                
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in non_cls1_sample_ids), 'B': int(x in cls1_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
-                # limma takes raw data
-                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
-                limma = robjects.r['limma']
-                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
-
-                signature = pd.DataFrame(limma_results[0])
-                signature.index = limma_results[1]
-                signature = signature.sort_values("t", ascending=False)
-        
+                signature = limma_voom_differential_expression(tmp_raw_expr_df.loc[:, non_cls1_sample_ids], tmp_raw_expr_df.loc[:, cls1_sample_ids])
             elif method == "characteristic_direction":
-                signature = characteristic_direction(expr_df.loc[:, non_cls1_sample_ids], expr_df.loc[:, cls1_sample_ids], calculate_sig=True)
+                signature = characteristic_direction(expr_df.loc[:, non_cls1_sample_ids], expr_df.loc[:, cls1_sample_ids], calculate_sig=False)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
                 edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(non_cls1_sample_ids), pandas2ri.conversion.py2rpy(cls1_sample_ids)))
@@ -478,31 +445,29 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
+            elif method == "wilcoxon":   
+                dedf = sc.get.rank_genes_groups_df(dataset, group=cls1).set_index('names').sort_values('pvals', ascending=True)
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()              
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
+                signature = dedf
+                
             signatures[signature_label] = signature
     else:
+        sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=True)
+                
         for cls1, cls2 in combinations(classes, 2):
             signature_label = " vs. ".join([cls1, cls2])
-            
-            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1].index.tolist() #control
-            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2].index.tolist() #case
+            print("Analyzing.. {} using {}".format(signature_label, method))
+            cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #control
+            cls2_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls2, :].index.tolist() #case
             sample_ids = cls1_sample_ids.copy()
             sample_ids.extend(cls2_sample_ids)
             tmp_raw_expr_df = raw_expr_df[sample_ids]
             if method == "limma":
-                design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in tmp_raw_expr_df.columns]).set_index('index')
-                # limma takes raw data
-                processed_data = {"expression": tmp_raw_expr_df, 'design': design_dataframe}
-
-                limma = robjects.r['limma']
-                limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design'])))
-                signature = pd.DataFrame(limma_results[0])
-                signature.index = limma_results[1]
-                signature = signature.sort_values("t", ascending=False)
+                signature = limma_voom_differential_expression(tmp_raw_expr_df.loc[:, cls1_sample_ids], tmp_raw_expr_df.loc[:, cls2_sample_ids])
                 
-                
-
             elif method == "characteristic_direction":
-                signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=True)
+                signature = characteristic_direction(expr_df.loc[:, cls1_sample_ids], expr_df.loc[:, cls2_sample_ids], calculate_sig=False)
             elif method == "edgeR":
                 edgeR = robjects.r['edgeR']
                 edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(tmp_raw_expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
@@ -517,8 +482,16 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
                 signature = pd.DataFrame(DESeq2_results[0])
                 signature.index = DESeq2_results[1]
                 signature = signature.sort_values("log2FoldChange", ascending=False)
+            elif method == "wilcoxon":   
+                dedf = sc.get.rank_genes_groups_df(dataset, group=cls2).set_index('names').sort_values('pvals', ascending=True)
+                dedf = dedf.replace([np.inf, -np.inf], np.nan).dropna()
+                dedf = dedf.sort_values("logfoldchanges", ascending=False)
+                signature = dedf
             signatures[signature_label] = signature
     return signatures
+
+
+
 
 def submit_enrichr_geneset(geneset, label):
     ENRICHR_URL = 'https://amp.pharm.mssm.edu/Enrichr/addList'
@@ -587,23 +560,28 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
         go_version = str(version)
         libraries = {
             'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
-            'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
-            'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
+            'MGI_Mammalian_Phenotype_Level_4_2019': 'MGI Mammalian Phenotype Level 4 2019'
+#             'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
+#             'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
         }
     elif library_type == "pathway":
         # Libraries
         libraries = {
-            'KEGG_2016': 'KEGG Pathways',
-            'WikiPathways_2016': 'WikiPathways',
-            'Reactome_2016': 'Reactome Pathways'
+            'KEGG_2019_Human': 'KEGG Pathways',
+#             'WikiPathways_2016': 'WikiPathways',
+#             'Reactome_2016': 'Reactome Pathways'
         }
     elif library_type == "celltype":
         # Libraries
         libraries = {
             'ARCHS4_Tissues': 'ARCHS4 Tissues',
-            'Human_Gene_Atlas': 'Human Gene Atlas'
+            'Human_Gene_Atlas': 'Human Gene Atlas',
+            'Descartes_Cell_Types_and_Tissue_2021': 'Descartes Cell Types'
         }
-        
+    elif library_type=="disease":
+        libraries = {
+            'GWAS_Catalog_2019': 'GWAS Catalog',
+        }
     # Get Enrichment Results
     enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
     enrichment_results['signature_label'] = signature_label
@@ -620,20 +598,18 @@ def get_enrichr_result_tables_by_library(enrichr_results, signature_label, libra
     if library_type == 'tf':
         # Libraries
         libraries = {
-            'ChEA_2016': 'A. ChEA (experimentally validated targets)',
-            'ENCODE_TF_ChIP-seq_2015': 'B. ENCODE (experimentally validated targets)',
-            'ARCHS4_TFs_Coexp': 'C. ARCHS4 (coexpressed genes)'
+            'ChEA_2016': 'ChEA (experimentally validated targets)',
         }
     elif library_type == "ke":
         # Libraries
         libraries = {
-            'KEA_2015': 'A. KEA (experimentally validated targets)',
-            'ARCHS4_Kinases_Coexp': 'B. ARCHS4 (coexpressed genes)'
+            'KEA_2015': 'KEA (experimentally validated targets)',
+            'ARCHS4_Kinases_Coexp': 'ARCHS4 (coexpressed genes)'
         }
     elif library_type == "mirna":
         libraries = {
-        'TargetScan_microRNA_2017': 'A. TargetScan (experimentally validated targets)',
-        'miRTarBase_2017': 'B. miRTarBase (experimentally validated targets)'
+        'TargetScan_microRNA_2017': 'TargetScan (experimentally validated targets)',
+        'miRTarBase_2017': 'miRTarBase (experimentally validated targets)'
         }
 
 
@@ -651,7 +627,73 @@ def get_enrichr_result_tables_by_library(enrichr_results, signature_label, libra
     enrichment_dataframe = pd.concat(results)
 
     return {'enrichment_dataframe': enrichment_dataframe, 'signature_label': signature_label}
+
+# enrichment analysis for uploaded gmt
+def get_library(filename):
+    # processes library data
+    raw_library_data = []
+    library_data = []
+
     
+    with open(filename, "r") as f:
+        for line in f.readlines():
+            raw_library_data.append(line.split("\t\t"))
+    name = []
+    gene_list = []
+
+    for i in range(len(raw_library_data)):
+        name += [raw_library_data[i][0]]
+        raw_genes = raw_library_data[i][1].replace('\t', ' ')
+        gene_list += [raw_genes[:-1]]
+
+    library_data = [list(a) for a in zip(name, gene_list)]
+    
+    return library_data
+
+def library_to_dict(library_data):
+    dictionary = dict()
+    for i in range(len(library_data)):
+        row = library_data[i]
+        dictionary[row[0]] = [x.upper() for x in row[1].split(" ")]
+    return dictionary
+
+def get_library_iter(library_data):
+    for term in library_data.keys():
+        single_set = library_data[term]
+        yield term, single_set
+
+def get_enrichment_results(items, library_data):
+    return sorted(enrich_crisp(items, get_library_iter(library_data), n_background_entities=20000, preserve_overlap=True), key=lambda r: r[1].pvalue)
+
+# Call enrichment results and return a plot and dataframe for Scatter Plot
+def get_values(obj_list):
+    pvals = []
+    odds_ratio = []
+    n_overlap = []
+    overlap = []
+    for i in obj_list:
+        pvals.append(i.pvalue)
+        odds_ratio.append(i.odds_ratio)
+        n_overlap.append(i.n_overlap)
+        overlap.append(i.overlap)
+    return pvals, odds_ratio, n_overlap, overlap
+
+def get_qvalue(p_vals):
+    r = multipletests(p_vals, method="fdr_bh")
+    return r[1]
+
+
+def enrichment_analysis(items, library_data):    
+    items = [x.upper() for x in items]
+    all_results = get_enrichment_results(items, library_data)
+    unzipped_results = list(zip(*all_results))
+    pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
+    df = pd.DataFrame({"term_name":unzipped_results[0], "p value": pvals, \
+                       "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
+    df["-log(p value)"] = -np.log10(df["p value"])
+    df["q value"] = get_qvalue(df["p value"].tolist())
+    return [list(unzipped_results[0])], [pvals], df
+
 
 def plot_library_barchart(enrichr_results, gene_set_library, signature_label, case_name, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
     sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
@@ -711,25 +753,51 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, ca
     fig['layout']['yaxis1'].update(showticklabels=False)
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
-    if plot_type=='interactive':
-        plotly.offline.iplot(fig)
-    else:
-        py.image.ishow(fig)
+    
+    fig.show()
 
-def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, location='right', category=True, dropdown=False, figure_counter=0):
+import hashlib
+def str_to_int(string, mod):
+
+    byte_string = bytearray(string, "utf8")
+    return int(hashlib.sha256(byte_string).hexdigest(), base=16)%mod
+
+def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, category_list_dict=None, location='right', category=True, dropdown=False, figure_counter=0):
     
     # init plot
     source = ColumnDataSource(data=dict(x=umap_df["x"], y=umap_df["y"], values=values_dict[option_list[0]], names=sample_names))
     if location == 'right':
         plot = figure(plot_width=800, plot_height=600)   
     else:
-        plot = figure(plot_width=700, plot_height=800)   
+        plot = figure(plot_width=600, plot_height=600+20*len(category_list_dict[option_list[0]]))   
     if category == True:
         unique_category_dict = dict()
         for option in option_list:
             unique_category_dict[option] = sorted(list(set(values_dict[option])))
         
-        color_mapper = CategoricalColorMapper(factors=unique_category_dict[option_list[0]], palette=Category20[min(len(unique_category_dict[option_list[0]]), 20)])
+        # map category to color
+        # color is mapped by its category name 
+        # if a color is used by other categories, use another color
+        factors_dict = dict()
+        colors_dict = dict()
+        for key in values_dict.keys():
+            unused_color = list(Category20[20])
+            factors_dict[key] = category_list_dict[key]
+            colors_dict[key] = list()
+            for category_name in factors_dict[key]:
+                color_for_category = Category20[20][str_to_int(category_name, 20)]
+                
+                if color_for_category not in unused_color:
+                    if len(unused_color) > 0:
+                        color_for_category = unused_color[0]                        
+                    else:
+                        color_for_category = Category20[20][19]
+                
+                colors_dict[key].append(color_for_category)
+                if color_for_category in unused_color:
+                    unused_color.remove(color_for_category)
+                    
+        color_mapper = CategoricalColorMapper(factors=factors_dict[option_list[0]], palette=colors_dict[option_list[0]])
         legend = Legend()
         
         plot.add_layout(legend, location)
@@ -752,7 +820,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         ("Value", "@values"),
     ]
     plot.add_tools(HoverTool(tooltips=tooltips))
-    plot.output_backend = "svg"
+    plot.output_backend = "webgl"
     plot.scatter('x', 'y', source=source, color={'field': 'values', 'transform': color_mapper})
     
     plot.xaxis.axis_label = "UMAP_1"
@@ -775,15 +843,20 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
                                               figure_counter=figure_counter, \
                                               color_mapper=color_mapper,\
                                               unique_category_dict=unique_category_dict,\
+                                              category_list_dict=category_list_dict,\
+                                              factors_dict=factors_dict,\
+                                              colors_dict=colors_dict,\
                                               plot=plot,\
                                               scatter=scatter,
                                               caption_text=caption_text
                                              ), code="""        
-                const val = cb_obj.value;    
+                const val = cb_obj.value;                    
                 source.data.values = values_dict[val]    
-                color_mapper.factors = unique_category_dict[val]
+                color_mapper.factors = category_list_dict[val]
+                color_mapper.palette = colors_dict[val]
                 plot.legend = unique_category_dict[val]
-                pre.text = "Figure "+figure_counter+". "+caption_text+val+".";    
+                pre.text = "Figure "+figure_counter+". "+caption_text+val+"."; 
+                plot.height = 600+20*(category_list_dict[val].length)
                 source.change.emit();
             """)
         else:
@@ -808,7 +881,8 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         col = column(plot, pre)
         show(col)
     return figure_counter
-def results_table(enrichment_dataframe, source_label, target_label, table_counter):
+
+def results_table(enrichment_dataframe, source_label, target_label, label, table_counter):
 
     # Get libraries
     for gene_set_library in enrichment_dataframe['gene_set_library'].unique():
@@ -849,23 +923,23 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
         # Display table
         display(HTML(html_results))
         # Display gene set
-        # display_object(table_counter, gene_set_library, istable=True)
+        
         if source_label == "Transcription Factor":
-            additional_description = ". The table contains scrollable tables displaying the results of the Transcription Factor (TF) enrichment analysis generated using Enrichr. Every row represents a TF; significant TFs are highlighted in bold."
+            additional_description = "Enrichment Analysis Results for {} in {}. The table contains scrollable tables displaying the results of the Transcription Factor (TF) enrichment analysis generated using Enrichr. Every row represents a TF; significant TFs are highlighted in bold."
         elif source_label == "Kinase":
-            additional_description = ". The table contains browsable tables displaying the results of the Protein Kinase (PK) enrichment analysis generated using Enrichr. Every row represents a PK; significant PKs are highlighted in bold."    
+            additional_description = "Enrichment Analysis Results for {} in {}. The table contains browsable tables displaying the results of the Protein Kinase (PK) enrichment analysis generated using Enrichr. Every row represents a PK; significant PKs are highlighted in bold."    
         elif source_label == "miRNA":
-            additional_description = ". The figure contains browsable tables displaying the results of the miRNA enrichment analysis generated using Enrichr. Every row represents a miRNA; significant miRNAs are highlighted in bold."
-        display_object(table_counter, gene_set_library+additional_description, istable=True)
+            additional_description = "Enrichment Analysis Results for {} in {}. The figure contains browsable tables displaying the results of the miRNA enrichment analysis generated using Enrichr. Every row represents a miRNA; significant miRNAs are highlighted in bold."
+        display_object(table_counter, additional_description.format(label, gene_set_library), istable=True)
         display(create_download_link(enrichment_dataframe_subset, filename="Enrichment_analysis_{}_{}.csv".format(source_label, gene_set_library)))
         table_counter += 1
         
     return table_counter
 
-def display_table(analysis_results, source_label, table_counter):
+def display_table(analysis_results, source_label, label, table_counter):
     
     # Plot Table
-    return results_table(analysis_results['enrichment_dataframe'].copy(), source_label=source_label, target_label='target', table_counter=table_counter)
+    return results_table(analysis_results['enrichment_dataframe'].copy(), source_label=source_label, target_label='target', label=label, table_counter=table_counter)
 def CPM(data):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -1233,10 +1307,7 @@ def plot_monocle(monocle_results, debug=False):
     layout = go.Layout(title='<b>Monocle Analysis | Cell Trajectory Plot</b><br><i>{}</i>'.format(colored), hovermode='closest', margin=go.Margin(l=0,r=0,b=0,t=50), width=900,
         scene=dict(xaxis=dict(title='Component 1'), yaxis=dict(title='Component 2')))
     fig = go.Figure(data=data, layout=layout)
-    if monocle_results['plot_type']=='interactive':
-        plotly.offline.iplot(fig)
-    else:
-        py.image.ishow(fig)
+    fig.show()
     plt.savefig("monocle.pdf")
 
 def run_tempora(dataset, timepoint_labels_column_name, timepoint_labels):
