@@ -24,7 +24,6 @@ from sklearn.manifold import TSNE
 import umap
 from rpy2 import robjects
 from rpy2.robjects import r, pandas2ri
-from magic import MAGIC
 import scanpy as sc
 import anndata
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
