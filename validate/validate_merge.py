@@ -71,7 +71,7 @@ def validate_appyter(appyter):
     if re.match(r'^https?://', image):
       image_name = os.path.basename(image)
       image_path = os.path.join(tmp_directory, image_name)
-      logger.warn("It is recommended to use a relative path instead of a url")
+      logger.warning("It is recommended to use a relative path instead of a url")
       _, response = urllib.request.urlretrieve(config['image'], filename=os.path.join(tmp_directory, image_name))
       assert response.get_content_maintype() == 'image', 'Expected image content'
     else:
@@ -80,7 +80,7 @@ def validate_appyter(appyter):
     with Image.open(image_path, 'r') as img:
       assert img.size == (1280, 720), "Image should be 1280x720 px"
   else:
-    logger.warn(f"`{appyter}/appyter.json` should have an 'image' defined...")
+    logger.warning(f"`{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
   nbpath = os.path.join('appyters', appyter, nbfile)
@@ -164,19 +164,19 @@ def validate_appyter(appyter):
             _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
             assert response.get_content_type() != 'text/html', 'Expected data, got html'
           except AssertionError as e:
-            logger.warn(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+            logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
             early_stopping = True
           except urllib.error.HTTPError as e:
             assert e.getcode() != 404, f"File not found on remote, reported 404"
-            logger.warn(f"example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+            logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
             early_stopping = True
       else:
-        logger.warn(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
+        logger.warning(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
-      logger.warn(f"no default file is provided")
+      logger.warning(f"no default file is provided")
   #
   if early_stopping:
-    logger.warn(f"Stopping early as a download requires manual intervention.")
+    logger.warning(f"Stopping early as a download requires manual intervention.")
     return
   logger.info(f"Fixing permissions...")
   assert Popen(['chmod', '-R', '777', tmp_directory]).wait() == 0, f"ERROR: Changing permissions failed"
