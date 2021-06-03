@@ -4,6 +4,7 @@ import sys
 import json
 import click
 import shutil
+import logging
 import nbformat as nbf
 import traceback
 import jsonschema
@@ -38,21 +39,23 @@ def get_changed_appyters(github_action):
     if file.startswith('appyters/')
   }
   for appyter in appyters:
-    print(f"{appyter}: Changed")
+    logging.getLogger(appyter).info(f"Changed")
     assert f"appyters/{appyter}/appyter.json" in changed_files, 'Expected update to appyter.json version'
   #
   return appyters
 
 def validate_appyter(appyter):
-  print(f"{appyter}: Preparing temporary directory...")
+  logger = logging.getLogger(appyter)
+
+  logger.info("Preparing temporary directory...")
   tmp_directory = os.path.realpath('.tmp')
   os.makedirs(tmp_directory, exist_ok=True)
   #
-  print(f"{appyter}: Checking for existing of files...")
+  logger.info("Checking for existing of files...")
   assert os.path.isfile(os.path.join('appyters', appyter, 'README.md')), f"Missing appyters/{appyter}/README.md"
   assert os.path.isfile(os.path.join('appyters', appyter, 'appyter.json')), f"Missing appyters/{appyter}/appyter.json"
   #
-  print(f"{appyter}: Validating `{appyter}/appyter.json`...")
+  logger.info("Validating `{appyter}/appyter.json`...")
   config = json.load(open(os.path.join('appyters', appyter, 'appyter.json'), 'r'))
   validator = jsonschema.Draft7Validator({
     '$ref': f"file:///{os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'schema', 'appyter-validator.json'))}",
@@ -68,7 +71,7 @@ def validate_appyter(appyter):
     if re.match(r'^https?://', image):
       image_name = os.path.basename(image)
       image_path = os.path.join(tmp_directory, image_name)
-      print(f"{appyter}: WARNING it is recommended to use a relative path instead of a url")
+      logger.warn("It is recommended to use a relative path instead of a url")
       _, response = urllib.request.urlretrieve(config['image'], filename=os.path.join(tmp_directory, image_name))
       assert response.get_content_maintype() == 'image', 'Expected image content'
     else:
@@ -77,12 +80,12 @@ def validate_appyter(appyter):
     with Image.open(image_path, 'r') as img:
       assert img.size == (1280, 720), "Image should be 1280x720 px"
   else:
-    print(f"{appyter}: WARNING `{appyter}/appyter.json` should have an 'image' defined...")
+    logger.warn(f"`{appyter}/appyter.json` should have an 'image' defined...")
   #
   nbfile = config['appyter']['file']
   nbpath = os.path.join('appyters', appyter, nbfile)
   #
-  print(f"{appyter}: Checking notebook for issues..")
+  logger.info(f"Checking notebook for issues..")
   nb = nbf.read(open(nbpath, 'r'), as_version=4)
   for cell in nb.cells:
     if cell['cell_type'] == 'code':
@@ -92,32 +95,32 @@ def validate_appyter(appyter):
   assert not nb['metadata'].get('widgets'), "Please clear all notebook output & metadata"
   assert not nb['metadata'].get('execution_info'), "Please clear all notebook output & metadata"
   #
-  print(f"{appyter}: Preparing docker to run `{nbfile}`...")
+  logger.info(f"Preparing docker to run `{nbfile}`...")
   assert os.path.isfile(nbpath), f"Missing {nbpath}"
   try:
     json.load(open(nbpath, 'r'))
   except Exception as e:
-    print(f"{nbfile} is not valid json")
-    print(f"{appyter}: {traceback.format_exc()}")
+    logger.error(f"{nbfile} is not valid json")
+    raise e
   #
   assert not os.path.isfile(os.path.join('appyters', appyter, 'Dockerfile')), 'Custom Dockerfiles are no longer supported'
-  print(f"{appyter}: Creating Dockerfile...")
+  logger.info("Creating Dockerfile...")
   import sys; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
   from compose.build_dockerfile import prepare_appyter
   with open(os.path.join('appyters', appyter, 'Dockerfile'), 'w') as fw:
     print(prepare_appyter(os.path.join('appyters', appyter), config), file=fw)
   #
-  print(f"{appyter}: Building Dockerfile...")
+  logger.info("Building Dockerfile...")
   with Popen([
     'docker', 'build',
     '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     '.',
   ], cwd=os.path.join('appyters', appyter), stdout=PIPE, stderr=STDOUT) as p:
     for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
-      print(f"{appyter}: `docker build .`: {line}")
+      logger.debug(f"`docker build .`: {line}")
     assert p.wait() == 0, '`docker build .` command failed'
   #
-  print(f"{appyter}: Inspecting appyter...")
+  logger.info("Inspecting appyter...")
   with Popen([
     'docker', 'run',
     '-e', 'APPYTER_PREFIX=', # hotfix because prefix is baked-in and necessary at production initialization time, but should be empty here
@@ -126,7 +129,7 @@ def validate_appyter(appyter):
     nbfile,
   ], stdout=PIPE, stderr=STDOUT) as p:
     nbinspect_output = p.stdout.read().decode().strip()
-    print(f"{appyter}: `appyter nbinspect {nbfile}`: {nbinspect_output})")
+    logger.info(f"`appyter nbinspect {nbfile}`: {nbinspect_output})")
     assert p.wait() == 0, f"`appyter nbinspect {nbfile}` command failed"
   #
   inspect = json.loads(nbinspect_output)
@@ -136,7 +139,7 @@ def validate_appyter(appyter):
   }
   assert len(field_args) == len(inspect), "Some of your fields weren't captured, there might be duplicate `name`s"
   #
-  print(f"{appyter}: Preparing defaults...")
+  logger.info("Preparing defaults...")
   default_args = {
     field_name: field.get('default')
     for field_name, field in field_args.items()
@@ -153,31 +156,31 @@ def validate_appyter(appyter):
     if default_file:
       if default_file in field_examples:
         if os.path.exists(os.path.join('appyters', appyter, field_examples[default_file])):
-          print(f"{appyter}: Copying example file {default_file} from {field_examples[default_file]}...")
+          logger.info(f"Copying example file {default_file} from {field_examples[default_file]}...")
           shutil.copyfile(os.path.join('appyters', appyter, field_examples[default_file]), os.path.join(tmp_directory, default_file))
         else:
-          print(f"{appyter}: Downloading example file {default_file} from {field_examples[default_file]}...")
+          logger.info(f"Downloading example file {default_file} from {field_examples[default_file]}...")
           try:
             _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
             assert response.get_content_type() != 'text/html', 'Expected data, got html'
           except AssertionError as e:
-            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
+            logger.warn(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
             early_stopping = True
           except urllib.error.HTTPError as e:
             assert e.getcode() != 404, f"File not found on remote, reported 404"
-            print(f"{appyter}: WARNING, example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
+            logger.warn(f"example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
             early_stopping = True
       else:
-        print(f"{appyter}: WARNING, default file isn't in examples, we won't know how to get it if it isn't available in the image")
+        logger.warn(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
-      print(f"{appyter}: WARNING, no default file is provided")
+      logger.warn(f"no default file is provided")
   #
   if early_stopping:
-    print(f"{appyter}: WARNING, Stopping early as a download requires manual intervention.")
+    logger.warn(f"Stopping early as a download requires manual intervention.")
     return
-  print(f"{appyter}: Fixing permissions...")
-  assert Popen(['chmod', '-R', '777', tmp_directory]).wait() == 0, f"{appyter}: ERROR: Changing permissions failed"
-  print(f"{appyter}: Constructing default notebook from appyter...")
+  logger.info(f"Fixing permissions...")
+  assert Popen(['chmod', '-R', '777', tmp_directory]).wait() == 0, f"ERROR: Changing permissions failed"
+  logger.info(f"Constructing default notebook from appyter...")
   with Popen([
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
@@ -186,14 +189,15 @@ def validate_appyter(appyter):
     f"--output=/data/{nbfile}",
     nbfile,
   ], stdin=PIPE, stdout=PIPE, stderr=STDOUT) as p:
-    print(f"{appyter}: `appyter nbconstruct {nbfile}` < {default_args}")
+    procLogger = logger.getChild(f"appyter nbconstruct {nbfile}")
+    procLogger.info(f"`< {default_args}")
     stdout, _ = p.communicate(json.dumps(default_args).encode())
     for line in filter(None, map(str.strip, stdout.decode().splitlines())):
-      print(f"{appyter}: `appyter nbconstruct {nbfile}`: {line}")
+      procLogger.debug(f"{line}")
     assert p.wait() == 0, f"`appyter nbconstruct {nbfile}` command failed"
-    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), 'nbconstruct output was not created'
+    assert os.path.exists(os.path.join(tmp_directory, config['appyter']['file'])), f"nbconstruct output was not created"
   #
-  print(f"{appyter}: Executing default notebook with appyter...")
+  logger.info(f"Executing default notebook with appyter...")
   with Popen([
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
@@ -203,30 +207,34 @@ def validate_appyter(appyter):
     f"--cwd=/data",
     f"{nbfile}",
   ], stdout=PIPE, stderr=STDOUT) as p:
+    procLogger = logger.getChild(f"appyter nbexecute {nbfile}")
     for msg in map(try_json_loads, p.stdout):
-      assert not (type(msg) == dict and msg['type'] == 'error'), f"{appyter}: error {msg.get('data')}"
-      print(f"{appyter}: `appyter nbexecute {nbfile}`: {json.dumps(msg)}")
+      assert not (type(msg) == dict and msg['type'] == 'error'), f"error {msg.get('data')}"
+      procLogger.debug(f"{json.dumps(msg)}")
     assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
-  print(f"{appyter}: Success!")
+  logger.info(f"Success!")
 
 @click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/master')
+@click.option('-v', '--verbose', count=True, default=0, help='How verbose this should be, more -v = more verbose')
 @click.option('--github-action', default=False, type=bool, is_flag=True, help='Use for receiving json on stdin from github actions')
-def validate_merge(github_action=False):
+def validate_merge(github_action=False, verbose=0):
+  logging.basicConfig(level=30 - (verbose*10))
   valid = True
   for appyter in get_changed_appyters(github_action):
+    logger = logging.getLogger(appyter)
     if not os.path.exists(os.path.join('appyters', appyter)):
-      print(f"{appyter}: Directory no longer exists, ignoring")
+      logger.info(f"{appyter} directory no longer exists, ignoring")
       continue
     elif not os.path.isdir(os.path.join('appyters', appyter)):
-      print(f"{appyter}: Is not a directory, ignoring")
+      logger.info(f"{appyter} is not a directory, ignoring")
       continue
     #
     try:
       validate_appyter(appyter)
     except Exception as e:
-      print(f"{appyter}: ERROR {str(e)}")
-      print(f"{appyter}: {traceback.format_exc()}")
+      logger.error(str(e))
+      logger.error(traceback.format_exc())
       valid = False
   #
   if valid:
