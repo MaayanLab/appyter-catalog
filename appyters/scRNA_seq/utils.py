@@ -5,6 +5,7 @@ import time
 import numpy as np
 import warnings
 import re
+import random
 
 # Visualization
 import scipy.stats as ss
@@ -65,14 +66,6 @@ output_notebook()
 pd.set_option('display.max_columns', 1000)  
 pd.set_option('display.max_rows', 1000)
 
-# Bokeh
-from bokeh.io import output_notebook
-from bokeh.plotting import figure, show
-from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Span, Select, Legend, PreText, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
-from bokeh.layouts import layout, row, column, gridplot
-from bokeh.palettes import all_palettes
-import colorcet as cc
-from bokeh.palettes import Category20
 
 def check_files(fname):
     if fname == "":
@@ -165,9 +158,6 @@ def load_data(dataset_name, rnaseq_data_filename, mtx_data_filename, gene_data_f
         adata.obs["batch"] = dataset_name
         adata.obs.index = adata.obs.index + "-" + dataset_name
         
-        table_counter = display_object(table_counter, "Raw data. The table displays the first 5 rows of the quantified RNA-seq expression dataset. Rows represent genes, columns represent samples, and values show the number of mapped reads.", adata.to_df().iloc[:10,:5].T.head(), istable=True)
-        table_counter = display_object(table_counter, "Metadata. The table displays the metadata associated with the samples in the RNA-seq dataset. Rows represent RNA-seq samples, columns represent metadata categories.", adata.obs.head(), istable=True)
-        table_counter = display_object(table_counter, "Sample size for each class. The table displays the number of samples in each class.", adata.obs.reset_index().groupby(meta_class_column_name).count(), istable=True)
         display_statistics(adata, "### Statistics of data ###") 
     return adata, table_counter, meta_class_column_name
 def create_download_link(df, title = "Download CSV file: {}", filename = "data.csv"):  
@@ -272,7 +262,7 @@ def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_nam
 #############################################
 
 
-def plot_dimension_reduction(dimension_reduction_results, return_data=False):
+def plot_dimension_reduction(dimension_reduction_results, return_data=False, plot_type="interactive"):
     # Get results
     dimension_reduction_embedding = dimension_reduction_results['embedding']
     var_explained = dimension_reduction_results['var_explained']
@@ -343,7 +333,11 @@ def plot_dimension_reduction(dimension_reduction_results, return_data=False):
         return data, layout
     else:
         fig = go.Figure(data=data, layout=layout)
-        fig.show()
+        
+        if plot_type=="interactive":
+            fig.show()
+        else:
+            fig.show(renderer="png")
 
 def normalize(adata, normalization_method, log_normalization):
     tmp_adata = adata.copy()
