@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "RDKIT_Drugmonizome_ETL",
   "title": "Drugmonizome ETL: RDKIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An appyter to convert lists of SMILES strings into chemical fingerprint matrices using RDKit.",
   "image": "Drugmonizome_ETL.png",
   "authors": [

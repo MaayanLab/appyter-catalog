@@ -6,7 +6,7 @@ install.packages("igraph")
 install.packages("devtools", dependencies=TRUE)
 install.packages("usethis")
 install.packages("gh")
-
+install.packages("statmod")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 

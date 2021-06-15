@@ -61,7 +61,7 @@ def logCPM(data):
         warnings.simplefilter("ignore")
         data = (data/data.sum())*10**6
         data = data.fillna(0)
-        data = np.log10(data+1)
+        data = np.log2(data+1)
 
     # Return
     return data
@@ -70,7 +70,7 @@ def log(data):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         data = data.fillna(0)
-        data = np.log10(data+1)
+        data = np.log2(data+1)
 
     return data
 def qnormalization(data):
