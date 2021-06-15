@@ -618,22 +618,16 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
         libraries = {
             'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
             'MGI_Mammalian_Phenotype_Level_4_2019': 'MGI Mammalian Phenotype Level 4 2019'
-#             'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
-#             'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
         }
     elif library_type == "pathway":
         # Libraries
         libraries = {
             'KEGG_2019_Human': 'KEGG Pathways',
-#             'WikiPathways_2016': 'WikiPathways',
-#             'Reactome_2016': 'Reactome Pathways'
         }
     elif library_type == "celltype":
         # Libraries
         libraries = {
-            'ARCHS4_Tissues': 'ARCHS4 Tissues',
-            'Human_Gene_Atlas': 'Human Gene Atlas',
-            'Descartes_Cell_Types_and_Tissue_2021': 'Descartes Cell Types'
+            'HuBMAP_ASCT_plus_B_augmented_w_RNAseq_Coexpression': 'HuBMAP ASCT+B Cell Type'
         }
     elif library_type=="disease":
         libraries = {
