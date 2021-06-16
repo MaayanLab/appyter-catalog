@@ -7,6 +7,7 @@ git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
 seaborn
 matplotlib
 umap-learn
+qnorm
 scipy
 sklearn
 git+git://github.com/maayanlab/react-scatter-board
