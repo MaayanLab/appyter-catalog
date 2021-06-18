@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "CFDE-C2M2-FAIR-Datapackage-Assessment",
   "title": "CFDE C2M2 FAIR Datapackage Assessment",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "This Appyter asserts C2M2 FAIR Rubric on a C2M2 Datapackage",
-  "image": "",
+  "image": "screenshot.png",
   "public": false,
   "authors": [
     {
-      "name": "Daniel Clarke",
+      "name": "Daniel J. B. Clarke",
       "email": "danieljbclarkemssm@gmail.com"
     }
   ],
