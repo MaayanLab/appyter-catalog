@@ -741,10 +741,10 @@ def enrichment_analysis(items, library_data):
     all_results = get_enrichment_results(items, library_data)
     unzipped_results = list(zip(*all_results))
     pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
-    df = pd.DataFrame({"term_name":unzipped_results[0], "p value": pvals, \
+    df = pd.DataFrame({"term_name":unzipped_results[0], "pvalue": pvals, \
                        "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
-    df["-log(p value)"] = -np.log10(df["p value"])
-    df["q value"] = get_qvalue(df["p value"].tolist())
+    df["-log(p value)"] = -np.log10(df["pvalue"])
+    df["q value"] = get_qvalue(df["pvalue"].tolist())
     return [list(unzipped_results[0])], [pvals], df
 
 
