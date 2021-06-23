@@ -244,7 +244,11 @@ def create_offline_client(paths):
   #
   joined_pkgs = {}
   for resource_name, resource in all_pkgs.items():
-    data = pd.DataFrame(resource['data'])
+    if resource['data']:
+      data = pd.DataFrame(resource['data'])
+    else:
+      data = pd.DataFrame([], columns=[field['name'] for field in resource['schema']['fields']])
+    #
     for field in resource['schema']['fields']:
         if field['type'] == 'datetime':
             data[field['name']] = pd.to_datetime(data[field['name']], utc=True)
