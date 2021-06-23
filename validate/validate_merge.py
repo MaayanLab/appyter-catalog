@@ -209,8 +209,11 @@ def validate_appyter(appyter):
   ], stdout=PIPE, stderr=sys.stderr) as p:
     procLogger = logger.getChild(f"appyter nbexecute {nbfile}")
     for msg in map(try_json_loads, p.stdout):
-      assert not (type(msg) == dict and msg['type'] == 'error'), f"error {msg.get('data')}"
-      procLogger.debug(f"{json.dumps(msg)}")
+      if type(msg) == dict and msg['type'] == 'error':
+        procLogger.error(f"{json.dumps(msg)}")
+        raise Exception(f"error {msg.get('data')}")
+      else:
+        procLogger.debug(f"{json.dumps(msg)}")
     assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
   logger.info(f"Success!")
