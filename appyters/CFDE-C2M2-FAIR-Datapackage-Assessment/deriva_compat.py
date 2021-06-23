@@ -240,7 +240,13 @@ def create_offline_client(paths):
     for resource in pkg.resources:
       if resource.name not in all_pkgs:
         all_pkgs[resource.name] = {'schema': resource.descriptor['schema'], 'data': []}
-      all_pkgs[resource.name]['data'] += resource.read(keyed=True)
+      #
+      try:
+        all_pkgs[resource.name]['data'] += resource.read(keyed=True)
+      except Exception as e:
+        print(f"datapackage exception while reading from table: '{resource.name}'")
+        print(e.errors)
+        raise e
   #
   joined_pkgs = {}
   for resource_name, resource in all_pkgs.items():
