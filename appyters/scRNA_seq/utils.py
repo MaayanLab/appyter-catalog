@@ -217,128 +217,12 @@ def autoselect_color_by(sample_metadata):
 
 
 
-def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_name, magic_normalization=False, nr_genes=500, color_by='auto', color_type='categorical', plot_type='interactive'):
-    if magic_normalization == False:
-        expression_dataframe = dataset.to_df()
-        
-    else:
-        expression_dataframe = dataset.uns["magic"]
-    
-    top_genes = expression_dataframe.T.var(axis=1).sort_values(ascending=False)
-    
-    # Filter columns         # sample x gene
-    expression_dataframe = expression_dataframe.loc[:, top_genes.index[:nr_genes]]
-    
-    # Run PCA
-    if dim_reduction_method == "PCA":
-        dim_red=PCA(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe) 
-        # Get Variance
-        var_explained = ['PC'+str((i+1))+'('+str(round(e*100, 1))+'% var. explained)' for i, e in enumerate(dim_red.explained_variance_ratio_)]
-        
-    elif dim_reduction_method == "t-SNE":
-        dim_red = TSNE(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe)
-        var_explained = ['t-SNE 1', 't-SNE 2', 't-SNE 3']
-    elif dim_reduction_method == "UMAP":
-        dim_red = umap.UMAP(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe)
-        var_explained = ['UMAP 1', 'UMAP 2', 'UMAP 3']
-        
-    sample_metadata = pd.DataFrame(dataset.obs.loc[:, meta_class_column_name])
-    # Estimate colors
-    if color_by == 'auto':
-        color_by, color_type = autoselect_color_by(sample_metadata)
-
-    # Return
-    dimension_reduction_results = {'result': dim_red, 'var_explained': var_explained, 'dim_reduction_method': dim_reduction_method,
-        'sample_metadata': sample_metadata, 'embedding': embedding,
-        'color_by': color_by, 'color_type': color_type, 'nr_genes': nr_genes, 
-        'plot_type': plot_type}
-    return dimension_reduction_results
 
 
 #############################################
 ########## 2. Plot
 #############################################
 
-
-def plot_dimension_reduction(dimension_reduction_results, return_data=False, plot_type="interactive"):
-    # Get results
-    dimension_reduction_embedding = dimension_reduction_results['embedding']
-    var_explained = dimension_reduction_results['var_explained']
-    sample_metadata = dimension_reduction_results['sample_metadata']
-    color_by = dimension_reduction_results.get('color_by')
-    color_type = dimension_reduction_results.get('color_type')
-    color_column = dimension_reduction_results['sample_metadata'][color_by] if color_by else None
-    if color_by:
-        colors = sns.color_palette(n_colors=len(color_column.unique())).as_hex()
-    dim_reduction_method = dimension_reduction_results["dim_reduction_method"]
-    
-    sample_titles = ['<b>{}</b><br>'.format(index)+'<br>'.join('<i>{key}</i>: {value}'.format(**locals()) for key, value in rowData.items()) for index, rowData in sample_metadata.iterrows()]
-    
-    if color_by and color_type == 'continuous':
-        marker = dict(size=5, color=color_column, colorscale='Viridis', showscale=True)
-        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                             y=dimension_reduction_embedding[category_indices, 1],
-                             z=dimension_reduction_embedding[category_indices, 2],
-                             mode='markers',
-                             hoverinfo='text',
-                             text=sample_titles,
-                             marker=marker)
-        
-        data = [trace]
-    elif color_by and color_type == 'categorical' and len(color_column.unique()) <= len(colors):
-        # Get unique categories
-        unique_categories = color_column.unique()
-        # Define empty list
-        data = []
-            
-        # Loop through the unique categories
-        for i, category in enumerate(unique_categories):
-            # Get the color corresponding to the category     
-            category_color = colors[i]
-
-            # Get the indices of the samples corresponding to the category
-            category_indices = [i for i, sample_category in enumerate(color_column) if sample_category == category]
-            
-            # Create new trace
-            trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                                 y=dimension_reduction_embedding[category_indices, 1],
-                                 z=dimension_reduction_embedding[category_indices, 2],
-                                 mode='markers',
-                                 hoverinfo='text',
-                                 text=[sample_titles[x] for x in category_indices],
-                                 name = category,
-                                 marker=dict(size=5, color=category_color))
-            # Append trace to data list
-            data.append(trace)
-    else: 
-        marker = dict(size=5)        
-        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                             y=dimension_reduction_embedding[category_indices, 1],
-                             z=dimension_reduction_embedding[category_indices, 2],
-                            mode='markers',
-                            hoverinfo='text',
-                            text=sample_titles,
-                            marker=marker)
-        
-        data = [trace]
-    
-    colored = '' if str(color_by) == 'None' else 'Colored by {}'.format(color_by)
-    layout = go.Layout(title='<b>{} Analysis | Scatter Plot</b><br><i>{}</i>'.format(dimension_reduction_results["dim_reduction_method"], colored), 
-        hovermode='closest', margin=go.Margin(l=0,r=0,b=0,t=50), width=900,
-        scene=dict(xaxis=dict(title=var_explained[0]), yaxis=dict(title=var_explained[1]),zaxis=dict(title=var_explained[2])))
-
-    if return_data==True:
-        return data, layout
-    else:
-        fig = go.Figure(data=data, layout=layout)
-        
-        if plot_type=="interactive":
-            fig.show()
-        else:
-            fig.show(renderer="png")
 
 def normalize(adata, normalization_method, log_normalization):
     tmp_adata = adata.copy()
@@ -741,73 +625,12 @@ def enrichment_analysis(items, library_data):
     all_results = get_enrichment_results(items, library_data)
     unzipped_results = list(zip(*all_results))
     pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
-    df = pd.DataFrame({"term_name":unzipped_results[0], "p value": pvals, \
+    df = pd.DataFrame({"term_name":unzipped_results[0], "pvalue": pvals, \
                        "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
-    df["-log(p value)"] = -np.log10(df["p value"])
-    df["q value"] = get_qvalue(df["p value"].tolist())
+    df["-log(p value)"] = -np.log10(df["pvalue"])
+    df["q value"] = get_qvalue(df["pvalue"].tolist())
     return [list(unzipped_results[0])], [pvals], df
 
-
-def plot_library_barchart(enrichr_results, gene_set_library, signature_label, case_name, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
-    sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
-    fig = tools.make_subplots(rows=1, cols=2, print_grid=False)
-    for i, geneset in enumerate(['upregulated', 'downregulated']):
-        # Get dataframe
-        enrichment_dataframe = enrichr_results[geneset]
-        plot_dataframe = enrichment_dataframe[enrichment_dataframe['gene_set_library'] == gene_set_library].sort_values(sort_results_by, ascending=False).iloc[:nr_genesets].iloc[::-1]
-
-        # Format
-        n = 7
-        plot_dataframe['nr_genes'] = [len(genes) for genes in plot_dataframe['overlapping_genes']]
-        plot_dataframe['overlapping_genes'] = ['<br>'.join([', '.join(genes[i:i+n]) for i in range(0, len(genes), n)]) for genes in plot_dataframe['overlapping_genes']]
-
-        # Get Bar
-        bar = go.Bar(
-            x=plot_dataframe[sort_results_by],
-            y=plot_dataframe['term_name'],
-            orientation='h',
-            name=geneset.title(),
-            showlegend=False,
-            hovertext=['<b>{term_name}</b><br><b>P-value</b>: <i>{pvalue:.2}</i><br><b>FDR</b>: <i>{FDR:.2}</i><br><b>Z-score</b>: <i>{zscore:.3}</i><br><b>Combined score</b>: <i>{combined_score:.3}</i><br><b>{nr_genes} Genes</b>: <i>{overlapping_genes}</i><br>'.format(**rowData) for index, rowData in plot_dataframe.iterrows()],
-            hoverinfo='text',
-            marker={'color': '#FA8072' if geneset == 'upregulated' else '#87CEFA'}
-        )
-        fig.append_trace(bar, 1, i+1)
-
-        # Get text
-        text = go.Scatter(
-            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
-            y=bar['y'],
-            mode='text',
-            hoverinfo='none',
-            showlegend=False,
-            text=['*<b>{}</b>'.format(rowData['term_name']) if rowData['FDR'] < 0.1 else '{}'.format(
-                rowData['term_name']) for index, rowData in plot_dataframe.iterrows()],
-            textposition="middle right",
-            textfont={'color': 'black'}
-        )
-        fig.append_trace(text, 1, i+1)
-
-    # Get annotations
-    annotations = [
-        {'x': 0.25, 'y': 1.06, 'text': '<span style="color: #FA8072; font-size: 10pt; font-weight: 600;">Up-regulated in ' +
-            case_name+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},
-        {'x': 0.75, 'y': 1.06, 'text': '<span style="color: #87CEFA; font-size: 10pt; font-weight: 600;">Down-regulated in ' +
-            case_name+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}
-    ] if signature_label else []
-
-    # Get title
-    title = signature_label + ' | ' + gene_set_library
-
-    fig['layout'].update(height=height, title='<b>{}</b>'.format(title),
-                         hovermode='closest', annotations=annotations)
-    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
-    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
-    fig['layout']['yaxis1'].update(showticklabels=False)
-    fig['layout']['yaxis2'].update(showticklabels=False)
-    fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
-    
-    fig.show()
 
 import hashlib
 def str_to_int(string, mod):
