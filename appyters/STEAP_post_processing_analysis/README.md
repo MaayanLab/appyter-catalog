@@ -8,7 +8,7 @@ STEAP runs multiple post-processing steps on top of CELLECT output files:
 - Cell-Type Correlation
 - Expression Specificity (ES) Gene Correlation
 
-![pipeline](https://github.com/erwinerdem/STEAP/blob/master/pipeline.png)
+![pipeline](https://raw.githubusercontent.com/erwinerdem/STEAP/master/pipeline.png)
 
 
 This appyter notebook requires the `prioritization.csv` files from the cell type enrichment analysis. To get these for your phenotype of interest you must first run the [STEAP pipeline](https://github.com/erwinerdem/STEAP).

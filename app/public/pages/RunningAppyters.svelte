@@ -33,7 +33,7 @@
       } else {
         slug_validity = true
       }
-      normalized_slug = $hash.params.slug.toLowerCase().replaceAll('-', '_')
+      normalized_slug = $hash.params.slug.toLowerCase()
     } else {
       slug_validity = undefined
     }

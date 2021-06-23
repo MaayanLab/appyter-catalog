@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "example",
   "title": "My Example Appyter",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An awesome appyter that I created.",
   "image": "screenshot.png",
   "authors": [
     {
       "name": "Daniel J. B. Clarke",
-      "email": "u8sand@gmail.com"
+      "email": "danieljbclarkemssm@gmail.com"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
