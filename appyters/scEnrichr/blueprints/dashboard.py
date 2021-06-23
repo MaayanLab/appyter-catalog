@@ -1,4 +1,4 @@
-def dashboard(app, url_prefix='/dashboard', DATA_DIR=''):
+def dashboard(app, url_prefix='/dashboard', **kwargs):
   import os
   import json
   import pandas as pd
@@ -16,30 +16,32 @@ def dashboard(app, url_prefix='/dashboard', DATA_DIR=''):
   dashapp = dash.Dash(
     'dashboard',
     server=app,
-    routes_pathname_prefix=url_prefix + '/',
+    requests_pathname_prefix='/'.join([app.config['PREFIX'].rstrip('/'), url_prefix.strip('/'), '']),
+    routes_pathname_prefix='/'.join(['', url_prefix.strip('/'), '']),
   )
 
-  def sanitize_uuid_path(val):
-    return str(uuid.UUID(val[len(url_prefix) + 1:]))
+  @lru_cache()
+  def session_from_href(href):
+    return href.replace(url_prefix, '')
 
   @lru_cache()
   def df_for_session(session):
     return pd.read_csv(
-      os.path.join(DATA_DIR, session, 'df.tsv'),
+      os.path.join(session, 'df.tsv'),
       sep='\t'
     )
 
   @lru_cache()
   def df_umap_for_session(session):
     return pd.read_csv(
-      os.path.join(DATA_DIR, session, 'df_umap.tsv'),
+      os.path.join(session, 'df_umap.tsv'),
       sep='\t'
     )
 
   @lru_cache()
   def df_enrich_for_session(session):
     return pd.read_csv(
-      os.path.join(DATA_DIR, session, 'df_enrich.tsv'),
+      os.path.join(session, 'df_enrich.tsv'),
       sep='\t'
     )
 
@@ -158,9 +160,9 @@ def dashboard(app, url_prefix='/dashboard', DATA_DIR=''):
   ])
 
   @dashapp.callback(dash.dependencies.Output('umap', 'figure'),
-                [dash.dependencies.Input('url', 'pathname')])
-  def load_data(pathname):
-    session = sanitize_uuid_path(pathname)
+                [dash.dependencies.Input('url', 'href')])
+  def load_data(href):
+    session = session_from_href(href)
     return umap_figure_for_session(session)
 
 
@@ -169,10 +171,10 @@ def dashboard(app, url_prefix='/dashboard', DATA_DIR=''):
 
   @dashapp.callback(
       [Output('cluster-header', 'children'), Output('enrichr-link', 'children'), Output('data-table', 'data')],
-      [dash.dependencies.Input('url', 'pathname'), Input('umap', 'clickData'), Input('umap', 'hoverData')]
+      [dash.dependencies.Input('url', 'href'), Input('umap', 'clickData'), Input('umap', 'hoverData')]
   )
-  def update_click(pathname, clickData, hoverData):
-    session = sanitize_uuid_path(pathname)
+  def update_click(href, clickData, hoverData):
+    session = session_from_href(href)
     df_umap = df_umap_for_session(session)
     df_enrich = df_enrich_for_session(session)
     lock = lock_for_session(session)
