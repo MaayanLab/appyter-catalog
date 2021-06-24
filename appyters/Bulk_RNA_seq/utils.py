@@ -15,18 +15,12 @@ import plotly
 from plotly import tools
 import plotly.express as px
 import plotly.graph_objs as go
-plotly.offline.init_notebook_mode() # To embed plots in the output cell of the notebook
-
 import matplotlib.pyplot as plt; plt.rcdefaults()
 from matplotlib import rcParams
-from matplotlib.lines import Line2D
-from matplotlib_venn import venn2, venn3
 
 import IPython
 from IPython.display import HTML, display, Markdown, IFrame
 
-import chart_studio
-import chart_studio.plotly as py
 
 # Data analysis
 from itertools import combinations
@@ -37,6 +31,9 @@ from maayanlab_bioinformatics.normalization.quantile import quantile_normalize
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 import umap
 from sklearn.manifold import TSNE
+
+from plotly.offline import init_notebook_mode
+init_notebook_mode(connected = False)
 
 def check_files(fname):
     if fname == "":
@@ -174,6 +171,7 @@ def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_ge
                    'plot_type': plot_type}
     return results
 
+
 def plot_samples(pca_results, meta_class_column_name, counter, plot_type='interactive',):
     pca_transformed = pca_results['result']
     axis = pca_results['axis']
@@ -188,89 +186,21 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_type='intera
         meta_df['y'] = [x[1] for x in pca_transformed]
         meta_df['z'] = [x[2] for x in pca_transformed]
         
-
+    fig = px.scatter_3d(meta_df, x='x', y='y', z='z', color=meta_class_column_name)
+    if plot_type == "interactive":
+        fig.show()
+    else:
+        fig.show(renderer="png")
     caption = '3D {} plot for samples using {} genes having largest variance. \
     The figure displays an interactive, three-dimensional scatter plot of the data. \
     Each point represents an RNA-seq sample. \
     Samples with similar gene expression profiles are closer in the three-dimensional space. \
     If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
-    display(IPython.core.display.HTML('''
-            <script src="/static/components/requirejs/require.js"></script>
-            <script>
-              requirejs.config({
-                paths: {
-                  base: '/static/base',
-                  plotly: 'https://cdn.plot.ly/plotly-latest.min.js?noext',
 
-                },
-              });
-            </script>
-            '''))
-
-    classes = meta_df[meta_class_column_name].unique().tolist()
-    SYMBOLS = ['circle', 'square']
-    
-    if len(classes) > 10:
-        def r(): return random.randint(0, 255)
-        COLORS = ['#%02X%02X%02X' % (r(), r(), r())
-                          for i in range(len(classes))]
-    else:
-        COLORS = [
-            '#1f77b4',
-            '#ff7f0e',
-            '#2ca02c',
-            '#d62728',
-            '#9467bd',
-            '#8c564b',
-            '#e377c2',
-            '#7f7f7f',
-            '#bcbd22',
-            '#17becf',
-            ]
-
-    data = [] # To collect all Scatter3d instances
-    for (cls), meta_df_sub in meta_df.groupby([meta_class_column_name]):
-        # Iteratate through samples grouped by class
-        display_name = '%s' % (cls)
-        # Initiate a Scatter3d instance for each group of samples specifying their coordinates
-        # and displaying attributes including color, shape, size and etc.
-        trace = go.Scatter3d(
-            x = meta_df_sub['x'],
-            y = meta_df_sub['y'],
-            z = meta_df_sub['z'],
-
-            text=meta_df_sub.index,
-            mode='markers',
-            marker=dict(
-                size=10,
-                color=COLORS[classes.index(cls)], # Color by infection status
-                opacity=.8,
-            ),
-            name=display_name,
-        )
-
-        data.append(trace)
-
-    # Configs for layout and axes
-    
-    layout=dict(height=1000, width=1000, 
-                title='3D {} plot for samples'.format(pca_results["method"]),
-                scene=dict(
-                    xaxis=dict(title=axis[0]),
-                    yaxis=dict(title=axis[1]),
-                    zaxis=dict(title=axis[2])
-                    )
-    )
-    
-
-    fig=dict(data=data, layout=layout)
-    if plot_type == "interactive":
-        plotly.offline.iplot(fig)
-    else:
-        py.image.ishow(fig)
     display(Markdown("*Figure {}. {}*".format(counter, caption)))
     counter += 1
     return counter
+
 def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
     # Subset the expression DataFrame using top 800 genes with largest variance
     data = dataset[normalization]
@@ -340,9 +270,9 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
         fig = go.Figure(data=[trace], layout=layout)
     
     if plot_type=='interactive':
-        plotly.offline.iplot(fig)
+        fig.show()
     else:
-        py.image.ishow(fig)
+        fig.show(renderer="png")
 
 
 robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
@@ -775,9 +705,9 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, so
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
     if plot_type=='interactive':
-        plotly.offline.iplot(fig)
+        fig.show()
     else:
-        py.image.ishow(fig)
+        fig.show(renderer='png')
 
 
 
@@ -916,9 +846,9 @@ def plot_l1000cds2(l1000cds2_results, counter, nr_drugs=7, height=300):
         fig['layout']['margin'].update(l=10, t=95, r=0, b=45, pad=5)
 
         if l1000cds2_results['plot_type'] == 'interactive':
-            plotly.offline.iplot(fig)        
+            fig.show()       
         else:
-            py.image.ishow(fig)
+            fig.show(renderer="png")
 
         display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), istable=False)
 
