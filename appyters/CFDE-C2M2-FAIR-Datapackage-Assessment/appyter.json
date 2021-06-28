@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "CFDE-C2M2-FAIR-Datapackage-Assessment",
   "title": "CFDE C2M2 FAIR Datapackage Assessment",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "This Appyter asserts C2M2 FAIR Rubric on a C2M2 Datapackage",
   "image": "screenshot.png",
   "public": true,
