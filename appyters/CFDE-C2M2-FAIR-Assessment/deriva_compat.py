@@ -20,14 +20,34 @@ class DerivaCompatPrimitive(DerivaCompat):
   def __call__(self):
     return self._value
   #
+  def in_(self, other):
+    return DerivaCompatPrimitive(
+      self().in_(other() if isinstance(other, DerivaCompat) else other)
+    )
+  #
+  def notin_(self, other):
+    return DerivaCompatPrimitive(
+      self().notin_(other() if isinstance(other, DerivaCompat) else other)
+    )
+  #
   def __eq__(self, other):
     return DerivaCompatPrimitive(
       self() == (other() if isinstance(other, DerivaCompat) else other)
     )
   #
+  def __ne__(self, other):
+    return DerivaCompatPrimitive(
+      self() != (other() if isinstance(other, DerivaCompat) else other)
+    )
+  #
   def __and__(self, other):
     return DerivaCompatPrimitive(
       self() & (other() if isinstance(other, DerivaCompat) else other)
+    )
+  #
+  def __or__(self, other):
+    return DerivaCompatPrimitive(
+      self() | (other() if isinstance(other, DerivaCompat) else other)
     )
 
 class DerivaCompatQuery(DerivaCompat):
@@ -51,11 +71,20 @@ class DerivaCompatQuery(DerivaCompat):
       path=self._path,
     )
   #
-  def link(self, other, on):
+  def link(self, other, on, join_type='left'):
+    if join_type == 'left':
+      q = lambda qs, _subj=self._subj, _query=self._query, _on=on: _query(qs).join(_subj(), _on())
+    elif join_type == 'right':
+      raise NotImplementedError
+    elif join_type == 'full':
+      q = lambda qs, _subj=self._subj, _query=self._query, _on=on: _query(qs).outerjoin(_subj(), _on())
+    else:
+      raise NotImplementedError
+    #
     return DerivaCompatQuery(
       self._pkg,
       other,
-      lambda qs, _subj=self._subj, _query=self._query, _on=on: _query(qs).join(_subj(), _on()),
+      q,
       path=self._path,
     )
   #
@@ -63,7 +92,15 @@ class DerivaCompatQuery(DerivaCompat):
     return DerivaCompatQuery(
       self._pkg,
       self._subj,
-      lambda qs, _subj=self._subj, _query=self._query, _clause=clause: _query(qs).filter(_clause()),
+      lambda qs, _query=self._query, _clause=clause: _query(qs).filter(_clause()),
+      path=self._path,
+    )
+  #
+  def groupby(self, *clauses):
+    return DerivaCompatQuery(
+      self._pkg,
+      self._subj,
+      lambda qs, _query=self._query, _clauses=clauses: _query(qs).group_by(*(_clause() for _clause in _clauses)),
       path=self._path,
     )
   #
@@ -120,33 +157,31 @@ class DerivaCompatTable(DerivaCompat):
       self._qs
     )
   #
-  def filter(self, selector):
+  def _as_query(self):
     return DerivaCompatQuery(
       self._pkg,
       self,
-      lambda qs, _query=self._qs, _selector=selector: _query(qs).filter(_selector())
+      lambda qs, _query=self._qs: _query(qs)
     )
   #
+  def link(self, other, on, join_type='left'):
+    return self._as_query().link(other, on, join_type=join_type)
+  #
+  def filter(self, selector):
+    return self._as_query().filter(selector)
+  #
   def entities(self):
-    return DerivaCompatQuery(
-      self._pkg,
-      self,
-      self._qs,
-    ).entities()
+    return self._as_query().entities()
   #
   def count(self):
-    return DerivaCompatQuery(
-      self._pkg,
-      self,
-      self._qs,
-    ).count()
+    return self._as_query().count()
 
 class DerivaCompatPkg:
-  def __init__(self, data):
+  def __init__(self, data, cachedir='.cached'):
     self.tables = {}
     # check_same_thread is safe here given that we don't ever write after init
-    os.makedirs('.cached', exist_ok=True)
-    self._engine = sa.create_engine('sqlite:///.cached/datapackage.sqlite')
+    os.makedirs(cachedir, exist_ok=True)
+    self._engine = sa.create_engine(f"sqlite:///{cachedir.rstrip('/')}/datapackage.sqlite")
     # load data into sqlite
     with self._engine.connect() as con:
       for resource_name, resource in data.items():
@@ -194,7 +229,7 @@ def DERIVA_col_in(qs, col, arr):
       f = f | (col == el)
   return qs if f is None else qs.filter(f)
 
-def create_offline_client(paths):
+def create_offline_client(paths, cachedir='.cached'):
   ''' Establish an offline client for more up to date assessments than those published
   '''
   import pandas as pd
@@ -205,16 +240,26 @@ def create_offline_client(paths):
     for resource in pkg.resources:
       if resource.name not in all_pkgs:
         all_pkgs[resource.name] = {'schema': resource.descriptor['schema'], 'data': []}
-      all_pkgs[resource.name]['data'] += resource.read(keyed=True)
+      #
+      try:
+        all_pkgs[resource.name]['data'] += resource.read(keyed=True)
+      except Exception as e:
+        print(f"datapackage exception while reading from table: '{resource.name}'")
+        print(e.errors)
+        raise e
   #
   joined_pkgs = {}
   for resource_name, resource in all_pkgs.items():
-    data = pd.DataFrame(resource['data'])
+    if resource['data']:
+      data = pd.DataFrame(resource['data'])
+    else:
+      data = pd.DataFrame([], columns=[field['name'] for field in resource['schema']['fields']])
+    #
     for field in resource['schema']['fields']:
         if field['type'] == 'datetime':
             data[field['name']] = pd.to_datetime(data[field['name']], utc=True)
     joined_pkgs[resource_name] = dict(resource, data=data)
-  return DerivaCompatPkg(joined_pkgs)
+  return DerivaCompatPkg(joined_pkgs, cachedir=cachedir)
 
 def create_online_client(uri):
   ''' Create a client to access the public CFDE Deriva Catalog
