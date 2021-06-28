@@ -177,11 +177,11 @@ class DerivaCompatTable(DerivaCompat):
     return self._as_query().count()
 
 class DerivaCompatPkg:
-  def __init__(self, data):
+  def __init__(self, data, cachedir='.cached'):
     self.tables = {}
     # check_same_thread is safe here given that we don't ever write after init
-    os.makedirs('.cached', exist_ok=True)
-    self._engine = sa.create_engine('sqlite:///.cached/datapackage.sqlite')
+    os.makedirs(cachedir, exist_ok=True)
+    self._engine = sa.create_engine(f"sqlite:///{cachedir.rstrip('/')}/datapackage.sqlite")
     # load data into sqlite
     with self._engine.connect() as con:
       for resource_name, resource in data.items():
@@ -229,7 +229,7 @@ def DERIVA_col_in(qs, col, arr):
       f = f | (col == el)
   return qs if f is None else qs.filter(f)
 
-def create_offline_client(paths):
+def create_offline_client(paths, cachedir='.cached'):
   ''' Establish an offline client for more up to date assessments than those published
   '''
   import pandas as pd
@@ -259,7 +259,7 @@ def create_offline_client(paths):
         if field['type'] == 'datetime':
             data[field['name']] = pd.to_datetime(data[field['name']], utc=True)
     joined_pkgs[resource_name] = dict(resource, data=data)
-  return DerivaCompatPkg(joined_pkgs)
+  return DerivaCompatPkg(joined_pkgs, cachedir=cachedir)
 
 def create_online_client(uri):
   ''' Create a client to access the public CFDE Deriva Catalog
