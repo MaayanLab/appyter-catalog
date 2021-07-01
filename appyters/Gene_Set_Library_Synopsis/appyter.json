@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Gene_Set_Library_Synopsis",
+  "title": "Gene Set Library Synopsis",
+  "version": "0.1",
+  "description": "An Appyter that performs basic analysis on a submitted gene set library.",
+  "image": "full_logo.png",
+  "authors": [
+    {
+      "name": "Sophia Vincoff",
+      "email": "sophievincoff@yahoo.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Genes",
+    "Gene Set Library",
+    "Compare Sets"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "Gene_Set_Library_Synopsis.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}
