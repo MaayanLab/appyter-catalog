@@ -899,7 +899,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     # Get genesets
     genesets = {
         'upregulated': up_signature.index[:geneset_size],
-        'downregulated': down_signature.index[:geneset_size:]
+        'downregulated': down_signature.index[-geneset_size:]
     }
 
     # Submit to Enrichr
