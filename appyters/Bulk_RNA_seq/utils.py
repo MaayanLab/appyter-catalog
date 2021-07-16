@@ -234,7 +234,7 @@ def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', 
     expr_df_sub_file = "expr_df_sub_file.txt"
     expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
     # POST the expression matrix to Clustergrammer and get the URL
-    clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
+    clustergrammer_url = 'https://maayanlab.cloud/clustergrammer/matrix_upload/'
     r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
     return r
     
@@ -536,7 +536,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     return enrichr_ids
 
 def submit_enrichr_geneset(geneset, label=''):
-    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/addList'
+    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/addList'
     genes_str = '\n'.join(geneset)
     payload = {
         'list': (None, genes_str),
@@ -552,7 +552,7 @@ def submit_enrichr_geneset(geneset, label=''):
 
 
 def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
-    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
+    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/enrich'
     query_string = '?userListId=%s&backgroundType=%s'
     results = []
     for gene_set_library, label in gene_set_libraries.items():
@@ -725,10 +725,10 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
 
         # Add links and bold for significant results
         # if " " in enrichment_dataframe_subset[source_label][0]:
-        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
+        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
           
         # else:
-        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
+        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
         enrichment_dataframe_subset[source_label] = [rowData[source_label].replace('target="_blank">', 'target="_blank"><b>').replace('</a>', '*</b></a>') if rowData['FDR'] < 0.05 else rowData[source_label] for index, rowData in enrichment_dataframe_subset.iterrows()]
 
         # Add rank
@@ -785,14 +785,14 @@ def run_l1000cds2(signature, nr_genes=500, signature_label='', plot_type='intera
 
         # Send to API
         config = {"aggravate":aggravate,"searchMethod":"geneSet","share":True,"combination":False,"db-version":"latest"}
-        r = requests.post('http://amp.pharm.mssm.edu/L1000CDS2/query',data=json.dumps({"data":data,"config":config}),headers={'content-type':'application/json'})
+        r = requests.post('http://maayanlab.cloud/L1000CDS2/query',data=json.dumps({"data":data,"config":config}),headers={'content-type':'application/json'})
         label = 'mimic' if aggravate else 'reverse'
 
         # Add results
         resGeneSet = r.json()
         if resGeneSet.get('topMeta'):
             l1000cds2_dataframe = pd.DataFrame(resGeneSet['topMeta'])[['cell_id', 'pert_desc', 'pert_dose', 'pert_dose_unit', 'pert_id', 'pert_time', 'pert_time_unit', 'pubchem_id', 'score', 'sig_id']].replace('-666', np.nan)
-            l1000cds2_results[label] = {'url': 'http://amp.pharm.mssm.edu/L1000CDS2/#/result/{}'.format(resGeneSet['shareId']), 'table': l1000cds2_dataframe}
+            l1000cds2_results[label] = {'url': 'http://maayanlab.cloud/L1000CDS2/#/result/{}'.format(resGeneSet['shareId']), 'table': l1000cds2_dataframe}
         else:
             l1000cds2_results[label] = None
     l1000cds2_results['plot_type'] = plot_type
@@ -872,7 +872,7 @@ def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     payload = {"up_genes":upperGenes(signature.index[:nr_genes]),"down_genes":upperGenes(signature.index[-nr_genes:])}
 
     # Get URL
-    L1000FWD_URL = 'https://amp.pharm.mssm.edu/L1000FWD/'
+    L1000FWD_URL = 'https://maayanlab.cloud/L1000FWD/'
 
     # Get result
     response = requests.post(L1000FWD_URL + 'sig_search', json=payload)
@@ -881,7 +881,7 @@ def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     else:
         # Get ID and URL
         result_id = response.json()['result_id']
-        l1000fwd_results['result_url'] = 'https://amp.pharm.mssm.edu/l1000fwd/vanilla/result/'+result_id
+        l1000fwd_results['result_url'] = 'https://maayanlab.cloud/l1000fwd/vanilla/result/'+result_id
         l1000fwd_results['result_id'] = result_id
 
         # Get Top
@@ -911,7 +911,7 @@ def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
 
             # Display table
             pd.set_option('max.colwidth', -1)
-            signature_dataframe['Signature ID'] = ['<a href="http://amp.pharm.mssm.edu/dmoa/sig/{x}" target="_blank">{x}</a>'.format(**locals()) for x in signature_dataframe['Signature ID']]
+            signature_dataframe['Signature ID'] = ['<a href="http://maayanlab.cloud/dmoa/sig/{x}" target="_blank">{x}</a>'.format(**locals()) for x in signature_dataframe['Signature ID']]
             table_html = signature_dataframe.to_html(escape=False, classes='w-100')
             
             display(HTML('<style>.w-100{{width: 100% !important;}}</style><div style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">{}</div>'.format(table_html)))
