@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "gsea_appyter",
+  "name": "GSEA_Appyter",
   "title": "GSEA Appyter",
   "version": "0.0.1",
   "description": "An appyter that performs gene set enrichment analysis and creates interactive visualizations of the results.",
@@ -22,7 +22,7 @@
   "license": "CC-BY-NC-SA-4.0",
   "public": true,
   "appyter": {
-    "file": "gsea_appyter.ipynb",
+    "file": "GSEA_Appyter.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
