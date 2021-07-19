@@ -13,11 +13,9 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "genes",
-    "gene set",
-    "gsea",
-    "gene set enrichment analysis",
-    "enrichment analysis"
+    "Gene Set Enrichment",
+    "Enrichment Analysis",
+    "GSEA"
   ],
   "license": "CC-BY-NC-SA-4.0",
   "public": true,
