@@ -4,7 +4,7 @@
   "title": "GSEA Appyter",
   "version": "0.0.1",
   "description": "An appyter that performs gene set enrichment analysis and creates interactive visualizations of the results.",
-  "image": "featured-image.png",
+  "image": "feature_image.png",
   "authors": [
     {
       "name": "Cindy Xiong",
