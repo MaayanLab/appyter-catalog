@@ -112,6 +112,7 @@ services:
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.minio.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.minio.tls.domains[1].main=s3.${server_name}"
 {%- endif %}
     environment:
       MINIO_BUCKET: ${MINIO_BUCKET}
