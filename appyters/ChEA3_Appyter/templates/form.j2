@@ -12,14 +12,17 @@
 <div class="row">
 <div class="col-sm-12">
 <div class="container">
-<h1>ChEA3 Appyter</h1>
+   <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='chea3_appyter_logo.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1>ChEA3 Appyter</h1>
+            <p class="my-0"> Description of appyter </p>
+        </div>
+    </div>
 </div>
 </div>
 </div>
 {{ super() }}
-{% endblock %}
-
-{% block script %}
-{{ super() }}
-<script src="{{ url_for('static', filename='chea3_appyter_logo.png') }}"></script>
 {% endblock %}
