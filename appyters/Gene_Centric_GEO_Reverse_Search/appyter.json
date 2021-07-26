@@ -9,23 +9,23 @@
     {
       "name": "Kerwin Chen",
       "email": "kc764@cornell.edu"
-    }
+    },
     {
       "name": "Alex Lachmann",
       "email": "alexander.lachmann@mssm.edu"
-    }
+    },
     {
       "name": "Sherry Xie",
       "email": "zhuorui.xie@mssm.edu"
-    }
+    },
     {
       "name": "Megan Wojciechowiczl",
       "email": "megan.wojciechowicz@icahn.mssm.edu"
-    }
+    },
     {
       "name": "Daniel Clarke",
       "email": "daniel.clarke@mssm.edu"
-    }
+    },
     {
       "name": "Avi Ma\'ayan",
       "email": "avi.maayan@mssm.edu"
@@ -39,7 +39,7 @@
   "license": "CC-BY-NC-SA-4.0",
   "public": true,
   "appyter": {
-    "file": "example.ipynb",
+    "file": "GEO_Reverse_Search.ipynb",
     "profile": "biojupies",
     "extras": [
       "hide-code",
