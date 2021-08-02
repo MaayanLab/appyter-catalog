@@ -1,0 +1,6 @@
+git+git://github.com/Maayanlab/appyter.git
+requests
+numpy
+tabulate
+plotly
+kaleido
