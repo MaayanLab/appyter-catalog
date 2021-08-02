@@ -7,9 +7,4 @@ numpy
 bokeh
 pybase64
 statsmodels
-csv
-itertools
-json
 requests
-time
-urllib
