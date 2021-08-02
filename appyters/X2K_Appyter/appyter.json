@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "X2K_Appyter",
+  "title": "X2K Appyter",
+  "version": "0.0.1",
+  "description": "Expression 2 Kinases Appyter",
+  "image": "x2k_appyter_logo.png",
+  "authors": [
+    {
+      "name": "Alex Tsai",
+      "email": "atsai3720@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "X2K",
+    "ChEA3",
+    "KEA3",
+    "Enrichment Analysis",
+    "Kinase",
+    "Transcription Factors"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "public": true,
+  "appyter": {
+    "file": "x2k_appyter.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}
