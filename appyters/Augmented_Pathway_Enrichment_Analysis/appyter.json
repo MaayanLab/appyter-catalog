@@ -16,6 +16,7 @@
     "Enrichment Analysis",
     "Enrichr"
   ],
+  "license": "CC-BY-NC-SA-4.0",
   "appyter": {
     "file": "Augmented_Pathway_Enrichment_Analysis.ipynb",
     "profile": "biojupies",
