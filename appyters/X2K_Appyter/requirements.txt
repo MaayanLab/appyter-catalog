@@ -4,3 +4,4 @@ numpy
 tabulate
 plotly
 kaleido
+pandas
