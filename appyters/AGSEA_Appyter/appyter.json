@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "AGSEA_Appyter",
   "title": "AGSEA Appyter",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "An appyter that performs and visualizes standard gene set enrichment analysis (GSEA) as well as augmented GSEA.",
   "image": "feature_image.png",
   "authors": [
