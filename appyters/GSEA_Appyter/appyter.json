@@ -1,14 +1,22 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "GSEA_Appyter",
-  "title": "GSEA Appyter",
-  "version": "0.0.2",
-  "description": "An appyter that performs gene set enrichment analysis and creates interactive visualizations of the results.",
+  "name": "AGSEA_Appyter",
+  "title": "AGSEA Appyter",
+  "version": "1.0.2",
+  "description": "An appyter that performs and visualizes standard gene set enrichment analysis (GSEA) as well as augmented GSEA.",
   "image": "feature_image.png",
   "authors": [
     {
       "name": "Cindy Xiong",
       "email": "cindyxiong71@gmail.com"
+    },
+    {
+      "name": "Sherry Xie",
+      "email": "sxie04@gmail.com"
+    },
+    {
+      "name": "Minji Jeon",
+      "email": "minji.jeon1@gmail.com"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
@@ -20,7 +28,7 @@
   "license": "CC-BY-NC-SA-4.0",
   "public": true,
   "appyter": {
-    "file": "GSEA_Appyter.ipynb",
+    "file": "AGSEA_Appyter.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
