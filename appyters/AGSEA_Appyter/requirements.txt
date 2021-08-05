@@ -7,3 +7,5 @@ numpy
 scipy
 ipython
 plotly
+appyter
+rpy2
