@@ -1,5 +1,7 @@
 git+git://github.com/Maayanlab/appyter.git
 git+git://github.com/BioNinja/gseapy.git#egg=gseapy
+git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+git+git://github.com/Maayanlab/geode.git
 pandas
 numpy
 scipy
