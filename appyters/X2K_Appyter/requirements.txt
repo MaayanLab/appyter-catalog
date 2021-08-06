@@ -4,4 +4,5 @@ numpy
 tabulate
 plotly
 kaleido
+observable_jupyter
 pandas
