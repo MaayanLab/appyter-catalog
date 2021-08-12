@@ -2,13 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "X2K_Appyter",
   "title": "X2K Appyter",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Expression 2 Kinases Appyter",
   "image": "x2k_appyter_logo.png",
   "authors": [
     {
       "name": "Alex Tsai",
       "email": "atsai3720@gmail.com"
+    },
+    {
+      "name": "Maxim Kuleshov",
+      "email": "kuleshov.max.v@gmail.com"
+    },
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
