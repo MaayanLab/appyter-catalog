@@ -9,6 +9,5 @@ bokeh==2.3.2
 fastcluster
 scipy
 sklearn
-umap
 umap-learn
 seaborn
