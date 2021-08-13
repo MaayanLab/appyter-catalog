@@ -1,0 +1,6 @@
+itables
+numpy
+pandas
+plotly
+requests
+scipy
