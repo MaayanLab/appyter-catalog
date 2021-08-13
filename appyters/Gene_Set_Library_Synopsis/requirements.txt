@@ -10,4 +10,5 @@ fastcluster
 scipy
 sklearn
 umap
+umap-learn
 seaborn
