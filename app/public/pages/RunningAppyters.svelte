@@ -15,6 +15,8 @@
       run = 'webform'
     } else if ($hash.params.run === 'cli') {
       run = 'cli'
+    } else if ($hash.params.run === 'cwl') {
+      run = 'cwl'
     } else {
       run = 'notebook'
     }
@@ -220,7 +222,15 @@
             class:active={run === 'cli'}
             class="nav-link"
             href="javascript:"
-          >Command Line Application</a>
+          >Command Line App</a>
+        </li>
+        <li class="nav-item">
+          <a
+            on:click={() => $hash.params.run = 'cwl'}
+            class:active={run === 'cwl'}
+            class="nav-link"
+            href="javascript:"
+          >CWL</a>
         </li>
       </ul>
       <div class="card">
@@ -303,6 +313,22 @@
                     docker run -it ${docker_tag} /bin/bash
                   `}
                 />
+              {:else if run === 'cwl'}
+                <h4>Running as a CWL Tool</h4>
+                <p>The Common Workflow Language (CWL) tool definition can be used to register the Appyter for execution as part of a CWL workflow. For more information on CWL, visit <a href="https://www.commonwl.org/" target="_blank">https://www.commonwl.org/</a>.</p>
+                <CodeSnippet
+                  code={JSON.stringify(JSON.parse(`
+                    {
+                      "class": "CommandLineTool",
+                      "cwlVersion": "v1.2",
+                      "label": "TODO"
+                    }
+                  `))}
+                />
+                <p>A number of platforms rely on CWL tool definitions. These platforms allow you to register new CWL definitions such as this one and interact with the tool through the platform. Each platform has its own unique instructions for registering a CWL tool, typically you will copy the above code and paste it where a CWL definition is accepted:</p>
+                <ul>
+                  <li><a href="https://docs.cavatica.org/docs/create-a-tool" target="_blank">Create a Tool in CAVATICA</a></li>
+                </ul>
               {/if}
             </div>
           </div>
