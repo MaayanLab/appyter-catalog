@@ -8,4 +8,11 @@ class RadioField(Field):
         super().__init__(**kwargs)
 
     def constraint(self):
-      return self.raw_value is not None
+        return self.raw_value is not None
+
+    def to_cwl(self):
+        _choices = self.args['choices']
+        self.args['choices'] = [choice['value'] for choice in _choices]
+        cwl = super().to_cwl()
+        self.args['choices'] = _choices
+        return cwl
