@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "LDP3_Consensus_Appyter",
-  "title": "LDP3 Consensus Appyter",
-  "version": "0.1.7",
+  "name": "SigCom_LINCS_Consensus_Appyter",
+  "title": "SigCom LINCS Consensus Appyter",
+  "version": "0.1.8",
   "description": "Returns consensus mimicker and reverser signatures from a set of up and down genesets",
   "image": "screenshot.png",
   "authors": [
@@ -14,11 +14,11 @@
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
     "LINCS",
-    "LDP3"
+    "SigCom"
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
-    "file": "LDP3 Consensus Perturbagens.ipynb",
+    "file": "SigCom LINCS Consensus Appyter.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
