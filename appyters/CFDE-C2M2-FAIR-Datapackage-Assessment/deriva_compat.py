@@ -5,6 +5,7 @@ a local sqlalchemy database.
 '''
 
 import os
+import json
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 from pandas.io.sql import to_sql
@@ -267,6 +268,8 @@ def create_offline_client(paths, cachedir='.cached'):
     for field in resource['schema']['fields']:
         if field['type'] == 'datetime':
             data[field['name']] = pd.to_datetime(data[field['name']], utc=True)
+        elif field['type'] in {'array', 'object'}:
+            data[field['name']] = data[field['name']].apply(json.dumps)
     joined_pkgs[resource_name] = dict(resource, data=data)
   return DerivaCompatPkg(joined_pkgs, cachedir=cachedir)
 
