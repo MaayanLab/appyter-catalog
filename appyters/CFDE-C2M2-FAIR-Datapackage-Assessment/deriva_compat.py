@@ -229,6 +229,15 @@ def DERIVA_col_in(qs, col, arr):
       f = f | (col == el)
   return qs if f is None else qs.filter(f)
 
+def format_patch(rc):
+  ''' Patch dialect for resource
+  '''
+  if rc.descriptor['path'].endswith('.tsv') and 'format' not in rc.descriptor:
+    rc.descriptor['format'] = None
+    rc.commit()
+  #
+  return rc
+
 def create_offline_client(paths, cachedir='.cached'):
   ''' Establish an offline client for more up to date assessments than those published
   '''
@@ -237,7 +246,7 @@ def create_offline_client(paths, cachedir='.cached'):
   all_pkgs = {}
   for path in paths:
     pkg = DataPackage(path)
-    for resource in pkg.resources:
+    for resource in map(format_patch, pkg.resources):
       if resource.name not in all_pkgs:
         all_pkgs[resource.name] = {'schema': resource.descriptor['schema'], 'data': []}
       #
