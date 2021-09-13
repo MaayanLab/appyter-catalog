@@ -5,6 +5,7 @@ a local sqlalchemy database.
 '''
 
 import os
+import json
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 from pandas.io.sql import to_sql
@@ -229,6 +230,15 @@ def DERIVA_col_in(qs, col, arr):
       f = f | (col == el)
   return qs if f is None else qs.filter(f)
 
+def format_patch(rc):
+  ''' Patch dialect for resource
+  '''
+  if rc.descriptor['path'].endswith('.tsv') and 'format' not in rc.descriptor:
+    rc.descriptor['format'] = None
+    rc.commit()
+  #
+  return rc
+
 def create_offline_client(paths, cachedir='.cached'):
   ''' Establish an offline client for more up to date assessments than those published
   '''
@@ -237,7 +247,7 @@ def create_offline_client(paths, cachedir='.cached'):
   all_pkgs = {}
   for path in paths:
     pkg = DataPackage(path)
-    for resource in pkg.resources:
+    for resource in map(format_patch, pkg.resources):
       if resource.name not in all_pkgs:
         all_pkgs[resource.name] = {'schema': resource.descriptor['schema'], 'data': []}
       #
@@ -258,6 +268,8 @@ def create_offline_client(paths, cachedir='.cached'):
     for field in resource['schema']['fields']:
         if field['type'] == 'datetime':
             data[field['name']] = pd.to_datetime(data[field['name']], utc=True)
+        elif field['type'] in {'array', 'object'}:
+            data[field['name']] = data[field['name']].apply(json.dumps)
     joined_pkgs[resource_name] = dict(resource, data=data)
   return DerivaCompatPkg(joined_pkgs, cachedir=cachedir)
 
