@@ -233,7 +233,7 @@ def DERIVA_col_in(qs, col, arr):
 def format_patch(rc):
   ''' Patch dialect for resource
   '''
-  if rc.descriptor['path'].endswith('.tsv') and 'format' not in rc.descriptor:
+  if 'format' not in rc.descriptor:
     rc.descriptor['format'] = None
     rc.commit()
   #
