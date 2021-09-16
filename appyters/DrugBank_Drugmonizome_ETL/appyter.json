@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "DrugBank_Drugmonizome_ETL",
   "title": "Drugmonizome ETL: DrugBank",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An appyter to process drug-protein associations from the DrugBank database.",
   "image": "Drugmonizome_ETL.png",
   "authors": [

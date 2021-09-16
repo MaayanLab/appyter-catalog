@@ -1,10 +1,10 @@
 <div class="footer mt-4 pt-4 bg-white">
-  <div class="row justify-content-center align-content-center" style="margin: 0">
+  <div class="row justify-content-center align-content-center mx-0 pb-3">
     <div class="d-flex col-md-3 col-sm-12 justify-content-center align-items-center">
       <p class="d-inline-block text-left">
         <a style="color: #555;" href="mailto:avi.maayan@mssm.edu">Contact Us</a><br />
         <a style="color: #555;" href="https://github.com/MaayanLab/appyter-catalog/blob/master/LICENSE">Usage License</a><br />
-        <a style="color: #555;" href="https://maayanlab.github.io/appyter/">Appyter Documentation</a><br />
+        <a style="color: #555;" href="/#/what-is-an-appyter/">Appyter Documentation</a><br />
       </p>
     </div>
     <div class="col-md-2 col-xs-3 text-center">
