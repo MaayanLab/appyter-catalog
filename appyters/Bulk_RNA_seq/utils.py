@@ -5,32 +5,22 @@ import pandas as pd
 import os
 import urllib3
 import requests, json
-import sys
-import geode
 import random
-from time import sleep
 import time
 import numpy as np
 import warnings
-import base64  
 
 # Visualization
 import plotly
 from plotly import tools
 import plotly.express as px
 import plotly.graph_objs as go
-plotly.offline.init_notebook_mode() # To embed plots in the output cell of the notebook
-
 import matplotlib.pyplot as plt; plt.rcdefaults()
 from matplotlib import rcParams
-from matplotlib.lines import Line2D
-from matplotlib_venn import venn2, venn3
 
 import IPython
 from IPython.display import HTML, display, Markdown, IFrame
 
-import chart_studio
-import chart_studio.plotly as py
 
 # Data analysis
 from itertools import combinations
@@ -41,6 +31,9 @@ from maayanlab_bioinformatics.normalization.quantile import quantile_normalize
 from maayanlab_bioinformatics.dge.characteristic_direction import characteristic_direction
 import umap
 from sklearn.manifold import TSNE
+
+from plotly.offline import init_notebook_mode
+init_notebook_mode(connected = False)
 
 def check_files(fname):
     if fname == "":
@@ -65,7 +58,7 @@ def logCPM(data):
         warnings.simplefilter("ignore")
         data = (data/data.sum())*10**6
         data = data.fillna(0)
-        data = np.log10(data+1)
+        data = np.log2(data+1)
 
     # Return
     return data
@@ -74,7 +67,7 @@ def log(data):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         data = data.fillna(0)
-        data = np.log10(data+1)
+        data = np.log2(data+1)
 
     return data
 def qnormalization(data):
@@ -124,7 +117,7 @@ def display_object(counter, caption, df=None, istable=True):
     counter += 1
     return counter
 
-def run_dimension_reduction(dataset, meta_id_column_name, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
+def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
     # Get data
     before_norm = normalization.replace("+z_norm", "").replace("+q_norm", "")
     top_genes = dataset[before_norm].var(axis=1).sort_values(ascending=False)
@@ -172,13 +165,14 @@ def run_dimension_reduction(dataset, meta_id_column_name, method='PCA', normaliz
 
     # Return
     results = {'method': method, 'result': result, 'axis': axis, 
-                   'dataset_metadata': dataset['dataset_metadata'][dataset['dataset_metadata'][meta_id_column_name] == expression_dataframe.columns], 
+                   'dataset_metadata': dataset['dataset_metadata'][dataset['dataset_metadata'].index == expression_dataframe.columns], 
                    'nr_genes': nr_genes, 
                    'normalization': normalization, 'signature_metadata': dataset.get('signature_metadata'), 
                    'plot_type': plot_type}
     return results
 
-def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, counter, plot_type='interactive',):
+
+def plot_samples(pca_results, meta_class_column_name, counter, plot_type='interactive',):
     pca_transformed = pca_results['result']
     axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
@@ -192,90 +186,21 @@ def plot_samples(pca_results, meta_id_column_name, meta_class_column_name, count
         meta_df['y'] = [x[1] for x in pca_transformed]
         meta_df['z'] = [x[2] for x in pca_transformed]
         
-
+    fig = px.scatter_3d(meta_df, x='x', y='y', z='z', color=meta_class_column_name)
+    if plot_type == "interactive":
+        fig.show()
+    else:
+        fig.show(renderer="png")
     caption = '3D {} plot for samples using {} genes having largest variance. \
     The figure displays an interactive, three-dimensional scatter plot of the data. \
     Each point represents an RNA-seq sample. \
     Samples with similar gene expression profiles are closer in the three-dimensional space. \
     If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
-    display(IPython.core.display.HTML('''
-            <script src="/static/components/requirejs/require.js"></script>
-            <script>
-              requirejs.config({
-                paths: {
-                  base: '/static/base',
-                  plotly: 'https://cdn.plot.ly/plotly-latest.min.js?noext',
 
-                },
-              });
-            </script>
-            '''))
-
-    classes = meta_df[meta_class_column_name].unique().tolist()
-    SYMBOLS = ['circle', 'square']
-    
-    if len(classes) > 10:
-        def r(): return random.randint(0, 255)
-        COLORS = ['#%02X%02X%02X' % (r(), r(), r())
-                          for i in range(len(classes))]
-    else:
-        COLORS = [
-            '#1f77b4',
-            '#ff7f0e',
-            '#2ca02c',
-            '#d62728',
-            '#9467bd',
-            '#8c564b',
-            '#e377c2',
-            '#7f7f7f',
-            '#bcbd22',
-            '#17becf',
-            ]
-
-    data = [] # To collect all Scatter3d instances
-    for (cls), meta_df_sub in meta_df.groupby([meta_class_column_name]):
-        # Iteratate through samples grouped by class
-        display_name = '%s' % (cls)
-        # Initiate a Scatter3d instance for each group of samples specifying their coordinates
-        # and displaying attributes including color, shape, size and etc.
-        trace = go.Scatter3d(
-            x = meta_df_sub['x'],
-            y = meta_df_sub['y'],
-            z = meta_df_sub['z'],
-
-            text=meta_df_sub[meta_id_column_name],
-            mode='markers',
-            marker=dict(
-                size=10,
-                color=COLORS[classes.index(cls)], # Color by infection status
-                opacity=.8,
-            ),
-#             name=meta_df_sub[meta_id_column_name]
-            name=display_name,
-        )
-
-        data.append(trace)
-
-    # Configs for layout and axes
-    
-    layout=dict(height=1000, width=1000, 
-                title='3D {} plot for samples'.format(pca_results["method"]),
-                scene=dict(
-                    xaxis=dict(title=axis[0]),
-                    yaxis=dict(title=axis[1]),
-                    zaxis=dict(title=axis[2])
-                    )
-    )
-    
-
-    fig=dict(data=data, layout=layout)
-    if plot_type == "interactive":
-        plotly.offline.iplot(fig)
-    else:
-        py.image.ishow(fig)
     display(Markdown("*Figure {}. {}*".format(counter, caption)))
     counter += 1
     return counter
+
 def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
     # Subset the expression DataFrame using top 800 genes with largest variance
     data = dataset[normalization]
@@ -309,7 +234,7 @@ def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', 
     expr_df_sub_file = "expr_df_sub_file.txt"
     expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
     # POST the expression matrix to Clustergrammer and get the URL
-    clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
+    clustergrammer_url = 'https://maayanlab.cloud/clustergrammer/matrix_upload/'
     r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
     return r
     
@@ -345,12 +270,11 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
         fig = go.Figure(data=[trace], layout=layout)
     
     if plot_type=='interactive':
-        plotly.offline.iplot(fig)
+        fig.show()
     else:
-        py.image.ishow(fig)
+        fig.show(renderer="png")
 
 
-        
 robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
     # Load packages
     suppressMessages(require(limma))
@@ -436,7 +360,7 @@ robjects.r('''deseq2 <- function(rawcount_dataframe, g1, g2) {
 }
 ''')
 
-def get_signatures(classes, dataset, normalization, method, meta_class_column_name, meta_id_column_name, filter_genes):
+def get_signatures(classes, dataset, normalization, method, meta_class_column_name, filter_genes):
     tmp_normalization = normalization.replace("+z_norm+q_norm","").replace("+z_norm","")
     raw_expr_df = dataset['rawdata']
     expr_df = dataset['rawdata']
@@ -447,19 +371,20 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
 
     for cls1, cls2 in combinations(classes, 2):
         print(cls1, cls2)
-        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, meta_id_column_name].tolist() #control
-        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2, meta_id_column_name].tolist() #case
+        cls1_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls1, :].index.tolist() #control
+        cls2_sample_ids = dataset["dataset_metadata"].loc[dataset["dataset_metadata"][meta_class_column_name]==cls2,:].index.tolist() #case
         
         signature_label = " vs. ".join([cls1, cls2])
-
+        
         if method == "limma":
             limma = robjects.r['limma']
+
             design_dataframe = pd.DataFrame([{'index': x, 'A': int(x in cls1_sample_ids), 'B': int(x in cls2_sample_ids)} for x in raw_expr_df.columns]).set_index('index')
 
             processed_data = {"expression": raw_expr_df, 'design': design_dataframe}
-            limma = robjects.r['limma']
-            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
             
+            limma_results = pandas2ri.conversion.rpy2py(limma(pandas2ri.conversion.py2rpy(processed_data['expression']), pandas2ri.conversion.py2rpy(processed_data['design']), filter_genes=filter_genes))
+                        
             signature = pd.DataFrame(limma_results[0])
             signature.index = limma_results[1]
             signature = signature.sort_values("t", ascending=False)
@@ -469,6 +394,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             signature = signature.sort_values("CD-coefficient", ascending=False)
         elif method == "edgeR":
             edgeR = robjects.r['edgeR']
+            
             edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
             
             signature = pd.DataFrame(edgeR_results[0])
@@ -486,7 +412,8 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
             
         signatures[signature_label] = signature
 
-    return signatures
+    return signatures        
+
 
 def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_threshold, plot_type):
     color = []
@@ -600,7 +527,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     # Get genesets
     genesets = {
         'upregulated': up_signature.index[:geneset_size],
-        'downregulated': down_signature.index[:geneset_size:]
+        'downregulated': down_signature.index[-geneset_size:]
     }
 
     # Submit to Enrichr
@@ -609,7 +536,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     return enrichr_ids
 
 def submit_enrichr_geneset(geneset, label=''):
-    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/addList'
+    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/addList'
     genes_str = '\n'.join(geneset)
     payload = {
         'list': (None, genes_str),
@@ -625,7 +552,7 @@ def submit_enrichr_geneset(geneset, label=''):
 
 
 def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
-    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
+    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/enrich'
     query_string = '?userListId=%s&backgroundType=%s'
     results = []
     for gene_set_library, label in gene_set_libraries.items():
@@ -778,9 +705,9 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, so
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
     if plot_type=='interactive':
-        plotly.offline.iplot(fig)
+        fig.show()
     else:
-        py.image.ishow(fig)
+        fig.show(renderer='png')
 
 
 
@@ -798,10 +725,10 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
 
         # Add links and bold for significant results
         # if " " in enrichment_dataframe_subset[source_label][0]:
-        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
+        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
           
         # else:
-        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
+        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
         enrichment_dataframe_subset[source_label] = [rowData[source_label].replace('target="_blank">', 'target="_blank"><b>').replace('</a>', '*</b></a>') if rowData['FDR'] < 0.05 else rowData[source_label] for index, rowData in enrichment_dataframe_subset.iterrows()]
 
         # Add rank
@@ -858,14 +785,14 @@ def run_l1000cds2(signature, nr_genes=500, signature_label='', plot_type='intera
 
         # Send to API
         config = {"aggravate":aggravate,"searchMethod":"geneSet","share":True,"combination":False,"db-version":"latest"}
-        r = requests.post('http://amp.pharm.mssm.edu/L1000CDS2/query',data=json.dumps({"data":data,"config":config}),headers={'content-type':'application/json'})
+        r = requests.post('http://maayanlab.cloud/L1000CDS2/query',data=json.dumps({"data":data,"config":config}),headers={'content-type':'application/json'})
         label = 'mimic' if aggravate else 'reverse'
 
         # Add results
         resGeneSet = r.json()
         if resGeneSet.get('topMeta'):
             l1000cds2_dataframe = pd.DataFrame(resGeneSet['topMeta'])[['cell_id', 'pert_desc', 'pert_dose', 'pert_dose_unit', 'pert_id', 'pert_time', 'pert_time_unit', 'pubchem_id', 'score', 'sig_id']].replace('-666', np.nan)
-            l1000cds2_results[label] = {'url': 'http://amp.pharm.mssm.edu/L1000CDS2/#/result/{}'.format(resGeneSet['shareId']), 'table': l1000cds2_dataframe}
+            l1000cds2_results[label] = {'url': 'http://maayanlab.cloud/L1000CDS2/#/result/{}'.format(resGeneSet['shareId']), 'table': l1000cds2_dataframe}
         else:
             l1000cds2_results[label] = None
     l1000cds2_results['plot_type'] = plot_type
@@ -919,9 +846,9 @@ def plot_l1000cds2(l1000cds2_results, counter, nr_drugs=7, height=300):
         fig['layout']['margin'].update(l=10, t=95, r=0, b=45, pad=5)
 
         if l1000cds2_results['plot_type'] == 'interactive':
-            plotly.offline.iplot(fig)        
+            fig.show()       
         else:
-            py.image.ishow(fig)
+            fig.show(renderer="png")
 
         display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), istable=False)
 
@@ -945,7 +872,7 @@ def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     payload = {"up_genes":upperGenes(signature.index[:nr_genes]),"down_genes":upperGenes(signature.index[-nr_genes:])}
 
     # Get URL
-    L1000FWD_URL = 'https://amp.pharm.mssm.edu/L1000FWD/'
+    L1000FWD_URL = 'https://maayanlab.cloud/L1000FWD/'
 
     # Get result
     response = requests.post(L1000FWD_URL + 'sig_search', json=payload)
@@ -954,7 +881,7 @@ def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     else:
         # Get ID and URL
         result_id = response.json()['result_id']
-        l1000fwd_results['result_url'] = 'https://amp.pharm.mssm.edu/l1000fwd/vanilla/result/'+result_id
+        l1000fwd_results['result_url'] = 'https://maayanlab.cloud/l1000fwd/vanilla/result/'+result_id
         l1000fwd_results['result_id'] = result_id
 
         # Get Top
@@ -984,7 +911,7 @@ def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
 
             # Display table
             pd.set_option('max.colwidth', -1)
-            signature_dataframe['Signature ID'] = ['<a href="http://amp.pharm.mssm.edu/dmoa/sig/{x}" target="_blank">{x}</a>'.format(**locals()) for x in signature_dataframe['Signature ID']]
+            signature_dataframe['Signature ID'] = ['<a href="http://maayanlab.cloud/dmoa/sig/{x}" target="_blank">{x}</a>'.format(**locals()) for x in signature_dataframe['Signature ID']]
             table_html = signature_dataframe.to_html(escape=False, classes='w-100')
             
             display(HTML('<style>.w-100{{width: 100% !important;}}</style><div style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">{}</div>'.format(table_html)))

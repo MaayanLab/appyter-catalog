@@ -8,6 +8,7 @@ seaborn
 matplotlib
 umap-learn
 scipy
+qnorm
 sklearn
 git+git://github.com/maayanlab/react-scatter-board
 git+git://github.com/maayanlab/react-GSEA.git@simplified

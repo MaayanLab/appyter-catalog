@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "Gene_Centric_GEO_Reverse_Search",
+  "title": "Gene Centric GEO Reverse Search",
+  "version": "0.0.3",
+  "description": "An appyter that generates volcano plot of gene signatures for an input gene and species of interest",
+  "image": "volcano_plot_ex.png",
+  "authors": [
+    {
+      "name": "Kerwin Chen",
+      "email": "kc764@cornell.edu"
+    },
+    {
+      "name": "Alex Lachmann",
+      "email": "alexander.lachmann@mssm.edu"
+    },
+    {
+      "name": "Sherry Xie",
+      "email": "zhuorui.xie@mssm.edu"
+    },
+    {
+      "name": "Megan Wojciechowiczl",
+      "email": "megan.wojciechowicz@icahn.mssm.edu"
+    },
+    {
+      "name": "Daniel Clarke",
+      "email": "daniel.clarke@mssm.edu"
+    },
+    {
+      "name": "Avi Ma'ayan",
+      "email": "avi.maayan@mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog/appyters/Gene_Centric_GEO_Reverse_Search",
+  "tags": [
+    "Signatures",
+    "Volcano Plot"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "public": true,
+  "appyter": {
+    "file": "GEO_Reverse_Search.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}

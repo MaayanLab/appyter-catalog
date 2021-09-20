@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "GMT_Augmentation_Appyter",
+  "title": "GMT Augmentation Appyter",
+  "version": "0.0.2",
+  "description": "Submit GMT files for gene set augmentation using co-expression or co-occurrence.",
+  "image": "favicon.png",
+  "authors": [
+    {
+      "name": "Eryk Kropiwnicki",
+      "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Genes",
+    "Gene Set Library",
+    "Gene Set Augmentation"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "public": true,
+  "appyter": {
+    "file": "GMT_Augmentation_Appyter.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}

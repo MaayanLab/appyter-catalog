@@ -2,12 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "Enrichr_Consensus_Terms",
   "title": "Enrichr Consensus Terms",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "This appyter returns consensus Enrichr terms using a set of gene sets",
   "image": "screenshot.png",
   "authors": [
     {
-      "name": "John Erol Evangelists",
+      "name": "John Erol Evangelista",
       "email": "JohnErol.Evangelista@mssm.edu"
     }
   ],

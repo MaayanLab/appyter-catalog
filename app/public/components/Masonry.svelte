@@ -14,14 +14,15 @@
       waitForImages: false,
       useOwnImageLoader: false,
       mobileFirst: true,
+      useContainerForBreakpoints: true,
       margin: {
         y: 16,
         x: '2%',
       },
       breakAt: {
-        1200: 3,
-        992: 2,
-        576: 1
+        1000: 3,
+        800: 2,
+        400: 1
       },
     })
   }

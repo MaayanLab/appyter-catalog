@@ -5,6 +5,5 @@ numpy
 seaborn
 ipython
 matplotlib
-bokeh==2.0.2
-umap
+bokeh==2.3.2
 requests

@@ -1,3 +1,8 @@
+# If trying to build this outside of the catalog,
+#  comment out/remove CATALOG blocks.
+#  Would have used a variable, but Docker doesn't
+#  seem to have a simple way to do this (:
+
 FROM ubuntu
 
 ENV DEBIAN_FRONTEND "noninteractive"
@@ -19,7 +24,7 @@ RUN set -x \
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
-  && pip3 install --no-cache-dir ipykernel \
+  && pip3 install --no-cache-dir ipython_genutils ipykernel \
   && python3 -m ipykernel install
 
 {%- if os.path.isfile(os.path.join(appyter_path, 'deps.txt')) %}
@@ -71,15 +76,17 @@ RUN set -x \
 
 {%- endif %}
 
-ARG appyter_version=git+git://github.com/Maayanlab/appyter.git
+ARG appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git
 RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --no-cache-dir --upgrade ${appyter_version}
 
+# BEGIN CATALOG
 COPY catalog_helper.py /bin/appyter-catalog-helper
 RUN set -x \
   && echo "Installing catalog helper..." \
   && chmod 755 /bin/appyter-catalog-helper
+# END CATALOG
 
 RUN set -x \
   && echo "Preparing user..." \
@@ -112,6 +119,9 @@ ENV PYTHONPATH "/app:$PYTHONPATH"
 
 COPY --chown=app:app . /app
 
+# BEGIN CATALOG
+RUN rm /app/catalog_helper.py
 RUN appyter-catalog-helper setup
+# END CATALOG
 
 CMD [ "appyter", "flask-app" ]
