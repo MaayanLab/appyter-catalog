@@ -1,0 +1,10 @@
+git+git://github.com/Maayanlab/appyter.git
+pandas
+numpy
+requests
+matplotlib
+seaborn
+h5py
+plotly
+ipython
+s3fs
