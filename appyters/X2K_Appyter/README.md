@@ -1,0 +1,16 @@
+# X2K Appyter
+
+The X2K Appyter (Expression2Kinases) predicts upstream regulatory networks associated with user-inputted sets of genes. Discrete query gene sets are compared first to ChEA3 libraries of transcription factor target gene sets assembled from orthogonal 'omics' datasets. Afterwards, ChEA3 results are put through a protein-protein interaction database to determine the transcription factor intermediate protein interactors. Finally, protein interactors are compared to the KEA3 background database—which contains measured and predicted kinase-substrate interactions, kinase-protein interactions, and interactions supported by co-expression and co-occurrence data—to determine which kinases may be most closely associated with the transcription factor intermediate protein interactors. Overall, Expression2Kinases can provide a method of identifying upstream regulators likely responsible for observed patterns in genome-wide gene expression.
+
+### Bar Charts
+The X2K Appyter returns bar charts for both the ChEA3 and KEA3 workflow portions. The bar charts are "mean rank bar charts." The total bar length is the average rank a certain transcription factor or kinases possesses across all of its contributing individual libraries. The colors within a total bar represent different individual libraries (labeled in the legend), which each give their own rank to a transcription factor or kinase. The size/length of each individual color varies on how well that transcription factor or kinase performed within that specific library. 
+
+Example:
+Take two molecules, A and B. A is ranked first in the red library but tenth in the green library. B is ranked sixth in the orange library and eighth in the green library. A's total bar length will be shorter (better) than B's, since A's average rank is lower (average between 1 and 10 is lower than the average between 6 and 8, all the different libraries are weighted equally). Within A's bar, however, red will make up a larger portion than green since A performed better in the red library than the green library. Same thing for B. B's total bar length will have a majority orange to display the fact that B performed better in the orange library than it did in the green library. 
+
+### Data Tables
+The data tables displayed by the X2K Appyter are all available to be downloaded as tsv files should the user wish to save the data for later.
+
+
+### Network Visualization
+The network visualization provides a summary of all the steps in the workflow of the X2K Appyter. Transcription factors are displayed in red, intermediate proteins/transcription factor interactors are displayed in grey, and kinases are displayed in blue. Protein-protein interactions between transcription factors and their intermediate proteins/interactors are shown by grey lines while phosphorylation reactions between kinases and intermediate proteins are shown by green lines. Users can zoom in on specific parts of the overall network to get a better view. Selecting a specific molecule or interaction in the network also highlights the pathway that the selected molecule participates in, allowing users to examine a specific pathway within the network in more depth.

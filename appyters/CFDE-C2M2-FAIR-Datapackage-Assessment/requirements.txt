@@ -1,0 +1,5 @@
+datapackage
+matplotlib
+pandas
+requests
+sqlalchemy

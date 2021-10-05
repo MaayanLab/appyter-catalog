@@ -689,24 +689,24 @@ spec:
     workload.user.cattle.io/workloadselector: deployment-appyters-orchestrator
 {%- for appyter in appyters %}
 ---
-# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/deployment.yaml
+# Source: templates/appyter-{{ appyter['name'].lower() }}/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  name: appyter-{{ appyter['name'].lower() }}
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+      workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower() }}
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+        workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower() }}
     spec:
       containers:
-      - name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+      - name: appyter-{{ appyter['name'].lower() }}
         image: {{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}
         imagePullPolicy: Always
         tty: true
@@ -724,16 +724,16 @@ spec:
         - name: DISPATCHER
           value: "http://appyters-orchestrator"
         - name: DISPATCHER_URL
-          value: "http://appyter-{{ appyter['name'].lower().replace('_', '-') }}/{{ appyter['name'] }}"
+          value: "http://appyter-{{ appyter['name'].lower() }}/{{ appyter['name'] }}"
         - name: DISPATCHER_IMAGE
           value: "{{ '{{ .Values.DOCKER_REGISTRY }}' }}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}"
       restartPolicy: Always
 ---
-# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/service.yaml
+# Source: templates/appyter-{{ appyter['name'].lower() }}/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  name: appyter-{{ appyter['name'].lower() }}
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
 spec:
   type: ClusterIP
@@ -743,13 +743,13 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower().replace('_', '-') }}
+    workload.user.cattle.io/workloadselector: deployment-appyter-{{ appyter['name'].lower() }}
 ---
-# Source: templates/appyter-{{ appyter['name'].lower().replace('_', '-') }}/ingress.yaml
+# Source: templates/appyter-{{ appyter['name'].lower() }}/ingress.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+  name: appyter-{{ appyter['name'].lower() }}
   namespace: {{ '{{ .Values.NAMESPACE }}' }}
   annotations:
     kubernetes.io/ingress.class: {{ '{{ .Values.INGRESS_CLASS }}' }}
@@ -774,7 +774,7 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: appyter-{{ appyter['name'].lower().replace('_', '-') }}
+          serviceName: appyter-{{ appyter['name'].lower() }}
           servicePort: 80
         path: /{{ appyter['name'] }}/
 {{ '{{- if .Values.APPYTERS_SERVER_NAME }}' }}
