@@ -18,7 +18,7 @@
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
-    "file": "Drugmonizome-Enrichment-Appyter.ipynb",
+    "file": "Drugmonizome_Enrichment_Appyter.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
