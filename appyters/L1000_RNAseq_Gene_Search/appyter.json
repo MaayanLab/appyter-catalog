@@ -1,0 +1,35 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "name": "L1000_RNAseq_Gene_Search",
+    "title": "Transformed L1000 to RNA-seq Signature Gene Search",
+    "version": "0.0.1",
+    "description": "An appyter that generates visualizations of gene-specific expression in transformed L1000 to RNA-seq perturbational signatures.",
+    "image": "featured_plot.png",
+    "authors": [
+      {
+        "name": "Zhuorui (Sherry) Xie",
+        "email": "sxie04@gmail.com"
+      },
+      {
+        "name": "Minji Jeon",
+        "email": "minji.jeon@mssm.edu"
+      }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/L1000_RNAseq_Gene_Search",
+    "tags": [
+      "L1000",
+      "RNA-seq",
+      "Transcriptomics",
+      "Visualization"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "appyter": {
+      "file": "L1000_RNAseq_Gene_Search.ipynb",
+      "profile": "biojupies",
+      "extras": [
+        "hide-code",
+        "toggle-code"
+      ]
+    }
+  }
+  
