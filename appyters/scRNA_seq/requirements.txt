@@ -33,3 +33,4 @@ typing-extensions==3.7.4.3
 scrublet==0.2.3
 bbknn==1.4.1
 kaleido
+palantir==1.0.0
