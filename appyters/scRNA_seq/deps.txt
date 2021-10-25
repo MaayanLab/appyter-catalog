@@ -6,3 +6,4 @@ libxml2-dev
 make
 libhdf5-dev
 libgit2-dev
+cmake
