@@ -155,14 +155,14 @@
               >{tag}</a>
             {/each}
           </div>
-          <button class="btn btn-primary btn-sm">
+          <button class="btn btn-primary btn-sm mb-1">
             View Details
           </button>
-          <a href="{base_url}/{appyter.name}/" class="btn btn-sm btn-danger">
+          <a href="{base_url}/{appyter.name}/" class="btn btn-sm btn-danger mb-1">
             Start Appyter
           </a>
-          <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-sm btn-secondary">
-            Run Appyter Locally
+          <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-sm btn-secondary mb-1">
+            Run Locally
           </a>
         </div>
       </div>
