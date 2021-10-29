@@ -81,7 +81,13 @@
           <div class="text-placeholder placeholder"></div>
         </div>
         <button class="btn btn-secondary btn-sm disabled">
-          Select
+          View Details
+        </button>
+        <button class="btn btn-sm btn-danger disabled">
+          Start Appyter
+        </button>
+        <button class="btn btn-sm btn-secondary disabled">
+          Run Appyter Locally
         </button>
       </div>
     </div>
@@ -150,8 +156,14 @@
             {/each}
           </div>
           <button class="btn btn-primary btn-sm">
-            Select
+            View Details
           </button>
+          <a href="{base_url}/{appyter.name}/" class="btn btn-sm btn-danger">
+            Start Appyter
+          </a>
+          <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-sm btn-secondary">
+            Run Appyter Locally
+          </a>
         </div>
       </div>
     </a>
