@@ -80,14 +80,14 @@
         <div class="pb-4 d-flex flex-row flex-wrap">
           <div class="text-placeholder placeholder"></div>
         </div>
-        <button class="btn btn-secondary btn-sm disabled">
+        <button class="btn btn-secondary btn-sm disabled mb-1">
           View Details
         </button>
-        <button class="btn btn-sm btn-danger disabled">
+        <button class="btn btn-sm btn-danger disabled mb-1">
           Start Appyter
         </button>
-        <button class="btn btn-sm btn-secondary disabled">
-          Run Appyter Locally
+        <button class="btn btn-sm btn-secondary disabled mb-1">
+          Run Locally
         </button>
       </div>
     </div>
