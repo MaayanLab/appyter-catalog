@@ -1,6 +1,6 @@
-git+git://github.com/Maayanlab/appyter.git
-git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
-git+https://github.com/maayanlab/clustergrammer-py@patch
+appyter @ git+https://github.com/Maayanlab/appyter
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+clustergrammer-py @ git+https://github.com/maayanlab/clustergrammer-py@patch
 numpy
 pandas
 scipy
