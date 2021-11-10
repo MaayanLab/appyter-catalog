@@ -76,7 +76,7 @@ RUN set -x \
 
 {%- endif %}
 
-ARG appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git
+ARG appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter
 RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --no-cache-dir --upgrade ${appyter_version}

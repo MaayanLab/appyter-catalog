@@ -1,5 +1,5 @@
 click
-git+git://github.com/Maayanlab/appyter.git
+appyter @ git+https://github.com/Maayanlab/appyter
 jsonschema
 nbformat
 Pillow
