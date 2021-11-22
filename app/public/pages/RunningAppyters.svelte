@@ -250,7 +250,7 @@
                   </p>
                   <CodeSnippet
                     code={`
-                      docker run -p 5000:5000 -it ${docker_tag} appyter serve
+                      docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -p 5000:5000 -it ${docker_tag} appyter serve
                     `}
                   />
                 {/if}
