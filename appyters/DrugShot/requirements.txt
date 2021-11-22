@@ -1,6 +1,6 @@
 pandas
 numpy
-git+git://github.com/Maayanlab/appyter.git
+appyter @ git+https://github.com/Maayanlab/appyter
 requests
 plotly
 scikit-learn
