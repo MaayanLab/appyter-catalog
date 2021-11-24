@@ -1,0 +1,4 @@
+# DODGE Chemical Similarity Appyter
+DODGEKB (Defective Organ Development Genetic Effects Knowledge Base) is an initiative that will produce a knowledge graph that connects phenotypes, tissues and organs, cell types and cell lines, drugs, and genes, based on knowledge and annotations captured across Common Fund DCCs.
+
+This Appyter provides knowledge from the chemical standpoint by facilitating the querying of small molecules (i.e. teratogens) to retrieve similiar small molecules based on Tanimoto structural similarity and similarity in the L1000 gene expression space. In this way, potentiallly teratogenic small molecules can be prioritized based on their structural and gene expression-based similarity to known teratogens.
