@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
-  "name": "DODGE_Chemical_Similarity_Appyter",
-  "title": "DODGE Chemical Similarity Appyter",
-  "version": "0.0.1",
-  "description": "This appyter facilitates the querying of a small molecule name to retrieve related small molecules based on structural and gene expression similarity.",
-  "image":"DODGE-Appyter-Logo.png",
+  "name": "LINCS_Chemical_Similarity_Appyter",
+  "title": "LINCS Chemical Similarity Appyter",
+  "version": "0.0.2",
+  "description": "This appyter facilitates the querying of a small molecule name to retrieve similar small molecules based on structural and gene expression similarity.",
+  "image":"LINCS-Chemical-Similarity-Appyter-Logo.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
@@ -13,13 +13,13 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
   "tags": [
-    "DODGEKB",
     "Tanimoto Similarity",
-    "L1000"
+    "L1000",
+    "LINCS"
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
-    "file": "DODGE-Chemical-Similarity-Appyter.ipynb",
+    "file": "LINCS-Chemical-Similarity-Appyter.ipynb",
     "profile": "biojupies",
     "extras": [
       "toc",
