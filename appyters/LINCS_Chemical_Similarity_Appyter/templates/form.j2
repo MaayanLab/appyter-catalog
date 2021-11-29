@@ -1,0 +1,18 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+            <h1 class = 'text-center'> LINCS Chemical Similarity Appyter </h1>
+            <p style= "text-align:center;margin:30px"> This Appyter outputs small molecules most similar to an input small molecule based on chemical structure similarity and gene expression signature similarity.
+             <br><br>Input a small molecule from the collection of >30,000 LINCS small molecules into the autocomplete field. Pressing submit will produce a report containing ranked lists of small molecules most similar to the input molecule based on Tanimoto structural similarity and L1000 gene expression signature similarity.
+             </p>
+
+{{ super() }}
+{% endblock %}
