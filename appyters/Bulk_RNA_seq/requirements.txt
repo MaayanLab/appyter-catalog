@@ -1,5 +1,5 @@
-git+git://github.com/Maayanlab/appyter.git
-git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+appyter @ git+https://github.com/Maayanlab/appyter
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
 ipykernel
 rpy2
 pandas

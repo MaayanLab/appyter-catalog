@@ -1,5 +1,5 @@
 datapackage
-deriva-datapackage @ git+https://github.com/nih-cfde/deriva-datapackage.git
+deriva-datapackage @ git+https://github.com/nih-cfde/deriva-datapackage
 matplotlib
 pandas
 requests

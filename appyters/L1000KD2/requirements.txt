@@ -1,10 +1,10 @@
-git+git://github.com/Maayanlab/appyter.git
+appyter @ git+https://github.com/Maayanlab/appyter
 dash
 numpy
 pandas
 fisher
 scipy
-git+git://github.com/maayanlab/react-scatter-board
+react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board
 plotly
 requests
 matplotlib

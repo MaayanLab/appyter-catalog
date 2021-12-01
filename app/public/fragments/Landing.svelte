@@ -32,9 +32,10 @@
         <span class="badge badge-primary m-1">{tag}</span>
       {/each}
     </span>
-    {#if appyter.url !== undefined}
-      <p><a href="{appyter.url}">{appyter.url}</a></p>
-    {/if}
+    <p>
+      <a href="{base_url}/{appyter.name}/" class="btn btn-lg btn-danger mb-1">Start Appyter</a>
+      <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-lg btn-secondary mb-1">Run Appyter Locally</a>
+    </p>
     <p>
       <b>First Published:</b> {(new Date(appyter.creation_timestamp)).toDateString()}<br />
       <b>Last Updated:</b> {(new Date(appyter.update_timestamp)).toDateString()}<br />
@@ -49,12 +50,15 @@
         </span>
       {/each}
     </p>
+    {#if appyter.url !== undefined}
+      <p><a href="{appyter.url}">{appyter.url}</a></p>
+    {/if}
   </div>
   <div class="col-sm-12">
     {@html appyter.long_description_html}
   </div>
   <div class="col-sm-12">
-    <a href="{base_url}/{appyter.name}/" class="btn btn-primary">Start Appyter</a>
-    <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-secondary">Run Appyter Locally</a>
+    <a href="{base_url}/{appyter.name}/" class="btn btn-lg btn-danger">Start Appyter</a>
+    <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-lg btn-secondary">Run Appyter Locally</a>
   </div>
 </div>
