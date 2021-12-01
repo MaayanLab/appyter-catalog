@@ -10,3 +10,4 @@ ipython
 s3fs
 bokeh
 colorcet
+pyvis
