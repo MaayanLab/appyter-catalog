@@ -18,6 +18,14 @@ import hashlib
 import colorcet as cc
 import itertools
 import random
+from pyvis.network import Network
+from scipy.sparse import load_npz
+import copy
+from bokeh.palettes import Colorblind, Bokeh, Category20,Category20b, Accent
+import s3fs
+import seaborn as sns
+import matplotlib.pyplot as plt
+from bokeh.models import Title
 
 # Get Enrichr link
 def Enrichr_API(enrichr_gene_list, description):
@@ -76,7 +84,7 @@ def predict_functions(library, matrix, query):
     df_results = df_results.sort_values(by ='Mean Pearson Correlation',ascending=False)
     return(df_results)
 
-def plot_bar(df,title,x_label,y_label):
+def plot_bar(df,title,x_label,y_label,filename):
     df_dict = {'x':list(df.index),'y':df[list(df.columns)[0]]}
     bar = figure(x_range=df_dict['x'], height=500, width=1000, title=title,toolbar_location="right", tools=["hover",'save'],tooltips=[ (x_label, "@x"),(y_label, "@y")])
     bar.vbar(x='x', top='y', width=0.7, source=df_dict)
@@ -87,8 +95,19 @@ def plot_bar(df,title,x_label,y_label):
     bar.yaxis.axis_label = y_label
     show(bar)
 
+    # Save image
+    plt.subplots(figsize=(20, 8))
+    sns.barplot(x=df_dict['x'], y=df_dict['y'],color='steelblue')
+    plt.ylabel(y_label,fontsize=20)
+    plt.xlabel(x_label,fontsize=20)
+    plt.xticks(rotation=60,fontsize=15,ha='right')
+    plt.title(title,fontsize=20)
+    plt.savefig(filename+'.png',facecolor='white',bbox_inches='tight')
+    plt.close()
+  
+
 # Plot the top terms for each prediction library
-def plot_results(library_names, results_dfs, top_results=20):
+def plot_results(library_names, results_dfs, file_name, top_results=15):
     
     fig = make_subplots(rows=1, cols=2, print_grid=False,shared_xaxes=False)
     max_scores = []
@@ -118,7 +137,7 @@ def plot_results(library_names, results_dfs, top_results=20):
             textfont={'color': 'black','size':8})
         fig.append_trace(text, 1, i+1)
     
-    annotations= [{'x': 0.25, 'y': 1.1, 'text': '<span style="color: black; font-size: 15pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.1, 'text': '<span style="color: black; font-size: 15pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
+    annotations= [{'x': 0.25, 'y': 1.1, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.1, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
     fig['layout'].update(height = 500, hovermode='closest', annotations=annotations)
     fig.update_layout(title='',height = 500,title_font_size = 25,title_x=0.5)
     
@@ -127,17 +146,85 @@ def plot_results(library_names, results_dfs, top_results=20):
     fig['layout']['yaxis1'].update(showticklabels=False)
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=30, t=65, r=30, b=35)
-    
+
+    # Show plot
     iplot(fig)
+
+    fig = make_subplots(rows=1, cols=2, print_grid=False,shared_xaxes=False)
+    max_scores = []
+    for i in range(0,2):
+        results_df = results_dfs[i][0:top_results].sort_values(by='Mean Pearson Correlation')
+        library_name = library_names[i]
+        max_scores.append(np.max(results_df['Mean Pearson Correlation']))
+        bar = go.Bar(x=results_df['Mean Pearson Correlation'],
+            y=results_df['Term'],
+            orientation='h',
+            name=library_name,
+            showlegend=False,
+            hovertext=['<b>Term: {Term}</b><br><b>Mean Pearson Correlation</b>: <i>{Mean Pearson Correlation:.3}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
+            hoverinfo='text', 
+            marker={'color': 'lightskyblue'})
+        fig.append_trace(bar, 1, i+1)
+        
+        #Get text
+        text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
+        text_shortened = [str(x[0:55] + '...' + x[-35::]) if len(x) > 93 else x for x in text_shortened] # if text is longer than image, shorten text
+        text = go.Scatter(
+            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
+            y=bar['y'],
+            mode='text',
+            hoverinfo='none',
+            showlegend=False,
+            text=text_shortened,
+            textposition="middle right",
+            textfont={'color': 'black','size':10})
+        fig.append_trace(text, 1, i+1)
+    
+    annotations= [{'x': 0.25, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
+    fig['layout'].update(height = 600, width = 1000, hovermode='closest', annotations=annotations)
+    fig.update_layout(title='',title_font_size = 30,title_x=0.5)
+    
+    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='Mean Pearson Correlation' ,range=(0,max_scores[0]+max_scores[0]*.01))
+    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='Mean Pearson Correlation',range=(0,max_scores[1]+max_scores[1]*.01))
+    fig['layout']['yaxis1'].update(showticklabels=False)
+    fig['layout']['yaxis2'].update(showticklabels=False)
+    fig['layout']['margin'].update(l=30, t=65, r=30, b=35)    
+    fig.write_image(file_name+".png")
+    fig.write_image(file_name+".svg")
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
     byte_string = bytearray(string, "utf8")
     return int(hashlib.sha256(byte_string).hexdigest(), base=16)%mod
 
-def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, category_list_dict=None, location='right', category=True, dropdown=False, figure_counter=0, additional_info=None, color_by_title='', first_selection = None, highlight_query=None):
+def plot_scatter(x,y,values,query,title,min_val,max_val,arrow_loc,rank,filename):
+    fig = plt.figure(figsize=(20,15))
+    plt.scatter(x, y, s=6, c=values, cmap=plt.cm.get_cmap('seismic'), vmin = min_val, vmax = max_val)
+    cb = plt.colorbar()
+    cb.set_label(label='Z-score',fontsize=15)
+    plt.xlabel('UMAP 1',fontsize=20)
+    plt.ylabel('UMAP 2',fontsize=20)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.annotate('', (arrow_loc['x'], arrow_loc['y']),xytext=(arrow_loc['x']+0.2, arrow_loc['y']+0.6),arrowprops=dict(facecolor='black', headwidth= 8, width=0.1))
+    plt.title(title,fontsize=25)
+    plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.png', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.close()
+
+
+def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, caption_text, category_list_dict=None, location='right', category=True, dropdown=False, figure_counter=0, additional_info=None, color_by_title='', first_selection = None, highlight_query=None, static_images_save = [], file_path=''):
     if first_selection == None:
         first_selection = option_list[0]
+
+    #Find the min and max scores across all options
+    
+    max_val = np.max([np.max(values_dict[option]) for option in values_dict.keys()])
+    min_val = np.min([np.min(values_dict[option]) for option in values_dict.keys()])
+    max_val_round = np.ceil(np.max([np.abs(max_val),np.abs(min_val)]))
+    max_val = max_val_round
+    min_val = np.negative(max_val_round)
+
     # init plot 
     source = ColumnDataSource(data=dict(x=umap_df["x"], y=umap_df["y"], values=values_dict[first_selection], names=sample_names))
     
@@ -146,7 +233,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         node_size = 4
     else:
         node_size = 6
-    plot = figure(plot_width=1000, plot_height=800)  
+    plot = figure(plot_width=1000, plot_height=800,sizing_mode='scale_both')      
  
     if category == True:
         unique_category_dict = dict()
@@ -209,8 +296,9 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
         for key in values_dict.keys():
             colors_dict[key]= cc.CET_D1A
 
-        color_mapper = LinearColorMapper(palette=colors_dict[first_selection] , low=min(values_dict[first_selection]), high=max(values_dict[first_selection]))
-        color_bar = ColorBar(color_mapper=color_mapper, label_standoff=12)
+        color_mapper = LinearColorMapper(palette=colors_dict[first_selection] , low=min_val, high=max_val)
+        #color_mapper = LinearColorMapper(palette=colors_dict[first_selection] , low=min(values_dict[first_selection]), high=max(values_dict[first_selection]))
+        color_bar = ColorBar(color_mapper=color_mapper)
         plot.add_layout(color_bar, 'right')
         scatter = plot.scatter('x', 'y', size=node_size,  source=source, color={'field': 'values', 'transform': color_mapper})
        
@@ -237,6 +325,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
     plot.xaxis.axis_label_text_font_size = "12pt"
     plot.yaxis.axis_label = "UMAP 2"
     plot.yaxis.axis_label_text_font_size = "12pt"
+
     
     plot.xaxis.major_tick_line_color = None  # turn off x-axis major ticks
     plot.xaxis.minor_tick_line_color = None  # turn off x-axis minor ticks
@@ -244,8 +333,16 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
     plot.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
     plot.xaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
     plot.yaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
+
+    plot.add_layout(Title(text="Z-score", align="left",standoff=0,offset=110), "right")
+
+    # Save static images 
+    for static_image_i,static_image in enumerate(static_images_save):
+        plot_scatter(x=umap_df['x'],y=umap_df['y'],values=values_dict[static_image],query=highlight_query,title=static_image,min_val=min_val,max_val=max_val,arrow_loc=umap_df.loc[highlight_query],rank=static_image_i+1,filename=file_path+'static/')
+ 
+
     default_text = "Figure {}. {}{}"
-    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=20, style={"font-family":'Helvetica', "font-style": "italic"})
+    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=10, style={"font-family":'Helvetica', "font-style": "italic"})
     figure_counter += 1
     if dropdown == True:
         if category == True:
@@ -322,3 +419,191 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
     else:
         col = column(plot, pre)
         show(col)
+    # Save to html file
+    # output_file(filename=file_path+highlight_query+'_dynamic_umap.html', title=highlight_query)
+    # save(col)
+
+# Interactive network visualization
+def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
+    
+    s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
+    edge_matrix = load_npz(s3.open('storage/lncRNA_Appyter/v0.0.6/network_edges.npz', 'rb'))
+
+    # Import chromosome location metadata
+    chr_loc = pd.read_csv(s3.open('storage/lncRNA_Appyter/v0.0.6/mart_export.txt','rb'),sep='\t')
+    chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].astype(str)
+    ensembl_2_chromsome = dict(zip(chr_loc['Gene stable ID'],chr_loc['Chromosome/scaffold name']))
+
+    # Find chromosome locations for each node
+    ensembl_network = [GENES_2_ENSEMBL[x] for x in LNCRNA_COEXP[0:100].index]
+    ensembl_network_loc = []
+    for x in ensembl_network:
+        try:
+            ensembl_network_loc.append(ensembl_2_chromsome[x])
+        except:
+            ensembl_network_loc.append('NA')
+    
+    # Node metadata
+    network = LNCRNA_COEXP[0:100]
+    #network.insert(1, 'Ensembl', ensembl_network, False)
+    network.insert(1, 'Chromosome', ensembl_network_loc,False)
+
+    # Load pre-computed edges
+    # Correlations <0.3 are 0
+   
+
+    # Edges per node to start
+    n_edges = 3
+
+    # Find all pairwise correlations between top correlated genes
+    network_genes = list(network.index)
+    network_genes_done = copy.deepcopy(network_genes)
+    idx_dict = dict(zip((ROW_GENES),list(range(0,len(ROW_GENES)))))
+
+    node1 = []
+    node2 = []
+    edge_values = []
+    
+    for symbol1 in list(network_genes):
+        idx1 = idx_dict[symbol1]
+        for symbol2 in network_genes_done:
+            idx2 = idx_dict[symbol2]
+            c = edge_matrix[idx1,idx2]
+            node1.append(symbol1)
+            node2.append(symbol2)
+            edge_values.append(c)
+        network_genes_done.remove(symbol1)
+        
+    # Add the top n_edges for the lncRNA of interest - regardless of correlation
+    for i in range(0,n_edges):
+        node1.append(list(network.index)[i])
+        node2.append(QUERY)
+        edge_values.append(list(network["Pearson's Correlation Coefficient"])[i])
+
+    # Edge Dataframe
+    all_edges_df = pd.DataFrame({"Node1":node1,'Node2':node2,'Correlation':edge_values})
+    all_edges_df = all_edges_df[all_edges_df['Correlation']!=1].reset_index(drop=True) # remove self-correlations
+    all_edges_df = all_edges_df[all_edges_df['Correlation']!=0].reset_index(drop=True) # remove correlations of 0
+    
+    # Only keep the top n edges per node to start 
+    idx_keep = []
+    for symbol in list(network_genes)+list([QUERY]):
+        top_idx=list(all_edges_df[(all_edges_df['Node1']==symbol) | (all_edges_df['Node2']==symbol)].sort_values(by='Correlation',ascending=False)[0:n_edges].index)
+        for idx in top_idx:
+            idx_keep.append(idx)
+    all_edges_df = all_edges_df.loc[sorted(np.unique(idx_keep))]
+    
+    
+    # Calculate the average edges per node in the network 
+    average = []
+    for node in np.unique(list(all_edges_df['Node1'])+list(all_edges_df['Node2'])):
+        sub_df = all_edges_df[(all_edges_df['Node1']==node) | (all_edges_df['Node2']==node)]
+        average.append(len(sub_df))
+    average = np.mean(average)
+
+    # Prune the network
+    # Remove edges from hub node one by one until the network has an average <3 edges per node
+    # Hub nodes are nodes with >10 edges. If there are no more hub nodes and the average is still >3 edges/node, decrease the definition of a hub node by 1
+    hub_node_n = 10
+    while average >3:
+        n_hubs = 0
+        remove_edges = []
+        for symbol in list(network_genes):
+            if symbol in np.unique(list(all_edges_df.Node1) + list(all_edges_df.Node2)):
+                sub_hub = all_edges_df[(all_edges_df.Node1 == symbol) | (all_edges_df.Node2 == symbol)].sort_values(by='Correlation',ascending=False)
+                if len(sub_hub)>hub_node_n:
+                    n_hubs = n_hubs + 1
+                    index_remove = list(sub_hub.index[hub_node_n-1:])
+                    for idx in index_remove:
+                        remove_edges.append(idx)
+        remove_edges = np.unique(remove_edges)
+        edges_keep = [x for x in list(all_edges_df.index) if x not in remove_edges]
+        all_edges_df= all_edges_df.loc[edges_keep]
+        average_new = []
+        for node in np.unique(list(all_edges_df['Node1'])+list(all_edges_df['Node2'])):
+            sub_df = all_edges_df[(all_edges_df['Node1']==node) | (all_edges_df['Node2']==node)]
+            average_new.append(len(sub_df))
+        average = np.mean(average_new)
+        if n_hubs == 0:
+            hub_node_n = hub_node_n-1
+    all_edges_df= all_edges_df.reset_index(drop=True)
+    
+    # After pruning, add the top 5 edges for the lncRNA of interest regardless of the pruning step
+    lncRNA_connections = all_edges_df[(all_edges_df['Node1']==QUERY)|(all_edges_df['Node2']==QUERY)]
+    for i,node in enumerate(LNCRNA_COEXP[0:5].index):
+        if node not in list(lncRNA_connections['Node1']):
+            if node not in list(lncRNA_connections['Node2']):
+                    df_add = {'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i]}
+                    all_edges_df = all_edges_df.append(df_add, ignore_index=True)
+
+
+    # If a node has no edges after pruning, remove it
+    nodes_keep = np.unique(list(all_edges_df['Node1'])+list(all_edges_df['Node2']))
+    nodes_keep = [x for x in nodes_keep if x!=QUERY]
+    network = network.loc[nodes_keep]
+    
+    # Get hover titles for nodes
+    titles = []
+    for i,x in enumerate(network.index):
+        titles.append(str(x)+ "(Chromosome:" + network['Chromosome'][i]+")")
+    titles.append(QUERY+ "(Chromosome:" + ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]+")")
+
+    # Get node colors
+    color_list = list(Category20[20] + Accent[8][5:6]+ Category20b[20][0:1] + Category20b[20][4:5]+ Bokeh[8][7:]+Colorblind[8][5:6])
+    color_list = [x+'90' for x in color_list] # Make node colors more opaque 
+    color_palette = list(random.sample(list(itertools.chain(*zip(color_list))),len(list(np.unique(network['Chromosome']))+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))))
+    chrom_2_color= dict(zip(list(np.unique(list(network['Chromosome'])+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))),color_palette ))
+    colors = [chrom_2_color[x] for x in list(network['Chromosome'])]
+    colors.append('red') # The lncRNA is labeled red
+
+    # Create the network
+    g = Network(height=800,width=800, notebook=True,bgcolor='wh', font_color='black')
+    g.add_nodes(
+        list(list(network.index)+list([QUERY])),
+        value=[10 for x in titles],
+        title=titles,
+        label=list(list(network.index)+list([QUERY])),
+        color=colors
+    )
+
+    # Add edges to the network
+    for i,node in enumerate(list(all_edges_df['Node1'])):
+        g.add_edge(node, list(all_edges_df['Node2'])[i], value=list(all_edges_df['Correlation'])[i])
+
+    # Set network options 
+    g.set_options('''
+        var options = {
+        "nodes": {
+            "color":{
+            "border": "black"
+            },
+        "borderWidth": 3,
+            "font": {
+            "color":"black",
+            "size": 20,
+            "face": "arial",
+            "highlight":"orange"
+            },
+            "shadow": {
+            "enabled": true
+            }
+        },
+        "edges": {
+            "color": {
+            "color":"lightgrey",
+            "inherit": false,
+            "highlight":"orange"
+            },
+            "smooth": false
+        },
+        "physics": {
+            "hierarchicalRepulsion": {
+            "centralGravity": 0
+            },
+            "minVelocity": 0.75
+        }
+        }
+        ''')
+    # Display network
+    return(g,network,all_edges_df)
+        
