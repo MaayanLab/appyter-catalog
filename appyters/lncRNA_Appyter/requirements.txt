@@ -1,4 +1,4 @@
-appyter @ git+https://github.com/Maayanlab/appyter
+git+git://github.com/Maayanlab/appyter.git
 pandas
 numpy
 requests
@@ -11,3 +11,4 @@ s3fs
 bokeh
 colorcet
 pyvis
+kaleido
