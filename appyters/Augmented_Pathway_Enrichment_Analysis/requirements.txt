@@ -1,0 +1,10 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+pandas
+matplotlib
+seaborn
+numpy
+bokeh
+pybase64
+statsmodels
+requests

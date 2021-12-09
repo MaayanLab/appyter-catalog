@@ -202,15 +202,24 @@ def validate_appyter(appyter):
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
     '-e', 'PYTHONPATH=/app',
+    '--device', '/dev/fuse',
+    '--cap-add', 'SYS_ADMIN',
+    '--security-opt', 'apparmor:unconfined',
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
     f"--cwd=/data",
     f"{nbfile}",
   ], stdout=PIPE, stderr=sys.stderr) as p:
     procLogger = logger.getChild(f"appyter nbexecute {nbfile}")
+    last_msg = None
     for msg in map(try_json_loads, p.stdout):
-      assert not (type(msg) == dict and msg['type'] == 'error'), f"error {msg.get('data')}"
-      procLogger.debug(f"{json.dumps(msg)}")
+      if type(msg) == dict and msg['type'] == 'error':
+        procLogger.error(f"{json.dumps(last_msg)}")
+        procLogger.error(f"{json.dumps(msg)}")
+        raise Exception(f"error {msg.get('data')}")
+      else:
+        procLogger.debug(f"{json.dumps(msg)}")
+        last_msg = msg
     assert p.wait() == 0, f"`appyter nbexecute {nbfile}` command failed"
   #
   logger.info(f"Success!")

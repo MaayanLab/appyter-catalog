@@ -1,15 +1,16 @@
-git+git://github.com/Maayanlab/appyter.git
+appyter @ git+https://github.com/Maayanlab/appyter
 requests
 pandas
 numpy
-git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
 seaborn
 matplotlib
 umap-learn
 scipy
+qnorm
 sklearn
 plotly
 plotly_express
-git+git://github.com/nicolemoiseyev/jupyter-d3.git@v0.0.4
+jupyter-d3 @ git+https://github.com/nicolemoiseyev/jupyter-d3@v0.0.4
 fastcluster
 lifelines

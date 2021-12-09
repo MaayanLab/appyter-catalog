@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "CFDE-Gene-WG",
+  "title": "CFDE Gene-WG",
+  "version": "0.0.13",
+  "description": "This Appyter uses FAIR APIs from different DCCs to find and present gene-centric knowledge.",
+  "image": "",
+  "public": false,
+  "authors": [
+    {
+      "name": "Daniel Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "Gene"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "GeneWG.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code",
+      "hide-code"
+    ]
+  }
+}

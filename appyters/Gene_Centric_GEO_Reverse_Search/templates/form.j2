@@ -1,0 +1,27 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <h1>Gene Centric GEO Reverse Search</h1>
+    <p style="text-align:center;"> Generate a volcano plot visualization displaying human/mouse signatures for a gene of interest.</p>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

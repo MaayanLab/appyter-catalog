@@ -33,7 +33,7 @@
       } else {
         slug_validity = true
       }
-      normalized_slug = $hash.params.slug.toLowerCase().replaceAll('-', '_')
+      normalized_slug = $hash.params.slug.toLowerCase()
     } else {
       slug_validity = undefined
     }
@@ -240,7 +240,7 @@
                   </p>
                   <CodeSnippet
                     code={`
-                      docker run -p 5000:5000 -it ${docker_tag} appyter fetch-and-serve ${public_url}/${$hash.params.slug}/${$hash.params.id}/
+                      docker run -p 5000:5000 --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -it ${docker_tag} appyter fetch-and-serve ${public_url}/${$hash.params.slug}/${$hash.params.id}/
                     `}
                   />
                 {:else}
@@ -250,7 +250,7 @@
                   </p>
                   <CodeSnippet
                     code={`
-                      docker run -p 5000:5000 -it ${docker_tag} appyter serve
+                      docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -p 5000:5000 -it ${docker_tag} appyter serve
                     `}
                   />
                 {/if}
@@ -266,7 +266,7 @@
                 <p>Executing the appyter as a web-form will allow you to serve the same type of application that we are serving but all execution happens in the docker image.</p>
                 <CodeSnippet
                   code={`
-                    docker run -p 5000:5000 -it ${docker_tag}
+                    docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -p 5000:5000 -it ${docker_tag}
                   `}
                 />
                 <p>The notebook should then be accessible in your web browser served from the container at <b>port 5000</b>.</p>
@@ -289,7 +289,8 @@
                     
                     # Execute a constructed jupyter notebook on the CLI
                     # exit code 0 for success, 1 for failure
-                    docker run -v $(pwd):/app/data -i ${docker_tag} appyter nbexecute data/output.ipynb
+                    # NOTE: fuse is required for nbexecute
+                    docker run -v $(pwd):/app/data --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -i ${docker_tag} appyter nbexecute data/output.ipynb
                     
                     # Review the appyter CLI options
                     docker run -it ${docker_tag} appyter --help
@@ -300,7 +301,8 @@
                 </p>
                 <CodeSnippet
                   code={`
-                    docker run -it ${docker_tag} /bin/bash
+                    # NOTE: fuse is required for some operations
+                    docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -it ${docker_tag} /bin/bash
                   `}
                 />
               {/if}

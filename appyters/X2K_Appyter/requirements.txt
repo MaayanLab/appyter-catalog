@@ -1,0 +1,8 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+requests
+numpy
+tabulate
+plotly
+kaleido
+observable_jupyter
+pandas

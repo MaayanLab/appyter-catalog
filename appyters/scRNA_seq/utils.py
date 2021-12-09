@@ -6,6 +6,7 @@ import numpy as np
 import warnings
 import re
 import random
+from collections import defaultdict
 
 # Visualization
 import scipy.stats as ss
@@ -19,7 +20,7 @@ from matplotlib.lines import Line2D
 from matplotlib_venn import venn2, venn3
 import IPython
 from IPython.display import HTML, display, Markdown, IFrame, FileLink
-from itertools import combinations
+from itertools import combinations, permutations
 from scipy import stats
 import seaborn as sns
 # Data analysis
@@ -216,128 +217,12 @@ def autoselect_color_by(sample_metadata):
 
 
 
-def run_dimension_reduction(dim_reduction_method, dataset, meta_class_column_name, magic_normalization=False, nr_genes=500, color_by='auto', color_type='categorical', plot_type='interactive'):
-    if magic_normalization == False:
-        expression_dataframe = dataset.to_df()
-        
-    else:
-        expression_dataframe = dataset.uns["magic"]
-    
-    top_genes = expression_dataframe.T.var(axis=1).sort_values(ascending=False)
-    
-    # Filter columns         # sample x gene
-    expression_dataframe = expression_dataframe.loc[:, top_genes.index[:nr_genes]]
-    
-    # Run PCA
-    if dim_reduction_method == "PCA":
-        dim_red=PCA(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe) 
-        # Get Variance
-        var_explained = ['PC'+str((i+1))+'('+str(round(e*100, 1))+'% var. explained)' for i, e in enumerate(dim_red.explained_variance_ratio_)]
-        
-    elif dim_reduction_method == "t-SNE":
-        dim_red = TSNE(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe)
-        var_explained = ['t-SNE 1', 't-SNE 2', 't-SNE 3']
-    elif dim_reduction_method == "UMAP":
-        dim_red = umap.UMAP(n_components=3)
-        embedding = dim_red.fit_transform(expression_dataframe)
-        var_explained = ['UMAP 1', 'UMAP 2', 'UMAP 3']
-        
-    sample_metadata = pd.DataFrame(dataset.obs.loc[:, meta_class_column_name])
-    # Estimate colors
-    if color_by == 'auto':
-        color_by, color_type = autoselect_color_by(sample_metadata)
-
-    # Return
-    dimension_reduction_results = {'result': dim_red, 'var_explained': var_explained, 'dim_reduction_method': dim_reduction_method,
-        'sample_metadata': sample_metadata, 'embedding': embedding,
-        'color_by': color_by, 'color_type': color_type, 'nr_genes': nr_genes, 
-        'plot_type': plot_type}
-    return dimension_reduction_results
 
 
 #############################################
 ########## 2. Plot
 #############################################
 
-
-def plot_dimension_reduction(dimension_reduction_results, return_data=False, plot_type="interactive"):
-    # Get results
-    dimension_reduction_embedding = dimension_reduction_results['embedding']
-    var_explained = dimension_reduction_results['var_explained']
-    sample_metadata = dimension_reduction_results['sample_metadata']
-    color_by = dimension_reduction_results.get('color_by')
-    color_type = dimension_reduction_results.get('color_type')
-    color_column = dimension_reduction_results['sample_metadata'][color_by] if color_by else None
-    if color_by:
-        colors = sns.color_palette(n_colors=len(color_column.unique())).as_hex()
-    dim_reduction_method = dimension_reduction_results["dim_reduction_method"]
-    
-    sample_titles = ['<b>{}</b><br>'.format(index)+'<br>'.join('<i>{key}</i>: {value}'.format(**locals()) for key, value in rowData.items()) for index, rowData in sample_metadata.iterrows()]
-    
-    if color_by and color_type == 'continuous':
-        marker = dict(size=5, color=color_column, colorscale='Viridis', showscale=True)
-        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                             y=dimension_reduction_embedding[category_indices, 1],
-                             z=dimension_reduction_embedding[category_indices, 2],
-                             mode='markers',
-                             hoverinfo='text',
-                             text=sample_titles,
-                             marker=marker)
-        
-        data = [trace]
-    elif color_by and color_type == 'categorical' and len(color_column.unique()) <= len(colors):
-        # Get unique categories
-        unique_categories = color_column.unique()
-        # Define empty list
-        data = []
-            
-        # Loop through the unique categories
-        for i, category in enumerate(unique_categories):
-            # Get the color corresponding to the category     
-            category_color = colors[i]
-
-            # Get the indices of the samples corresponding to the category
-            category_indices = [i for i, sample_category in enumerate(color_column) if sample_category == category]
-            
-            # Create new trace
-            trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                                 y=dimension_reduction_embedding[category_indices, 1],
-                                 z=dimension_reduction_embedding[category_indices, 2],
-                                 mode='markers',
-                                 hoverinfo='text',
-                                 text=[sample_titles[x] for x in category_indices],
-                                 name = category,
-                                 marker=dict(size=5, color=category_color))
-            # Append trace to data list
-            data.append(trace)
-    else: 
-        marker = dict(size=5)        
-        trace = go.Scatter3d(x=dimension_reduction_embedding[category_indices, 0],
-                             y=dimension_reduction_embedding[category_indices, 1],
-                             z=dimension_reduction_embedding[category_indices, 2],
-                            mode='markers',
-                            hoverinfo='text',
-                            text=sample_titles,
-                            marker=marker)
-        
-        data = [trace]
-    
-    colored = '' if str(color_by) == 'None' else 'Colored by {}'.format(color_by)
-    layout = go.Layout(title='<b>{} Analysis | Scatter Plot</b><br><i>{}</i>'.format(dimension_reduction_results["dim_reduction_method"], colored), 
-        hovermode='closest', margin=go.Margin(l=0,r=0,b=0,t=50), width=900,
-        scene=dict(xaxis=dict(title=var_explained[0]), yaxis=dict(title=var_explained[1]),zaxis=dict(title=var_explained[2])))
-
-    if return_data==True:
-        return data, layout
-    else:
-        fig = go.Figure(data=data, layout=layout)
-        
-        if plot_type=="interactive":
-            fig.show()
-        else:
-            fig.show(renderer="png")
 
 def normalize(adata, normalization_method, log_normalization):
     tmp_adata = adata.copy()
@@ -406,7 +291,7 @@ def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=Fals
     expr_df_sub_file = "expr_df_sub_file.txt"
     expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
     # POST the expression matrix to Clustergrammer and get the URL
-    clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
+    clustergrammer_url = 'https://maayanlab.cloud/clustergrammer/matrix_upload/'
     r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
 
     return r
@@ -420,6 +305,7 @@ def plot_clustergrammar(clustergrammer_url):
     display_link(clustergrammer_url, clustergrammer_url)
     # Embed
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
+
 
 
 
@@ -476,7 +362,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
         sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='t-test', use_raw=True)
             
         for cls1 in classes:
-            signature_label = " vs. ".join(["Cluster {}".format(cls1), "rest"])
+            signature_label = f"{cls1} vs. rest"
             print("Analyzing.. {} using {}".format(signature_label, method))
             cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #case
             non_cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]!=cls1, :].index.tolist() #control
@@ -512,7 +398,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
     else:
         sc.tl.rank_genes_groups(dataset, meta_class_column_name, method='wilcoxon', use_raw=True)
                 
-        for cls1, cls2 in combinations(classes, 2):
+        for cls1, cls2 in permutations(classes, 2):
             signature_label = " vs. ".join([cls1, cls2])
             print("Analyzing.. {} using {}".format(signature_label, method))
             cls1_sample_ids = meta_df.loc[meta_df[meta_class_column_name]==cls1, :].index.tolist() #control
@@ -551,7 +437,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
 
 
 def submit_enrichr_geneset(geneset, label):
-    ENRICHR_URL = 'https://amp.pharm.mssm.edu/Enrichr/addList'
+    ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
     genes_str = '\n'.join(geneset)
     payload = {
         'list': (None, genes_str),
@@ -565,16 +451,16 @@ def submit_enrichr_geneset(geneset, label):
     return data
 
 
-def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logFC', sort_genes_by='t', ascending=True):
+def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logFC'):
 
     # Sort signature
-    up_signature = signature[signature[fc_colname] > 0].sort_values(sort_genes_by, ascending=ascending)
-    down_signature = signature[signature[fc_colname] < 0].sort_values(sort_genes_by, ascending=ascending)
+    up_signature = signature[signature[fc_colname] > 0]
+    down_signature = signature[signature[fc_colname] < 0]
     
     # Get genesets
     genesets = {
         'upregulated': up_signature.index[:geneset_size],
-        'downregulated': down_signature.index[:geneset_size:]
+        'downregulated': down_signature.index[-geneset_size:]
     }
 
     # Submit to Enrichr
@@ -583,7 +469,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     return enrichr_ids
 
 def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
-    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
+    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/enrich'
     query_string = '?userListId=%s&backgroundType=%s'
     results = []
     for gene_set_library, label in gene_set_libraries.items():
@@ -618,22 +504,16 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
         libraries = {
             'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
             'MGI_Mammalian_Phenotype_Level_4_2019': 'MGI Mammalian Phenotype Level 4 2019'
-#             'GO_Molecular_Function_'+go_version: 'Gene Ontology Molecular Function ('+go_version+' version)',
-#             'GO_Cellular_Component_'+go_version: 'Gene Ontology Cellular Component ('+go_version+' version)'
         }
     elif library_type == "pathway":
         # Libraries
         libraries = {
             'KEGG_2019_Human': 'KEGG Pathways',
-#             'WikiPathways_2016': 'WikiPathways',
-#             'Reactome_2016': 'Reactome Pathways'
         }
     elif library_type == "celltype":
         # Libraries
         libraries = {
-            'ARCHS4_Tissues': 'ARCHS4 Tissues',
-            'Human_Gene_Atlas': 'Human Gene Atlas',
-            'Descartes_Cell_Types_and_Tissue_2021': 'Descartes Cell Types'
+            'HuBMAP_ASCT_plus_B_augmented_w_RNAseq_Coexpression': 'HuBMAP ASCT+B Cell Type'
         }
     elif library_type=="disease":
         libraries = {
@@ -745,73 +625,12 @@ def enrichment_analysis(items, library_data):
     all_results = get_enrichment_results(items, library_data)
     unzipped_results = list(zip(*all_results))
     pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
-    df = pd.DataFrame({"term_name":unzipped_results[0], "p value": pvals, \
+    df = pd.DataFrame({"term_name":unzipped_results[0], "pvalue": pvals, \
                        "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
-    df["-log(p value)"] = -np.log10(df["p value"])
-    df["q value"] = get_qvalue(df["p value"].tolist())
+    df["-log(p value)"] = -np.log10(df["pvalue"])
+    df["q value"] = get_qvalue(df["pvalue"].tolist())
     return [list(unzipped_results[0])], [pvals], df
 
-
-def plot_library_barchart(enrichr_results, gene_set_library, signature_label, case_name, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
-    sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
-    fig = tools.make_subplots(rows=1, cols=2, print_grid=False)
-    for i, geneset in enumerate(['upregulated', 'downregulated']):
-        # Get dataframe
-        enrichment_dataframe = enrichr_results[geneset]
-        plot_dataframe = enrichment_dataframe[enrichment_dataframe['gene_set_library'] == gene_set_library].sort_values(sort_results_by, ascending=False).iloc[:nr_genesets].iloc[::-1]
-
-        # Format
-        n = 7
-        plot_dataframe['nr_genes'] = [len(genes) for genes in plot_dataframe['overlapping_genes']]
-        plot_dataframe['overlapping_genes'] = ['<br>'.join([', '.join(genes[i:i+n]) for i in range(0, len(genes), n)]) for genes in plot_dataframe['overlapping_genes']]
-
-        # Get Bar
-        bar = go.Bar(
-            x=plot_dataframe[sort_results_by],
-            y=plot_dataframe['term_name'],
-            orientation='h',
-            name=geneset.title(),
-            showlegend=False,
-            hovertext=['<b>{term_name}</b><br><b>P-value</b>: <i>{pvalue:.2}</i><br><b>FDR</b>: <i>{FDR:.2}</i><br><b>Z-score</b>: <i>{zscore:.3}</i><br><b>Combined score</b>: <i>{combined_score:.3}</i><br><b>{nr_genes} Genes</b>: <i>{overlapping_genes}</i><br>'.format(**rowData) for index, rowData in plot_dataframe.iterrows()],
-            hoverinfo='text',
-            marker={'color': '#FA8072' if geneset == 'upregulated' else '#87CEFA'}
-        )
-        fig.append_trace(bar, 1, i+1)
-
-        # Get text
-        text = go.Scatter(
-            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
-            y=bar['y'],
-            mode='text',
-            hoverinfo='none',
-            showlegend=False,
-            text=['*<b>{}</b>'.format(rowData['term_name']) if rowData['FDR'] < 0.1 else '{}'.format(
-                rowData['term_name']) for index, rowData in plot_dataframe.iterrows()],
-            textposition="middle right",
-            textfont={'color': 'black'}
-        )
-        fig.append_trace(text, 1, i+1)
-
-    # Get annotations
-    annotations = [
-        {'x': 0.25, 'y': 1.06, 'text': '<span style="color: #FA8072; font-size: 10pt; font-weight: 600;">Up-regulated in ' +
-            case_name+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},
-        {'x': 0.75, 'y': 1.06, 'text': '<span style="color: #87CEFA; font-size: 10pt; font-weight: 600;">Down-regulated in ' +
-            case_name+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}
-    ] if signature_label else []
-
-    # Get title
-    title = signature_label + ' | ' + gene_set_library
-
-    fig['layout'].update(height=height, title='<b>{}</b>'.format(title),
-                         hovermode='closest', annotations=annotations)
-    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
-    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='-log10P' if sort_results_by == 'log10P' else 'Enrichment score')
-    fig['layout']['yaxis1'].update(showticklabels=False)
-    fig['layout']['yaxis2'].update(showticklabels=False)
-    fig['layout']['margin'].update(l=0, t=65, r=0, b=35)
-    
-    fig.show()
 
 import hashlib
 def str_to_int(string, mod):
@@ -832,7 +651,7 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
     if umap_df.shape[0] > 1000:
         node_size = 2
     else:
-        node_size = 4
+        node_size = 6
         
     if location == 'right':
         plot = figure(plot_width=1000, plot_height=800)   
@@ -969,11 +788,9 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
     return figure_counter
 
 
+
 def clustering(adata, dataset, bool_plot, figure_counter, batch_correction=True):
     # clustering
-#     sc.pp.neighbors(adata, n_neighbors=30)
-#     sc.tl.leiden(adata, resolution=1.0)
-#     sc.tl.umap(adata, min_dist=0.1)
     
     if batch_correction== True:
         sc.external.pp.bbknn(adata, batch_key="batch")
@@ -986,6 +803,7 @@ def clustering(adata, dataset, bool_plot, figure_counter, batch_correction=True)
     # sort by clusters
     new_order = adata.obs.sort_values(by='leiden').index.tolist()
     adata = adata[new_order, :]
+    adata.obs['leiden'] = 'Cluster '+adata.obs['leiden'].astype('object')
     
     if bool_plot == True:
         umap_df = pd.DataFrame(adata.obsm['X_umap'])
@@ -994,50 +812,14 @@ def clustering(adata, dataset, bool_plot, figure_counter, batch_correction=True)
         values_dict = dict()
         values_dict["Cluster"] = adata.obs["leiden"].values
         category_list_dict = dict()
-        category_list_dict["Cluster"] = list(sorted(adata.obs["leiden"].values.unique()))
+        category_list_dict["Cluster"] = list(sorted(adata.obs["leiden"].unique()))
         figure_counter = plot_scatter(umap_df, values_dict, ["Cluster"], adata.obs.index.tolist(), "Scatter plot of the samples. Each dot represents a sample and it is colored by ", category_list_dict=category_list_dict, category=True, dropdown=False, figure_counter=figure_counter)
 
         display(create_download_link(adata.obs["leiden"], filename=f"clustering_{dataset}.csv"))
     return adata, figure_counter
 
-def differential_gene_expression_analysis(adata, diff_gex_method, enrichment_groupby, meta_class_column_name, table_counter):
-    
-    if enrichment_groupby == "user_defined_class":
-        classes = adata.obs[meta_class_column_name].unique().tolist()
-        bool_cluster=False
-        if len(classes) < 2:
-            print("Warning: Please provide at least 2 classes in the metadata")
-    elif enrichment_groupby == "Cluster":
-        meta_class_column_name = "leiden"
-        classes = sorted(adata.obs["leiden"].unique().tolist())
-        classes.sort(key=int)
-        bool_cluster=True
-    else:
-        meta_class_column_name = enrichment_groupby
-        classes = sorted(adata.obs[meta_class_column_name].unique().tolist())
-        classes.sort()
-        bool_cluster=True
-        
-    if len(classes) > 5 and adata.n_obs > 5000:
-        if diff_gex_method == "wilcoxon":
-            print('Warning: There are too many cells/clusters. It cannot execute the analysis code for the data. The appyter randomly select 5000 samples. If you want to execute it with the whole data, please run it locally.')
-        else:
-            print('Warning: There are too many cells/clusters. It cannot execute the analysis code for the data. The appyter switched to Wilcoxon rank-sum method and randomly select 5000 samples. If you want to execute it with the whole data, please run it locally.')
-            diff_gex_method = "wilcoxon"
-        # randomly select 5K samples
-        random_selected_samples = random.sample(adata.obs.index.tolist(), 5000)
-        adata_random_sampled = adata[random_selected_samples, :]
-        signatures = get_signatures(classes, adata_random_sampled, method=diff_gex_method, meta_class_column_name=meta_class_column_name, cluster=bool_cluster)
-    else:
-        signatures = get_signatures(classes, adata, method=diff_gex_method, meta_class_column_name=meta_class_column_name, cluster=bool_cluster)
-    if len(classes) > 1:
-        for label, signature in signatures.items():
-            table_counter = display_object(table_counter, f"Top 5 Differentially Expressed Genes in {label}", signature.head(5), istable=True)
-            display(create_download_link(signature, filename="DEG_{}.csv".format(label)))
-    return signatures, bool_cluster, table_counter
 
-def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, diff_gex_method, enrichr_libraries_filename, enrichr_libraries, enrichment_groupby, libraries_tab, gene_topk, bool_cluster, bool_plot, figure_counter, table_counter):
-    
+def differential_gene_expression_analysis(adata, diff_gex_method, enrichment_groupby, meta_class_column_name, table_counter):
     if diff_gex_method == "characteristic_direction":
         fc_colname = "CD-coefficient"
         sort_genes_by = "CD-coefficient"
@@ -1058,6 +840,63 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
         fc_colname = "logfoldchanges"
         sort_genes_by = "scores"
         ascending = False
+        
+        
+    if enrichment_groupby == "user_defined_class":
+        classes = adata.obs[meta_class_column_name].unique().tolist()
+        bool_cluster=False
+        if len(classes) < 2:
+            print("Warning: Please provide at least 2 classes in the metadata")
+        
+    elif enrichment_groupby == "Cluster":
+        meta_class_column_name = "leiden"
+        classes = sorted(adata.obs["leiden"].unique().tolist())
+        classes = sorted(classes, key=lambda x: int(x.replace("Cluster ", "")))
+        bool_cluster=True
+    else:
+        meta_class_column_name = enrichment_groupby
+        classes = sorted(adata.obs[meta_class_column_name].unique().tolist())
+        classes.sort()
+        bool_cluster=True
+        
+    if len(classes) > 5 and adata.n_obs > 5000:
+        if diff_gex_method == "wilcoxon":
+            print('Warning: There are too many cells/clusters. It cannot execute the analysis code for the data. The appyter randomly select 5000 samples. If you want to execute it with the whole data, please run it locally.')
+        else:
+            print('Warning: There are too many cells/clusters. It cannot execute the analysis code for the data. The appyter switched to Wilcoxon rank-sum method and randomly select 5000 samples. If you want to execute it with the whole data, please run it locally.')
+            diff_gex_method = "wilcoxon"
+        # randomly select 5K samples
+        random_selected_samples = random.sample(adata.obs.index.tolist(), 5000)
+        adata_random_sampled = adata[random_selected_samples, :]
+        signatures = get_signatures(classes, adata_random_sampled, method=diff_gex_method, meta_class_column_name=meta_class_column_name, cluster=bool_cluster)
+    else:
+        signatures = get_signatures(classes, adata, method=diff_gex_method, meta_class_column_name=meta_class_column_name, cluster=bool_cluster)
+    
+    if len(classes) > 1:
+        for label, signature in signatures.items():
+            if bool_cluster == True:
+                case_label = label.split(" vs. ")[0]
+            else:
+                case_label = label.split(" vs. ")[1]
+            signature = signature.sort_values(by=sort_genes_by, ascending=ascending)
+            table_counter = display_object(table_counter, f"Top 5 Differentially Expressed Genes in {label} (up-regulated in {case_label})", signature.head(5), istable=True)
+            display(create_download_link(signature, filename="DEG_{}.csv".format(label)))
+    return signatures, bool_cluster, table_counter
+
+
+def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, diff_gex_method, enrichr_libraries_filename, enrichr_libraries, enrichment_groupby, libraries_tab, gene_topk, bool_cluster, bool_plot, figure_counter, table_counter):
+    
+    if diff_gex_method == "characteristic_direction":
+        fc_colname = "CD-coefficient"
+    elif diff_gex_method == "limma":
+        fc_colname = "logFC"
+    elif diff_gex_method == "edgeR":
+        fc_colname = "logFC"
+    elif diff_gex_method == "DESeq2":
+        fc_colname = "log2FoldChange"
+    elif diff_gex_method == "wilcoxon":
+        fc_colname = "logfoldchanges"
+        
     results = {}    
     if libraries_tab == 'Yes' or libraries_tab == 'All':
         results['enrichr'] = {}
@@ -1073,11 +912,11 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
                 case_name = label.split(" vs. ")[0]
                 col_name = "batch"
 
-            results['enrichr'][label] = run_enrichr(signature=signature, signature_label=label, fc_colname=fc_colname,geneset_size=gene_topk, sort_genes_by = sort_genes_by,ascending=ascending)
+            results['enrichr'][label] = run_enrichr(signature=signature, signature_label=label, fc_colname=fc_colname, geneset_size=gene_topk)
             display(Markdown("*Enrichment Analysis Result: {} (Up-regulated in {})*".format(label, case_name)))
-            display_link("https://amp.pharm.mssm.edu/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["upregulated"]["shortId"]))
+            display_link("https://maayanlab.cloud/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["upregulated"]["shortId"]))
             display(Markdown("*Enrichment Analysis Result: {} (Down-regulated in {})*".format(label, case_name)))
-            display_link("https://amp.pharm.mssm.edu/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["downregulated"]["shortId"]))
+            display_link("https://maayanlab.cloud/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["downregulated"]["shortId"]))
         table_counter = display_object(table_counter, "The table displays links to Enrichr containing the results of enrichment analyses generated by analyzing the up-regulated and down-regulated genes from a differential expression analysis. By clicking on these links, users can interactively explore and download the enrichment results from the Enrichr website.", istable=True)
     if libraries_tab == 'No' or libraries_tab == 'All':
         results['user_defined_enrichment'] = {}
@@ -1097,7 +936,7 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
             user_library = library_to_dict(get_library(enrichr_libraries_filename))
 
             # Sort signature
-            up_signature = signature[signature[fc_colname] > 0].sort_values(sort_genes_by, ascending=ascending)
+            up_signature = signature[signature[fc_colname] > 0]
             up_genes = [x.upper() for x in up_signature.index[:gene_topk].tolist()]
 
             results['user_defined_enrichment'][label] = dict()
@@ -1153,63 +992,58 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
             results['disease_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='disease', version='2018')
     
     library_option_list = set()
+    top3_enriched_terms_dict = defaultdict(list)
     for label, signature in signatures.items():
         if bool_cluster == True:
-            cluster_names = [label.split(" vs. ")[0].replace("Cluster ", "")]
+            cluster_names = [label.split(" vs. ")[0]]
         else:
-            cluster_names = label.split(" vs. ")
+            cluster_names = [label.split(" vs. ")[1]]
 
         for key in results.keys():
             if key.endswith("enrichment") == False:
                 continue
             enrichment_results = results[key][label]
             meta_df = adata.obs
-            if bool_cluster == True:
-                for cluster_name in cluster_names:
-                    for direction in ['upregulated']:
-                        if direction in enrichment_results:
-                            enrichment_dataframe = enrichment_results[direction]
-                        else:
-                            enrichment_dataframe = enrichment_results["enrichment_dataframe"]
-                            
-                        if enrichment_dataframe.empty == True:
-                            raise Exception("Enrichment analysis returns empty results. Please check if your data contains proper gene names.")
-                        libraries = enrichment_dataframe['gene_set_library'].unique() 
-                        for library in libraries:
-                            enrichment_dataframe_library = enrichment_dataframe[enrichment_dataframe['gene_set_library']==library]
-                            top_term = enrichment_dataframe_library.iloc[0]['term_name']
-                            if library not in meta_df.columns:
-                                meta_df.insert(0, library, np.nan)
-                            meta_df[library] = meta_df[library].astype("object")
-                            if bool_cluster == True:
-                                meta_df.loc[meta_df[col_name]==cluster_name, library] = top_term
-                            else:
-                                meta_df.loc[meta_df[meta_class_column_name]==cluster_name, library] = top_term
-                            library_option_list.add(library)
-            else: # bool_cluster == False
+            for cluster_name in cluster_names:
                 for direction in ['upregulated']:
                     if direction in enrichment_results:
                         enrichment_dataframe = enrichment_results[direction]
                     else:
                         enrichment_dataframe = enrichment_results["enrichment_dataframe"]
-                    if enrichment_dataframe.empty == True:
-                        raise Exception("Enrichment analysis returns empty results. Please check if your data and library contains shared items.")
 
-                            
-                    libraries = enrichment_dataframe['gene_set_library'].unique()  
+                    if enrichment_dataframe.empty == True:
+                        raise Exception("Enrichment analysis returns empty results. Please check if your data contains proper gene names.")
+                    libraries = enrichment_dataframe['gene_set_library'].unique() 
                     for library in libraries:
                         enrichment_dataframe_library = enrichment_dataframe[enrichment_dataframe['gene_set_library']==library]
+                        
+                        # todo
+                        top3_enriched_terms = enrichment_dataframe_library.iloc[:3]
+                        selected_columns = ['term_name', 'pvalue']
+                        top3_enriched_terms = top3_enriched_terms[selected_columns]
+                        top3_enriched_terms.columns = ["Enriched Term", "pvalue"]
+                        top3_enriched_terms.insert(0, 'Rank', [1,2,3])
+                        top3_enriched_terms.insert(0, 'Class', cluster_name)
+                        
+                        top3_enriched_terms_dict[library].append(top3_enriched_terms)
+                        
                         top_term = enrichment_dataframe_library.iloc[0]['term_name']
                         if library not in meta_df.columns:
                             meta_df.insert(0, library, np.nan)
                         meta_df[library] = meta_df[library].astype("object")
-                        if direction == "upregulated":
-                            meta_df.loc[meta_df[meta_class_column_name]==cluster_names[0], library] = top_term
+                        if bool_cluster == True:
+                            meta_df.loc[meta_df[col_name]==cluster_name, library] = top_term
                         else:
-                            meta_df.loc[meta_df[meta_class_column_name]==cluster_names[1], library] = top_term
+                            meta_df.loc[meta_df[meta_class_column_name]==cluster_name, library] = top_term
                         library_option_list.add(library)
-
+    
     library_option_list = list(library_option_list)
+    
+    for library in library_option_list: 
+        top_enriched_term_df = pd.concat(top3_enriched_terms_dict[library])
+        top_enriched_term_df = top_enriched_term_df.set_index(["Class", "Rank"])
+        table_counter = display_object(table_counter, f"Top 3 Enriched Terms for each cluster/class in library {library}. To see more results, please use Enrichr links above.", df=top_enriched_term_df, istable=True)
+        display(create_download_link(top_enriched_term_df, filename=f"Top3_Enriched_Terms_{library}.csv"))
     # umap info into dataframe 
     umap_df = pd.DataFrame(adata.obsm['X_umap'])
     umap_df.columns = ['x', 'y']
@@ -1224,6 +1058,9 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
     if bool_plot == True:
         figure_counter = plot_scatter(umap_df, values_dict, option_list, adata.obs.index.tolist(), "Scatter plot of the samples. Each dot represents a sample and it is colored by enriched terms in library ", location='below', category_list_dict=category_list_dict, category=True, dropdown=True, figure_counter=figure_counter)
     return adata, option_list, figure_counter, table_counter
+
+
+
 
 
 def summary(adata, option_list, table_counter):
@@ -1272,10 +1109,10 @@ def results_table(enrichment_dataframe, source_label, target_label, label, table
 
         # Add links and bold for significant results
         # if " " in enrichment_dataframe_subset[source_label][0]:
-        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
+        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
           
         # else:
-        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
+        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
         enrichment_dataframe_subset[source_label] = [rowData[source_label].replace('target="_blank">', 'target="_blank"><b>').replace('</a>', '*</b></a>') if rowData['FDR'] < 0.05 else rowData[source_label] for index, rowData in enrichment_dataframe_subset.iterrows()]
 
         # Add rank

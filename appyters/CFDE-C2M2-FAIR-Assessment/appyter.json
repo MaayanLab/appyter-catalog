@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "CFDE-C2M2-FAIR-Assessment",
+  "title": "CFDE C2M2 FAIR Assessment",
+  "version": "0.1.1",
+  "description": "This Appyter asserts C2M2 FAIR Rubric on a C2M2 Datapackage",
+  "image": "screenshot.png",
+  "public": true,
+  "authors": [
+    {
+      "name": "Daniel Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "FAIR"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "C2M2Assessment.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "hide-code",
+      "toc",
+      "toggle-code"
+    ]
+  }
+}

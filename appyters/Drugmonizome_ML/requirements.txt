@@ -1,4 +1,4 @@
-git+git://github.com/Maayanlab/appyter.git
+appyter @ git+https://github.com/Maayanlab/appyter
 autopep8
 pandas
 numpy

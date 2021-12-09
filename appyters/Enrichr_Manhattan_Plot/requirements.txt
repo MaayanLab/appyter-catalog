@@ -1,4 +1,4 @@
-git+https://github.com/MaayanLab/appyter
+appyter @ git+https://github.com/MaayanLab/appyter
 pandas
 numpy
 requests
