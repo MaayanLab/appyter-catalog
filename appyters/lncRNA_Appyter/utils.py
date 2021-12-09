@@ -126,13 +126,15 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
         fig.append_trace(bar, 1, i+1)
         
         #Get text
+        text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
+        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
         text = go.Scatter(
             x=[max(bar['x'])/50 for x in range(len(bar['y']))],
             y=bar['y'],
             mode='text',
             hoverinfo='none',
             showlegend=False,
-            text=['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()],
+            text=text_shortened,
             textposition="middle right",
             textfont={'color': 'black','size':8})
         fig.append_trace(text, 1, i+1)
@@ -168,7 +170,7 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
         
         #Get text
         text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
-        text_shortened = [str(x[0:55] + '...' + x[-35::]) if len(x) > 93 else x for x in text_shortened] # if text is longer than image, shorten text
+        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
         text = go.Scatter(
             x=[max(bar['x'])/50 for x in range(len(bar['y']))],
             y=bar['y'],
