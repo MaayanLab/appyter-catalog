@@ -1,4 +1,4 @@
 requests
 pandas
 numpy
-git+git://github.com/Maayanlab/maayanlab-bioinformatics.git
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics

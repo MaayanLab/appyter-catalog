@@ -3,3 +3,4 @@ pandas
 matplotlib
 bokeh==2.3.0
 pyarrow
+requests
