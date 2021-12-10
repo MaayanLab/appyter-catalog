@@ -18,14 +18,14 @@ def acquire_with_timeout(lock):
   lock.release()
 
 class NCBITaxonClient(Thread):
-  def __init__(self):
+  def __init__(self, cachedir='.cached'):
     super().__init__()
     self._queue = Queue()
     self._data = {}
     self._data_lock = Lock()
     self._join = False
-    os.makedirs('.cached', exist_ok=True)
-    self._local_data = shelve.open('.cached/ncbitaxon.cache')
+    os.makedirs(cachedir, exist_ok=True)
+    self._local_data = shelve.open(os.path.join(cachedir, 'ncbitaxon.cache'))
   #
   def run(self):
     # when _join is set, we'll exit the loop when the queue is empty
@@ -88,8 +88,8 @@ class NCBITaxonClient(Thread):
     return self.fetch(id)
 
 @contextmanager
-def create_ncbi_taxon_client():
-  ncbi_taxon_client = NCBITaxonClient()
+def create_ncbi_taxon_client(cachedir='.cached'):
+  ncbi_taxon_client = NCBITaxonClient(cachedir=cachedir)
   ncbi_taxon_client.start()
   try:
     yield ncbi_taxon_client
