@@ -13,3 +13,4 @@ colorcet
 pyvis
 kaleido
 requests
+aiohttp
