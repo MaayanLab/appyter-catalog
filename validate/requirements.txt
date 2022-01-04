@@ -1,6 +1,8 @@
+aiohttp
 appyter @ git+https://github.com/Maayanlab/appyter
 click
 fsspec
 jsonschema
 nbformat
 Pillow
+requests
