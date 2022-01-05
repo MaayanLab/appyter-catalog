@@ -126,13 +126,15 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
         fig.append_trace(bar, 1, i+1)
         
         #Get text
+        text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
+        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
         text = go.Scatter(
             x=[max(bar['x'])/50 for x in range(len(bar['y']))],
             y=bar['y'],
             mode='text',
             hoverinfo='none',
             showlegend=False,
-            text=['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()],
+            text=text_shortened,
             textposition="middle right",
             textfont={'color': 'black','size':8})
         fig.append_trace(text, 1, i+1)
@@ -168,7 +170,7 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
         
         #Get text
         text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
-        text_shortened = [str(x[0:55] + '...' + x[-35::]) if len(x) > 93 else x for x in text_shortened] # if text is longer than image, shorten text
+        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
         text = go.Scatter(
             x=[max(bar['x'])/50 for x in range(len(bar['y']))],
             y=bar['y'],
@@ -190,7 +192,7 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=30, t=65, r=30, b=35)    
     fig.write_image(file_name+".png")
-    fig.write_image(file_name+".svg")
+    #fig.write_image(file_name+".svg")
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
@@ -209,7 +211,7 @@ def plot_scatter(x,y,values,query,title,min_val,max_val,arrow_loc,rank,filename)
     plt.annotate('', (arrow_loc['x'], arrow_loc['y']),xytext=(arrow_loc['x']+0.2, arrow_loc['y']+0.6),arrowprops=dict(facecolor='black', headwidth= 8, width=0.1))
     plt.title(title,fontsize=25)
     plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.png', bbox_inches='tight', dpi=300, facecolor='white')
-    plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
+    #plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close()
 
 
@@ -424,13 +426,12 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     # save(col)
 
 # Interactive network visualization
-def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
+def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES,NETWORK_EDGE_FILE,CHROM_LOC_DATA):
     
-    s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
-    edge_matrix = load_npz(s3.open('storage/lncRNA_Appyter/v0.0.6/network_edges.npz', 'rb'))
+    edge_matrix = load_npz(NETWORK_EDGE_FILE)
 
     # Import chromosome location metadata
-    chr_loc = pd.read_csv(s3.open('storage/lncRNA_Appyter/v0.0.6/mart_export.txt','rb'),sep='\t')
+    chr_loc = pd.read_csv(CHROM_LOC_DATA,sep='\t')
     chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].astype(str)
     ensembl_2_chromsome = dict(zip(chr_loc['Gene stable ID'],chr_loc['Chromosome/scaffold name']))
 
@@ -551,7 +552,7 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
     # Get node colors
     color_list = list(Category20[20] + Accent[8][5:6]+ Category20b[20][0:1] + Category20b[20][4:5]+ Bokeh[8][7:]+Colorblind[8][5:6])
     color_list = [x+'90' for x in color_list] # Make node colors more opaque 
-    color_palette = list(random.sample(list(itertools.chain(*zip(color_list))),len(list(np.unique(network['Chromosome']))+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))))
+    color_palette = list(random.sample(list(itertools.chain(*zip(color_list))),len(list(np.unique(list(network['Chromosome'])+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))))))
     chrom_2_color= dict(zip(list(np.unique(list(network['Chromosome'])+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))),color_palette ))
     colors = [chrom_2_color[x] for x in list(network['Chromosome'])]
     colors.append('red') # The lncRNA is labeled red
