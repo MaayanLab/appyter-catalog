@@ -891,6 +891,8 @@ def differential_gene_expression_analysis(adata, diff_gex_method, enrichment_gro
 
 
 
+
+
 def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, diff_gex_method, enrichr_libraries_filename, enrichr_libraries, enrichment_groupby, libraries_tab, gene_topk, bool_cluster, bool_plot, figure_counter, table_counter):
 
     topk_enrichment_terms = 3
@@ -1091,7 +1093,6 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
     return adata, option_list, figure_counter, table_counter
 
 
-
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -1100,7 +1101,7 @@ from scipy.spatial.distance import pdist, squareform
 def extract_library_name(path):
     return path.replace("libraries/","").replace(".txt","").replace(".gmt", "").replace("_0","")
 
-def plot_protrack(libraries, tmp_adata, figure_counter=0, fig_size=(1800, 800)):
+def plot_protrack(libraries, tmp_adata, bool_plot_rug=True, bool_plot_dendrogram=True, figure_counter=0, fig_size=(1800, 800)):
     
     frequent_genes = get_frequent_genes(tmp_adata.uns['signature'])
     frequent_genes = frequent_genes.intersection(tmp_adata.var.index)
@@ -1115,29 +1116,31 @@ def plot_protrack(libraries, tmp_adata, figure_counter=0, fig_size=(1800, 800)):
                        )
 
     # plot dendrogram
-    fig, dendrogram_fig, trace_idx, dendrogram_sample_index_list = plot_dendrogram(fig, tmp_adata, frequent_genes, trace_idx)
+    if bool_plot_dendrogram == True:
+        fig, dendrogram_fig, trace_idx, dendrogram_sample_index_list = plot_dendrogram(fig, tmp_adata, frequent_genes, trace_idx)
     
     # get color mapping dictionary
     color_map_dict = get_color_map(libraries, tmp_adata)
         
     i = 2
+    if bool_plot_rug == True:
+        for library_filename in libraries:
+            # init rug plots
+            adata_heatmap = tmp_adata.copy()
+            adata_heatmap.obs = adata_heatmap.obs.T.drop_duplicates().T
+            new_library_filename = extract_library_name(library_filename)
+            library_name = library_filename+"_0"
+            clean_library_filename = {library_name: new_library_filename}
+            new_cols = list()
+            for col in adata_heatmap.obs.columns:
+                if col in clean_library_filename:
+                    new_cols.append(clean_library_filename[col])
+                else:
+                    new_cols.append(col)
+            adata_heatmap.obs.columns = new_cols
 
-    for library_filename in libraries:
-        # init rug plots
-        adata_heatmap = tmp_adata.copy()
-        new_library_filename = extract_library_name(library_filename)
-        library_name = library_filename+"_0"
-        clean_library_filename = {library_name: new_library_filename}
-        new_cols = list()
-        for col in adata_heatmap.obs.columns:
-            if col in clean_library_filename:
-                new_cols.append(clean_library_filename[col])
-            else:
-                new_cols.append(col)
-        adata_heatmap.obs.columns = new_cols
-
-        ####### rug plots to show predicted cell types/enriched terms    ########
-        fig, trace_idx, i = plot_rug(fig, dendrogram_fig, dendrogram_sample_index_list, adata_heatmap, new_library_filename, color_map_dict, trace_idx, i)
+            ####### rug plots to show predicted cell types/enriched terms    ########
+            fig, trace_idx, i = plot_rug(fig, dendrogram_fig, dendrogram_sample_index_list, adata_heatmap, new_library_filename, color_map_dict, trace_idx, i)
         
         
     # Edit Layout
@@ -1158,7 +1161,7 @@ def plot_rug(fig, dendrogram_fig, dendrogram_sample_index_list, adata_heatmap, n
     rug_df.columns = ['x']
     rug_df['y'] = new_library_filename
     rug_df['sample'] = rug_df.index
-    rug_df['Prediction'] = adata_heatmap.obs.loc[dendrogram_sample_index_list, new_library_filename].map(str)
+    rug_df['Prediction'] = adata_heatmap.obs.loc[dendrogram_sample_index_list, new_library_filename].astype(str)#.map(str)
     cell_types = list(map(str, rug_df['Prediction'].tolist()))
 
     subfig = px.scatter(rug_df, x='x', y='y', color='Prediction', hover_name='sample',
@@ -1222,6 +1225,7 @@ def get_frequent_genes(signatures, topk_genes_heatmap=1000):
     sorted_dict = set(top1000_rank_df.iloc[:topk_genes_heatmap,:].index)
     
     return sorted_dict
+
 def get_color_map(library_filenames, tmp_adata):
     # legend color map
     color_list = list()
@@ -1234,8 +1238,10 @@ def get_color_map(library_filenames, tmp_adata):
     i = 0
     for library_filename in library_filenames:
         library_name = library_filename+"_0" # top1 prediction
-
-        prediction = tmp_adata.obs[library_name].unique()
+        if library_name in tmp_adata.obs.columns:
+            prediction = tmp_adata.obs[library_name].unique()
+        else:
+            prediction = tmp_adata.obs[library_filename].unique()
         for pred in prediction:
             pred = str(pred)
             cl_id_in_pred = pred.split(":")[-1]
@@ -1253,6 +1259,7 @@ def get_color_map(library_filenames, tmp_adata):
             if i == len(color_list):
                 i = i-len(color_list)
     return color_map_dict
+
 def summary(adata, option_list, table_counter):
     for col in option_list:
         counts = adata.obs[[col]].reset_index().groupby(col).count()
