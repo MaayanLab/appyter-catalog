@@ -7,6 +7,7 @@ seaborn
 h5py
 plotly
 ipython
+s3fs
 bokeh
 colorcet
 pyvis
