@@ -28,7 +28,7 @@ colorcet==2.0.6
 bokeh==2.3.1
 PyYAML==5.4.1
 python-dateutil==2.8.1
-pillow==8.2.0
+pillow==8.3.2
 typing-extensions==3.7.4.3
 scrublet==0.2.3
 bbknn==1.4.1
