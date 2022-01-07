@@ -9,7 +9,7 @@ matplotlib==3.3.0
 scipy==1.5.2
 stats==0.1.2a0
 scikit-learn==0.23.2
-numpy==1.20.1
+numpy==1.21.0
 scanpy==1.7.2
 python-igraph==0.8.2
 anndata==0.7.6
