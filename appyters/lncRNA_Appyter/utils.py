@@ -426,12 +426,13 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     # save(col)
 
 # Interactive network visualization
-def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES,NETWORK_EDGE_FILE,CHROM_LOC_DATA):
+def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
     
-    edge_matrix = load_npz(NETWORK_EDGE_FILE)
+    s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
+    edge_matrix = load_npz(s3.open('storage/lncRNA_Appyter/v0.0.6/network_edges.npz', 'rb'))
 
     # Import chromosome location metadata
-    chr_loc = pd.read_csv(CHROM_LOC_DATA,sep='\t')
+    chr_loc = pd.read_csv(s3.open('storage/lncRNA_Appyter/v0.0.6/mart_export.txt','rb'),sep='\t')
     chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].astype(str)
     ensembl_2_chromsome = dict(zip(chr_loc['Gene stable ID'],chr_loc['Chromosome/scaffold name']))
 
