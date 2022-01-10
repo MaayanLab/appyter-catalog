@@ -4,3 +4,4 @@ fsspec
 jsonschema
 nbformat
 Pillow
+requests
