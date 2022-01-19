@@ -8,16 +8,11 @@ import logging
 import nbformat as nbf
 import traceback
 import jsonschema
-import urllib.request, urllib.error
+import urllib.request
 from fsspec.core import url_to_fs
 from appyter.ext.urllib import parse_file_uri
 from PIL import Image
 from subprocess import Popen, PIPE
-
-# remove user agent from urllib.request requests
-_opener = urllib.request.build_opener()
-_opener.addheaders = [('Accept', '*/*')]
-urllib.request.install_opener(_opener)
 
 def try_json_loads(s):
   import json
