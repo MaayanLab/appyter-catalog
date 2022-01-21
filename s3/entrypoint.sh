@@ -28,7 +28,7 @@ cat > public-get.json << EOF
 EOF
 
 echo "Starting minio server..."
-env MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY} minio server /data &
+minio server /data --console-address ":9001" &
 PID=$!
 
 let SUCCESS=1
@@ -41,11 +41,11 @@ while [ ${SUCCESS} -ne 0 ]; do
   sleep 5
 
   echo "Setting up client..."
-  mc config host add s3 http://localhost:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
+  mc alias set s3 http://127.0.0.1:9000 "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
   let SUCCESS=$?
 
   echo "Setting bucket policy..."
-  mc policy set-json public-get.json s3/${MINIO_BUCKET}
+  mc policy set-json public-get.json "s3/${MINIO_BUCKET}"
   let SUCCESS=$?
 
   let RETRIES="${RETRIES}+1"
