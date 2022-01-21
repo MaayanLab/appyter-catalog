@@ -6,7 +6,7 @@ aiohttp-remotes==1.1.0
 click==7.1.2
 appyter
 geode @ git+https://github.com/Maayanlab/geode
-mmaayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics --no-binary=fisher
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics --no-binary=fisher
 numba==0.55.0
 ipython==8.0.1
 ipykernel==6.7.0
