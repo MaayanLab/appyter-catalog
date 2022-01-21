@@ -1,10 +1,12 @@
+cmake
+numpy==1.21.5
 testresources
 aiohttp==3.7.4
 aiohttp-remotes==1.1.0
 click==7.1.2
 appyter
 geode @ git+https://github.com/Maayanlab/geode
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+mmaayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics --no-binary=fisher
 numba==0.55.0
 ipython==8.0.1
 ipykernel==6.7.0
@@ -18,7 +20,6 @@ matplotlib==3.5.1
 scipy==1.7.3
 stats==0.1.2a
 scikit-learn==1.0.2
-numpy==1.21.5
 seaborn==0.11.2
 scanpy==1.8.2
 python-igraph==0.9.9
