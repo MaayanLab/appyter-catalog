@@ -166,7 +166,10 @@ def create_download_link(df, title = "Download CSV file: {}", filename = "data.c
     if filename.endswith(".csv"):
         df.to_csv(filename)
     elif filename.endswith(".h5ad"): #anndata
-        df.write(filename)
+        import tempfile, shutil
+        tmp = tempfile.mktemp()
+        df.write(tmp)
+        shutil.move(tmp, filename)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
     return HTML(html)
 
