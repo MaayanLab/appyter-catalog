@@ -14,6 +14,7 @@ import plotly
 from plotly import tools
 import plotly.express as px
 import plotly.graph_objs as go
+import matplotlib
 import matplotlib.pyplot as plt; plt.rcdefaults()
 from matplotlib import rcParams
 from matplotlib.lines import Line2D
@@ -165,7 +166,11 @@ def create_download_link(df, title = "Download CSV file: {}", filename = "data.c
     if filename.endswith(".csv"):
         df.to_csv(filename)
     elif filename.endswith(".h5ad"): #anndata
-        df.write(filename)
+        import os, tempfile, shutil
+        tmp = tempfile.mktemp()
+        df.write(tmp)
+        shutil.copyfile(tmp, filename)
+        os.unlink(tmp)
     html = "<a href=\"./{}\" target='_blank'>{}</a>".format(filename, title.format(filename))
     return HTML(html)
 
@@ -251,6 +256,7 @@ def normalize_magic(dataset, solver='exact'):
     data_magic = magic_op.fit_transform(dataset)
     return data_magic.transpose()
     
+
 def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=False, nr_genes=800, metadata_cols=None, filter_samples=True,gene_list=None):
     # Subset the expression DataFrame using top 800 genes with largest variance
     if magic_normalization == True:
@@ -291,7 +297,7 @@ def run_clustergrammer(dataset, meta_class_column_name, magic_normalization=Fals
     expr_df_sub_file = "expr_df_sub_file.txt"
     expr_df_sub.to_csv("expr_df_sub_file.txt", sep='\t')
     # POST the expression matrix to Clustergrammer and get the URL
-    clustergrammer_url = 'https://maayanlab.cloud/clustergrammer/matrix_upload/'
+    clustergrammer_url = 'https://amp.pharm.mssm.edu/clustergrammer/matrix_upload/'
     r = requests.post(clustergrammer_url, files={'file': open(expr_df_sub_file, 'rb')}).text
 
     return r
@@ -437,7 +443,7 @@ def get_signatures(classes, dataset, method, meta_class_column_name, cluster=Tru
 
 
 def submit_enrichr_geneset(geneset, label):
-    ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
+    ENRICHR_URL = 'https://amp.pharm.mssm.edu/Enrichr/addList'
     genes_str = '\n'.join(geneset)
     payload = {
         'list': (None, genes_str),
@@ -460,7 +466,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     # Get genesets
     genesets = {
         'upregulated': up_signature.index[:geneset_size],
-        'downregulated': down_signature.index[-geneset_size:]
+        'downregulated': down_signature.index[:geneset_size:]
     }
 
     # Submit to Enrichr
@@ -469,7 +475,7 @@ def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logF
     return enrichr_ids
 
 def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True, geneset=None):
-    ENRICHR_URL = 'http://maayanlab.cloud/Enrichr/enrich'
+    ENRICHR_URL = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
     query_string = '?userListId=%s&backgroundType=%s'
     results = []
     for gene_set_library, label in gene_set_libraries.items():
@@ -624,12 +630,15 @@ def enrichment_analysis(items, library_data):
     items = [x.upper() for x in items]
     all_results = get_enrichment_results(items, library_data)
     unzipped_results = list(zip(*all_results))
-    pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
-    df = pd.DataFrame({"term_name":unzipped_results[0], "pvalue": pvals, \
-                       "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
-    df["-log(p value)"] = -np.log10(df["pvalue"])
-    df["q value"] = get_qvalue(df["pvalue"].tolist())
-    return [list(unzipped_results[0])], [pvals], df
+    if len(unzipped_results)>0:
+        pvals, odds_ratio, n_overlap, overlap = get_values(unzipped_results[1])
+        df = pd.DataFrame({"term_name":unzipped_results[0], "pvalue": pvals, \
+                           "odds_ratio": odds_ratio, "n_overlap": n_overlap, "overlap": overlap})
+        df["-log(p value)"] = -np.log10(df["pvalue"])
+        df["q value"] = get_qvalue(df["pvalue"].tolist())
+        return [list(unzipped_results[0])], [pvals], df
+    else:
+        raise IOError()
 
 
 import hashlib
@@ -789,15 +798,16 @@ def plot_scatter(umap_df, values_dict, option_list, sample_names, caption_text, 
 
 
 
-def clustering(adata, dataset, bool_plot, figure_counter, batch_correction=True):
+
+def clustering(adata, dataset, umap_n_neighbors, umap_min_dist, bool_plot, figure_counter, batch_correction=True):
     # clustering
     
     if batch_correction== True:
         sc.external.pp.bbknn(adata, batch_key="batch")
     else:
-        sc.pp.neighbors(adata, n_neighbors=30)
+        sc.pp.neighbors(adata, n_neighbors=umap_n_neighbors)
     sc.tl.leiden(adata, resolution=1.0)
-    sc.tl.umap(adata, min_dist=0.1)
+    sc.tl.umap(adata, min_dist=umap_min_dist)
     
     
     # sort by clusters
@@ -884,8 +894,12 @@ def differential_gene_expression_analysis(adata, diff_gex_method, enrichment_gro
     return signatures, bool_cluster, table_counter
 
 
+
+
+
 def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, diff_gex_method, enrichr_libraries_filename, enrichr_libraries, enrichment_groupby, libraries_tab, gene_topk, bool_cluster, bool_plot, figure_counter, table_counter):
-    
+
+    topk_enrichment_terms = 3
     if diff_gex_method == "characteristic_direction":
         fc_colname = "CD-coefficient"
     elif diff_gex_method == "limma":
@@ -914,9 +928,9 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
 
             results['enrichr'][label] = run_enrichr(signature=signature, signature_label=label, fc_colname=fc_colname, geneset_size=gene_topk)
             display(Markdown("*Enrichment Analysis Result: {} (Up-regulated in {})*".format(label, case_name)))
-            display_link("https://maayanlab.cloud/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["upregulated"]["shortId"]))
+            display_link("https://amp.pharm.mssm.edu/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["upregulated"]["shortId"]))
             display(Markdown("*Enrichment Analysis Result: {} (Down-regulated in {})*".format(label, case_name)))
-            display_link("https://maayanlab.cloud/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["downregulated"]["shortId"]))
+            display_link("https://amp.pharm.mssm.edu/Enrichr/enrich?dataset={}".format(results['enrichr'][label]["downregulated"]["shortId"]))
         table_counter = display_object(table_counter, "The table displays links to Enrichr containing the results of enrichment analyses generated by analyzing the up-regulated and down-regulated genes from a differential expression analysis. By clicking on these links, users can interactively explore and download the enrichment results from the Enrichr website.", istable=True)
     if libraries_tab == 'No' or libraries_tab == 'All':
         results['user_defined_enrichment'] = {}
@@ -932,7 +946,6 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
             else:
                 case_name = label.split(" vs. ")[1]
                 col_name = "batch"
-
             user_library = library_to_dict(get_library(enrichr_libraries_filename))
 
             # Sort signature
@@ -940,9 +953,11 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
             up_genes = [x.upper() for x in up_signature.index[:gene_topk].tolist()]
 
             results['user_defined_enrichment'][label] = dict()
-            _, _, results['user_defined_enrichment'][label]['enrichment_dataframe'] = enrichment_analysis(up_genes, user_library)
-            results['user_defined_enrichment'][label]['enrichment_dataframe']['gene_set_library'] = enrichr_libraries_filename
-    
+            try:
+                _, _, results['user_defined_enrichment'][label]['enrichment_dataframe'] = enrichment_analysis(up_genes, user_library)
+                results['user_defined_enrichment'][label]['enrichment_dataframe']['gene_set_library'] = enrichr_libraries_filename
+            except:
+                pass
     if "Gene Ontology" in enrichr_libraries:
         results['go_enrichment'] = {}
         for label, signature in signatures.items():
@@ -992,13 +1007,13 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
             results['disease_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='disease', version='2018')
     
     library_option_list = set()
-    top3_enriched_terms_dict = defaultdict(list)
+    topk_enriched_terms_dict = defaultdict(list)
     for label, signature in signatures.items():
         if bool_cluster == True:
             cluster_names = [label.split(" vs. ")[0]]
         else:
             cluster_names = [label.split(" vs. ")[1]]
-
+        
         for key in results.keys():
             if key.endswith("enrichment") == False:
                 continue
@@ -1008,24 +1023,25 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
                 for direction in ['upregulated']:
                     if direction in enrichment_results:
                         enrichment_dataframe = enrichment_results[direction]
-                    else:
+                    elif "enrichment_dataframe" in enrichment_results:
                         enrichment_dataframe = enrichment_results["enrichment_dataframe"]
-
+                    else:
+                        continue
                     if enrichment_dataframe.empty == True:
                         raise Exception("Enrichment analysis returns empty results. Please check if your data contains proper gene names.")
                     libraries = enrichment_dataframe['gene_set_library'].unique() 
+                    
                     for library in libraries:
                         enrichment_dataframe_library = enrichment_dataframe[enrichment_dataframe['gene_set_library']==library]
                         
-                        # todo
-                        top3_enriched_terms = enrichment_dataframe_library.iloc[:3]
+                        topk_enriched_terms = enrichment_dataframe_library.iloc[:topk_enrichment_terms]
                         selected_columns = ['term_name', 'pvalue']
-                        top3_enriched_terms = top3_enriched_terms[selected_columns]
-                        top3_enriched_terms.columns = ["Enriched Term", "pvalue"]
-                        top3_enriched_terms.insert(0, 'Rank', [1,2,3])
-                        top3_enriched_terms.insert(0, 'Class', cluster_name)
+                        topk_enriched_terms = topk_enriched_terms[selected_columns]
+                        topk_enriched_terms.columns = ["Enriched Term", "pvalue"]
+                        topk_enriched_terms.insert(0, 'Rank', [*range(1, len(topk_enriched_terms)+1)])
+                        topk_enriched_terms.insert(0, 'Class', cluster_name)
                         
-                        top3_enriched_terms_dict[library].append(top3_enriched_terms)
+                        topk_enriched_terms_dict[library].append(topk_enriched_terms)
                         
                         top_term = enrichment_dataframe_library.iloc[0]['term_name']
                         if library not in meta_df.columns:
@@ -1036,20 +1052,41 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
                         else:
                             meta_df.loc[meta_df[meta_class_column_name]==cluster_name, library] = top_term
                         library_option_list.add(library)
+                        
+                        
+                        for topk_i in range(topk_enrichment_terms):
+                            if topk_i < topk_enriched_terms.shape[0]: # in case # of enrichment terms is less than topk_enrichment_terms
+                                new_col_name = f"{library}_{topk_i}"
+                                top_term = topk_enriched_terms.iloc[topk_i]['Enriched Term']
+
+                                if new_col_name not in meta_df.columns:
+                                    meta_df.insert(0, new_col_name, np.nan)
+                                meta_df[new_col_name] = meta_df[new_col_name].astype("object")
+                                meta_df.loc[meta_df[col_name]==cluster_name, new_col_name] = top_term
+
     
     library_option_list = list(library_option_list)
-    
+
     for library in library_option_list: 
-        top_enriched_term_df = pd.concat(top3_enriched_terms_dict[library])
+        top_enriched_term_df = pd.concat(topk_enriched_terms_dict[library])
         top_enriched_term_df = top_enriched_term_df.set_index(["Class", "Rank"])
-        table_counter = display_object(table_counter, f"Top 3 Enriched Terms for each cluster/class in library {library}. To see more results, please use Enrichr links above.", df=top_enriched_term_df, istable=True)
-        display(create_download_link(top_enriched_term_df, filename=f"Top3_Enriched_Terms_{library}.csv"))
+        
+        if libraries_tab == 'Yes':
+            table_counter = display_object(table_counter, f"Top 3 Enriched Terms for each cluster/class in library {library}. To see more results, please use Enrichr links above.", df=top_enriched_term_df, istable=True)
+        else:
+            table_counter = display_object(table_counter, f"Top 3 Enriched Terms for each cluster/class in library {library}.", df=top_enriched_term_df, istable=True)
+        display(create_download_link(top_enriched_term_df, filename=f"Top{topk_enrichment_terms}_Enriched_Terms_{library}.csv"))
+    
     # umap info into dataframe 
     umap_df = pd.DataFrame(adata.obsm['X_umap'])
     umap_df.columns = ['x', 'y']
 
     option_list = library_option_list  
-    adata_norm_selected = adata.obs[option_list].fillna("NaN")
+    if enrichment_groupby != "batch":
+        option_list.append("leiden")
+    else:
+        option_list.append("batch")
+    adata_norm_selected = adata.obs[option_list].astype("object").fillna("NaN")
     
     values_dict = dict(zip(adata_norm_selected.T.index.tolist(), adata_norm_selected.T.values))
     category_list_dict = dict()
@@ -1060,8 +1097,172 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
     return adata, option_list, figure_counter, table_counter
 
 
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import plotly.figure_factory as ff
+from scipy.spatial.distance import pdist, squareform
+
+def extract_library_name(path):
+    return path.replace("libraries/","").replace(".txt","").replace(".gmt", "").replace("_0","")
+
+def plot_protrack(libraries, tmp_adata, bool_plot_rug=True, bool_plot_dendrogram=True, figure_counter=0, fig_size=(1800, 800)):
+    
+    frequent_genes = get_frequent_genes(tmp_adata.uns['signature'])
+    frequent_genes = frequent_genes.intersection(tmp_adata.var.index)
+    
+    # init figure
+    trace_idx = 0
+    row_length = len(libraries)+2
+    
+    row_heights = [0.1]
+    row_heights.extend([(1-row_heights[0])/(row_length-1)]*(row_length-1))
+    fig = make_subplots(rows=row_length, cols=1, shared_xaxes=True, vertical_spacing=0.00, row_heights=row_heights,
+                       )
+
+    # plot dendrogram
+    if bool_plot_dendrogram == True:
+        fig, dendrogram_fig, trace_idx, dendrogram_sample_index_list = plot_dendrogram(fig, tmp_adata, frequent_genes, trace_idx)
+    
+    # get color mapping dictionary
+    color_map_dict = get_color_map(libraries, tmp_adata)
+        
+    i = 2
+    if bool_plot_rug == True:
+        for library_filename in libraries:
+            # init rug plots
+            adata_heatmap = tmp_adata.copy()
+            adata_heatmap.obs = adata_heatmap.obs.T.drop_duplicates().T
+            new_library_filename = extract_library_name(library_filename)
+            library_name = library_filename+"_0"
+            clean_library_filename = {library_name: new_library_filename}
+            new_cols = list()
+            for col in adata_heatmap.obs.columns:
+                if col in clean_library_filename:
+                    new_cols.append(clean_library_filename[col])
+                else:
+                    new_cols.append(col)
+            adata_heatmap.obs.columns = new_cols
+
+            ####### rug plots to show predicted cell types/enriched terms    ########
+            fig, trace_idx, i = plot_rug(fig, dendrogram_fig, dendrogram_sample_index_list, adata_heatmap, new_library_filename, color_map_dict, trace_idx, i)
+        
+        
+    # Edit Layout
+    fig.update_yaxes(showgrid=False, showline=False, zeroline=False, showticklabels=False, ticks="", row=1, col=1)
+    fig.update_layout({'width':fig_size[0], 'height':fig_size[1],
+                       'legend_traceorder': "grouped",
+                             })
+    fig.update_layout(paper_bgcolor='#FFFFFF', plot_bgcolor='#FFFFFF') 
+
+    
+    # Plot!
+    fig.show() 
+    figure_counter = display_object(figure_counter, "Protrack Plot. The plot shows the top predicted cell types for each cluster for each library. The colors are based on Cell Ontology IDs.", istable=False)        
+    return figure_counter
+    
+def plot_rug(fig, dendrogram_fig, dendrogram_sample_index_list, adata_heatmap, new_library_filename, color_map_dict, trace_idx, i):
+    rug_df = pd.DataFrame(dendrogram_fig['layout']['xaxis']['tickvals'], index=dendrogram_sample_index_list)
+    rug_df.columns = ['x']
+    rug_df['y'] = new_library_filename
+    rug_df['sample'] = rug_df.index
+    rug_df['Prediction'] = adata_heatmap.obs.loc[dendrogram_sample_index_list, new_library_filename].astype(str)#.map(str)
+    cell_types = list(map(str, rug_df['Prediction'].tolist()))
+
+    subfig = px.scatter(rug_df, x='x', y='y', color='Prediction', hover_name='sample',
+                        color_discrete_map=color_map_dict, hover_data=['Prediction','y'])
+    subfig.update_layout({'width':800, 'height':30, 'showlegend': False})
+    subfig.update_traces(marker=dict(size=12, symbol='line-ns-open',
+                              line=dict(width=2,
+                                        color='DarkSlateGrey')),
+                  selector=dict(mode='markers'))
+    for sub in subfig['data']:
+        fig.add_trace(sub, row=i, col=1)
+        fig['data'][trace_idx]['showlegend']=True
+        fig['data'][trace_idx]['legendgroup']=new_library_filename
+        fig['data'][trace_idx]['legendgrouptitle_text']=new_library_filename
+
+        trace_idx += 1
+    # Update yaxis properties
+    fig.update_yaxes(showgrid=False, showline=False, zeroline=False, showticklabels=True, ticks="", row=i, col=1)
+    fig.update_xaxes(showgrid=False, showline=False, zeroline=False, showticklabels=False, ticks="", row=i, col=1)
+    i += 1
+    
+    return fig, trace_idx, i
+def plot_dendrogram(fig, tmp_adata, frequent_genes, trace_idx=0):
+    labels = tmp_adata.obs.index # ordered in cluster
+    data_array = tmp_adata.to_df().loc[:,frequent_genes]
+    genes = data_array.columns
+
+    # Initialize figure by creating upper dendrogram for samples
+    dendrogram_fig = ff.create_dendrogram(data_array, orientation='bottom', labels=list(labels), colorscale=["#000000"], color_threshold=0.0) # fig ordered in dendrogram
+    for i in range(len(fig['data'])):
+        dendrogram_fig['data'][i]['yaxis'] = 'y2'
+    dendrogram_fig.update_layout({'width':1000, 'height':800, 'showlegend':False, 'hovermode': 'closest',})
+    dendrogram_fig.update_yaxes(mirror=False, showgrid=False, showline=False, zeroline=False, showticklabels=False, ticks="")
+    dendrogram_fig.update_xaxes(mirror=False, showgrid=False, showline=False, zeroline=False, showticklabels=False, ticks="")
+    dendrogram_sample_index_list = dendrogram_fig['layout']['xaxis']['ticktext'] # sample names
+    for subfig in dendrogram_fig['data']:
+        fig.add_trace(subfig, row=1, col=1)
+        fig['data'][trace_idx]['showlegend']=False
+        trace_idx += 1
+    return fig, dendrogram_fig, trace_idx, dendrogram_sample_index_list
+
+def get_frequent_genes(signatures, topk_genes_heatmap=1000):
+    # frequent genes for heatmap
+    frequent_upregulated_genes = dict()
+    
+    rank_list = list()
+    top1000_rank_list = list()
+    for label, signature in signatures.items():
+        rank_list.append(signature.rank(ascending=False)["scores"])
+        top1000_rank_list.append(signature.rank(ascending=False)["scores"]<topk_genes_heatmap)
+
+    rank_df = pd.concat(rank_list, axis=1)
+    rank_df["median"] = rank_df.median(axis=1)
+
+    top1000_rank_df = pd.concat(top1000_rank_list, axis=1)
+    top1000_rank_df["sum"] = top1000_rank_df.sum(axis=1)\
+
+    top1000_rank_df["median"] = rank_df["median"]
+    top1000_rank_df = top1000_rank_df.sort_values(["sum", "median"], ascending=[False, True])
+
+    sorted_dict = set(top1000_rank_df.iloc[:topk_genes_heatmap,:].index)
+    
+    return sorted_dict
+
+def get_color_map(library_filenames, tmp_adata):
+    # legend color map
+    color_list = list()
+    color_list.extend(px.colors.qualitative.Plotly)
+    color_list.extend(px.colors.qualitative.Alphabet)
+
+    color_map_dict = dict() # pred cell ontology name+ID :color
+    color_map_id_dict = dict() # pred cell ontology ID : color
+
+    i = 0
+    for library_filename in library_filenames:
+        library_name = library_filename+"_0" # top1 prediction
+        if library_name in tmp_adata.obs.columns:
+            prediction = tmp_adata.obs[library_name].unique()
+        else:
+            prediction = tmp_adata.obs[library_filename].unique()
+        for pred in prediction:
+            pred = str(pred)
+            cl_id_in_pred = pred.split(":")[-1]
+            if cl_id_in_pred == "": #if CL ID is None, use cell ontology name
+                cl_id_in_pred = pred
+
+            if cl_id_in_pred not in color_map_id_dict:
+                color_map_id_dict[cl_id_in_pred] = color_list[i]
+                color_map_dict[pred] = color_list[i]
+                i += 1
+            else:
+                color_map_dict[pred] = color_map_id_dict[cl_id_in_pred]
 
 
+            if i == len(color_list):
+                i = i-len(color_list)
+    return color_map_dict
 
 def summary(adata, option_list, table_counter):
     for col in option_list:
@@ -1073,12 +1274,13 @@ def summary(adata, option_list, table_counter):
     return table_counter
 def trajectory_inference(adata, trajectory_method, figure_counter=0):
     node_size = min(100, 120000 / len(adata.obs.index))
-    if trajectory_method == "monocle":
+    if trajectory_method == "palantir":
         # Run analysis
-        results = run_monocle(dataset=adata, color_by='Pseudotime')
-
+        pr_res, umap = run_palantir(dataset=adata)
+        
         # Display results
-        plot_monocle(results)
+        sc.pl.umap(adata, color=['leiden'], size=node_size)
+        plot_palantir(pr_res, umap)
 
     elif trajectory_method == "dpt":
         adata.uns['iroot'] = 0
@@ -1086,8 +1288,56 @@ def trajectory_inference(adata, trajectory_method, figure_counter=0):
         sc.tl.dpt(adata)
         sc.pl.umap(adata, color=['dpt_pseudotime'], size=node_size)
         display_link("draw_graph_fa.pdf", "Download figure")
+        
     figure_counter = display_object(figure_counter, "Trajectory inference result using {}. Each point represents an RNA-seq sample. Sample colors are based on pseudotime.".format(trajectory_method), istable=False)
     return adata, figure_counter
+
+def run_palantir(dataset):
+    sc.external.tl.phenograph(dataset, clustering_algo="leiden", k=30)
+    sc.external.tl.palantir(dataset)
+    umap = pd.DataFrame(dataset.obsm['X_umap'], index=dataset.obs_names, columns=['x', 'y'])
+    
+    # early cell is set based on CD34 expression
+    df = dataset.to_df()
+    df.columns = df.columns.map(str.upper)
+    start_cell = df['CD34'].sort_values(ascending=False).index[0]
+    pr_res = sc.external.tl.palantir_results(
+        dataset,
+        early_cell=start_cell,
+        ms_data='X_palantir_multiscale',
+        num_waypoints=500,
+    )
+    return pr_res, umap
+def plot_palantir(pr_res, umap):
+    # Set up figure
+    n_branches = pr_res.branch_probs.shape[1]
+    n_cols = 6
+    n_rows = int(np.ceil(n_branches / n_cols))
+    fig = plt.figure(figsize=[2 * n_cols, 2 * (n_rows + 2)])
+    gs = plt.GridSpec(
+        n_rows + 2, n_cols, height_ratios=np.append([0.75, 0.75], np.repeat(1, n_rows))
+    )
+    cmap = plt.cm.plasma
+    # Pseudotime
+    ax = plt.subplot(gs[0:2, 1:3])
+    c = pr_res.pseudotime[umap.index]
+    ax.scatter(umap.loc[:, "x"], umap.loc[:, "y"], s=3, cmap=plt.cm.plasma, c=c)
+    normalize = matplotlib.colors.Normalize(vmin=np.min(c), vmax=np.max(c))
+    cax, _ = matplotlib.colorbar.make_axes(ax)
+    cbar = matplotlib.colorbar.ColorbarBase(cax, norm=normalize, cmap=cmap)
+    ax.set_axis_off()
+    ax.set_title("Pseudotime")
+
+    # Entropy
+    ax = plt.subplot(gs[0:2, 3:5])
+    c = pr_res.entropy[umap.index]
+    ax.scatter(umap.loc[:, "x"], umap.loc[:, "y"], s=3, cmap=plt.cm.plasma, c=c)
+    normalize = matplotlib.colors.Normalize(vmin=np.min(c), vmax=np.max(c))
+    cax, _ = matplotlib.colorbar.make_axes(ax)
+    cbar = matplotlib.colorbar.ColorbarBase(cax, norm=normalize, cmap=cmap)
+    ax.set_axis_off()
+    ax.set_title("Differentiation potential")
+
 def time_series_trajectory_inference(adata, timepoint_labels_column_name, timepoint_labels, figure_counter):
     run_tempora(adata, timepoint_labels_column_name, timepoint_labels)
     display(Image.open("Tempora_plot.jpg"))
@@ -1108,11 +1358,9 @@ def results_table(enrichment_dataframe, source_label, target_label, label, table
         enrichment_dataframe_subset = enrichment_dataframe_subset.sort_values(['FDR', 'pvalue']).rename(columns={'pvalue': 'P-value'}).drop_duplicates(source_label)
 
         # Add links and bold for significant results
-        # if " " in enrichment_dataframe_subset[source_label][0]:
-        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
+        enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://amp.pharm.mssm.edu/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
           
         # else:
-        #     enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={x}" target="_blank">{x}</a>'.format(**locals()) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{x}" target="_blank">{x}</a>'.format(**locals())for x in enrichment_dataframe_subset[source_label]]
         enrichment_dataframe_subset[source_label] = [rowData[source_label].replace('target="_blank">', 'target="_blank"><b>').replace('</a>', '*</b></a>') if rowData['FDR'] < 0.05 else rowData[source_label] for index, rowData in enrichment_dataframe_subset.iterrows()]
 
         # Add rank
@@ -1122,8 +1370,7 @@ def results_table(enrichment_dataframe, source_label, target_label, label, table
         enrichment_dataframe_subset['nr_overlapping_genes'] = [len(x) for x in enrichment_dataframe_subset['overlapping_genes']]
         enrichment_dataframe_subset['overlapping_genes'] = [', '.join(x) for x in enrichment_dataframe_subset['overlapping_genes']]
         enrichment_dataframe_subset[target_label.title()] = ['{nr_overlapping_genes} {geneset} '.format(**rowData)+target_label+'s' for index, rowData in enrichment_dataframe_subset.iterrows()]
-        # enrichment_dataframe[target_label.title()] = ['<span class="gene-tooltip">{nr_overlapping_genes} {geneset} '.format(**rowData)+target_label+'s<div class="gene-tooltip-text">{overlapping_genes}</div></span>'.format(**rowData) for index, rowData in enrichment_dataframe.iterrows()]
-
+        
         # Convert to HTML
         pd.set_option('max.colwidth', -1)
         html_table = enrichment_dataframe_subset.head(50)[['Rank', source_label, 'P-value', 'FDR', target_label.title()]].to_html(escape=False, index=False, classes='w-100')
@@ -1160,6 +1407,7 @@ def CPM(data):
         data = data.fillna(0)
 
     return data
+
 
 def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='interactive'):
     robjects.r('''
@@ -1427,7 +1675,7 @@ def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='intera
         monocle_results[key] = df
 
     monocle_results['data_df'].set_index('sample_name', inplace=True)
-    monocle_results['sample_metadata'] = dataset.obs.merge(
+    monocle_results['sample_metadata'] = dataset.obs[["leiden"]].merge(
         monocle_results['data_df'],
         left_index=True,
         right_index=True
@@ -1437,6 +1685,8 @@ def run_monocle(dataset, color_by='Pseudotime', ordering='de', plot_type='intera
         {'color_by': color_by, 'plot_type': plot_type}
         )
     return monocle_results
+
+
 
 def plot_monocle(monocle_results, debug=False):
     # Get results
