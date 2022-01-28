@@ -195,8 +195,8 @@ def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_ge
     return results
 
 
+
 def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebook_metadata, plot_type='interactive'):
-    pca_transformed = pca_results['result']
     axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
     
@@ -214,10 +214,10 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebo
         fig.show()
     else:
         fig.show(renderer="png")
+
     fig.write_image(plot_name)
-    
-    
     caption = '3D {} plot for samples using {} genes having largest variance. The figure displays an interactive, three-dimensional scatter plot of the data. Each point represents an RNA-seq sample. Samples with similar gene expression profiles are closer in the three-dimensional space. If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
+
 
     display(Markdown("*Figure {}. {}*".format(counter, caption)))
     object_info = dict()
@@ -227,6 +227,7 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebo
     notebook_metadata["figures"][str(counter)] = object_info
     
     counter += 1
+
     return counter, notebook_metadata
 
 def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
@@ -301,6 +302,7 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
         fig.show()
     else:
         fig.show(renderer="png")
+
     fig.write_image(plot_name)
 
 
@@ -744,9 +746,8 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, so
         fig.show()
     else:
         fig.show(renderer='png')
+
     fig.write_image(plot_name)
-
-
 
 
 def results_table(enrichment_dataframe, source_label, target_label, notebook_metadata, table_counter):
@@ -890,8 +891,7 @@ def plot_l1000cds2(l1000cds2_results, counter, notebook_metadata, nr_drugs=7, he
         
         counter, notebook_metadata = display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), notebook_metadata, saved_filename=plot_name, istable=False)
         notebook_metadata["figures"][str(counter-1)]["file_desc"] = [{"name": "Mimic Signature Query Results", "link":l1000cds2_results['mimic']['url']},
-                                                                     {"name": "Reverse Signature Query Results", "link":l1000cds2_results['reverse']['url']},]
-        
+
         # Links        
         display(Markdown(' *Mimic Signature Query Results*:'))
         display_link(l1000cds2_results['mimic']['url'])
