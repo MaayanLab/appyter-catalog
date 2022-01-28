@@ -195,8 +195,8 @@ def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_ge
     return results
 
 
-
 def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebook_metadata, plot_type='interactive'):
+    pca_transformed = pca_results['result']
     axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
     
@@ -218,7 +218,6 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebo
     fig.write_image(plot_name)
     caption = '3D {} plot for samples using {} genes having largest variance. The figure displays an interactive, three-dimensional scatter plot of the data. Each point represents an RNA-seq sample. Samples with similar gene expression profiles are closer in the three-dimensional space. If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
 
-
     display(Markdown("*Figure {}. {}*".format(counter, caption)))
     object_info = dict()
     object_info["description"] = caption
@@ -227,7 +226,6 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebo
     notebook_metadata["figures"][str(counter)] = object_info
     
     counter += 1
-
     return counter, notebook_metadata
 
 def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
@@ -746,7 +744,6 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, so
         fig.show()
     else:
         fig.show(renderer='png')
-
     fig.write_image(plot_name)
 
 
