@@ -28,10 +28,10 @@ RUN set -x \
 
 RUN set -x \
   && echo "Installing jupyter kernel..." \
-  && pip3 install --no-cache-dir ipykernel \
+  && pip3 install --no-cache-dir ipython_genutils ipykernel \
   && python3 -m ipykernel install
 
-ARG appyter_version=appyter[production]@git+git://github.com/Maayanlab/appyter.git
+ARG appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter
 RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install --no-cache-dir ${appyter_version}

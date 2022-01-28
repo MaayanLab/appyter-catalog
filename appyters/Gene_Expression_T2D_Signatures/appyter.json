@@ -2,12 +2,12 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
     "name": "Gene_Expression_T2D_Signatures",
     "title": "My Gene's Expression in T2D Transcriptomics Signatures",
-    "version": "0.0.6",
+    "version": "0.0.11",
     "description": "An appyter that generates volcano plots for visualizing gene-specific expression in Type 2 Diabetes signatures.",
     "image": "example_plot.png",
     "authors": [
       {
-        "name": "Sherry Xie",
+        "name": "Zhuorui (Sherry) Xie",
         "email": "sxie04@gmail.com"
       },
       {
@@ -30,7 +30,8 @@
       "Signatures",
       "Transcriptomics",
       "Volcano Plot",
-      "Visualization"
+      "Visualization",
+      "Gene Centric"
     ],
     "license": "CC-BY-NC-SA-4.0",
     "appyter": {

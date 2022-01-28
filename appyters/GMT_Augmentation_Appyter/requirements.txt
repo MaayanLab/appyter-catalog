@@ -1,0 +1,4 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+requests
+pandas
+tqdm

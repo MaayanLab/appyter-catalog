@@ -80,8 +80,14 @@
         <div class="pb-4 d-flex flex-row flex-wrap">
           <div class="text-placeholder placeholder"></div>
         </div>
-        <button class="btn btn-secondary btn-sm disabled">
-          Select
+        <button class="btn btn-secondary btn-sm disabled mb-1">
+          View Details
+        </button>
+        <button class="btn btn-sm btn-danger disabled mb-1">
+          Start Appyter
+        </button>
+        <button class="btn btn-sm btn-secondary disabled mb-1">
+          Run Locally
         </button>
       </div>
     </div>
@@ -149,9 +155,15 @@
               >{tag}</a>
             {/each}
           </div>
-          <button class="btn btn-primary btn-sm">
-            Select
+          <button class="btn btn-primary btn-sm mb-1">
+            View Details
           </button>
+          <a href="{base_url}/{appyter.name}/" class="btn btn-sm btn-danger mb-1">
+            Start Appyter
+          </a>
+          <a href="#/running-appyters/?slug={appyter.name}&appyter_version={appyter.version}&run=webform" class="btn btn-sm btn-secondary mb-1">
+            Run Locally
+          </a>
         </div>
       </div>
     </a>

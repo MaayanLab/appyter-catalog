@@ -8,14 +8,11 @@ import logging
 import nbformat as nbf
 import traceback
 import jsonschema
-import urllib.request, urllib.error
+import urllib.request
+from fsspec.core import url_to_fs
+from appyter.ext.urllib import parse_file_uri
 from PIL import Image
 from subprocess import Popen, PIPE
-
-# remove user agent from urllib.request requests
-_opener = urllib.request.build_opener()
-_opener.addheaders = [('Accept', '*/*')]
-urllib.request.install_opener(_opener)
 
 def try_json_loads(s):
   import json
@@ -159,17 +156,17 @@ def validate_appyter(appyter):
           logger.info(f"Copying example file {default_file} from {field_examples[default_file]}...")
           shutil.copyfile(os.path.join('appyters', appyter, field_examples[default_file]), os.path.join(tmp_directory, default_file))
         else:
-          logger.info(f"Downloading example file {default_file} from {field_examples[default_file]}...")
+          logger.info(f"Using example file {default_file} from {field_examples[default_file]}...")
           try:
-            _, response = urllib.request.urlretrieve(field_examples[default_file], filename=os.path.join(tmp_directory, default_file))
-            assert response.get_content_type() != 'text/html', 'Expected data, got html'
+            fs, fs_path = url_to_fs(field_examples[default_file])
+            assert fs.exists(fs_path), "file does not exist"
           except AssertionError as e:
             logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
             early_stopping = True
-          except urllib.error.HTTPError as e:
-            assert e.getcode() != 404, f"File not found on remote, reported 404"
-            logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error code {e.getcode()}.")
-            early_stopping = True
+          else:
+            uri_parsed = parse_file_uri(field_examples[default_file])
+            uri_parsed.fragment = default_file
+            default_args[file_field] = str(uri_parsed)
       else:
         logger.warning(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
@@ -202,6 +199,9 @@ def validate_appyter(appyter):
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
     '-e', 'PYTHONPATH=/app',
+    '--device', '/dev/fuse',
+    '--cap-add', 'SYS_ADMIN',
+    '--security-opt', 'apparmor:unconfined',
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
     f"--cwd=/data",

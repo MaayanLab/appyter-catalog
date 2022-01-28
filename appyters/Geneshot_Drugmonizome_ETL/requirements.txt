@@ -1,5 +1,5 @@
-git+https://github.com/MaayanLab/appyter
-git+https://github.com/MaayanLab/ETL-appyter-utilities
+appyter @ git+https://github.com/MaayanLab/appyter
+harmonizome-helper @ git+https://github.com/MaayanLab/ETL-appyter-utilities
 pandas
 numpy
 requests

@@ -1,0 +1,27 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <h1>RNA-seq-like Gene Centric Signature Reverse Search (RGCSRS)</h1>
+    <p style="margin:15px; text-align:center;"> Generate a volcano plot visualization displaying the expression of a specific gene in RNA-seq signatures generated from transformed L1000 data.</p>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

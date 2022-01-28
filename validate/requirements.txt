@@ -1,5 +1,7 @@
+appyter @ git+https://github.com/Maayanlab/appyter
 click
-git+git://github.com/Maayanlab/appyter.git
+fsspec
 jsonschema
 nbformat
 Pillow
+requests

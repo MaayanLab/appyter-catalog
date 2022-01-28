@@ -1,0 +1,28 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+   <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='chea3_appyter_logo.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1>ChEA3 Appyter</h1>
+            <p class="my-0"> The ChEA3 Appyter (ChIP-X Enrichment Analysis 3) predicts transcription factors (TFs) associated with user-input sets of genes. Discrete query gene sets are compared to ChEA3 libraries of TF target gene sets assembled from multiple orthogonal 'omics' datasets. The Fisher's Exact Test, with a background size of 20,000, is used to compare the input gene set to the TF target gene sets in order to determine which TFs may be most closely associated with the input gene set. Users can submit a set of human or mouse gene symbols for transcription factor enrichment analysis. </p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

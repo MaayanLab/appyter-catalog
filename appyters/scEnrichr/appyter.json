@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
   "name": "scEnrichr",
   "title": "scEnrichr",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An Enrichr interface for single cell data",
   "authors": [
     {

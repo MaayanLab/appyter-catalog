@@ -1,0 +1,13 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+pandas
+numpy
+plotly
+matplotlib
+ipython
+bokeh==2.3.2
+fastcluster
+scipy
+sklearn
+umap-learn
+seaborn
