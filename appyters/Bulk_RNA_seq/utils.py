@@ -107,16 +107,39 @@ def display_link(url):
     raw_html = '<a href="%s" target="_blank">%s</a>' % (url, url)
     return display(HTML(raw_html))
 
-def display_object(counter, caption, df=None, istable=True):
+
+def display_object(counter, caption, notebook_metadata=None, saved_filename=None, df=None, istable=True, ishtml=False):
+    object_info = dict()
+    
     if df is not None:
-        display(df)
+        if ishtml == True:
+            display(HTML(df.to_html(render_links=True, escape=False)))
+        else:
+            display(df)
+        df.to_csv(saved_filename)
+        
     if istable == True:
+        if notebook_metadata is not None:
+            object_info["description"] = caption
+            object_info["file_name"] = saved_filename
+            notebook_metadata["tables"][str(counter)] = object_info  
+        
+
         display(Markdown("*Table {}. {}*".format(counter, caption)))
     else:
+        if notebook_metadata is not None:
+            object_info["description"] = caption
+            object_info["file_name"] = saved_filename
+            notebook_metadata["figures"][str(counter)] = object_info
+        
         display(Markdown("*Figure {}. {}*".format(counter, caption)))
+        
     counter += 1
-    return counter
-
+    if notebook_metadata is not None:
+        return counter, notebook_metadata
+    else:
+        return counter
+    
 def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_genes=2500, filter_samples=True, plot_type='interactive'):
     # Get data
     before_norm = normalization.replace("+z_norm", "").replace("+q_norm", "")
@@ -172,7 +195,7 @@ def run_dimension_reduction(dataset, method='PCA', normalization='logCPM', nr_ge
     return results
 
 
-def plot_samples(pca_results, meta_class_column_name, counter, plot_type='interactive',):
+def plot_samples(pca_results, meta_class_column_name, counter, plot_name, notebook_metadata, plot_type='interactive'):
     pca_transformed = pca_results['result']
     axis = pca_results['axis']
     meta_df = pca_results['dataset_metadata']
@@ -191,15 +214,20 @@ def plot_samples(pca_results, meta_class_column_name, counter, plot_type='intera
         fig.show()
     else:
         fig.show(renderer="png")
-    caption = '3D {} plot for samples using {} genes having largest variance. \
-    The figure displays an interactive, three-dimensional scatter plot of the data. \
-    Each point represents an RNA-seq sample. \
-    Samples with similar gene expression profiles are closer in the three-dimensional space. \
-    If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
+    fig.write_image(plot_name)
+    
+    
+    caption = '3D {} plot for samples using {} genes having largest variance. The figure displays an interactive, three-dimensional scatter plot of the data. Each point represents an RNA-seq sample. Samples with similar gene expression profiles are closer in the three-dimensional space. If provided, sample groups are indicated using different colors, allowing for easier interpretation of the results.'.format(pca_results["method"], pca_results['nr_genes'])
 
     display(Markdown("*Figure {}. {}*".format(counter, caption)))
+    object_info = dict()
+    object_info["description"] = caption
+    object_info["file_name"] = plot_name
+    
+    notebook_metadata["figures"][str(counter)] = object_info
+    
     counter += 1
-    return counter
+    return counter, notebook_metadata
 
 def run_clustergrammer(dataset, meta_class_column_name, normalization='logCPM', z_score=True, nr_genes=1500, metadata_cols=None, filter_samples=True,gene_list=None):
     # Subset the expression DataFrame using top 800 genes with largest variance
@@ -249,7 +277,7 @@ def plot_clustergrammar(clustergrammer_url):
     display(IPython.display.IFrame(clustergrammer_url, width="1000", height="1000"))
 
 
-def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False, labels=False, plot_type='interactive', de_type='ma'):
+def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text', color='black', colorscale='Blues', size=8, showscale=False, symmetric_x=False, symmetric_y=False, pad=0.5, hline=False, vline=False, return_trace=False, labels=False, plot_type='interactive', de_type='ma', plot_name="2d_plot.png"):
     range_x = [-max(abs(x))-pad, max(abs(x))+pad]if symmetric_x else None
     range_y = [-max(abs(y))-pad, max(abs(y))+pad]if symmetric_y else None
     trace = go.Scattergl(x=x, y=y, mode='markers', text=text, hoverinfo=hoverinfo, marker={'color': color, 'colorscale': colorscale, 'showscale': showscale, 'size': size})
@@ -273,6 +301,7 @@ def plot_2D_scatter(x, y, text='', title='', xlab='', ylab='', hoverinfo='text',
         fig.show()
     else:
         fig.show(renderer="png")
+    fig.write_image(plot_name)
 
 
 robjects.r('''limma <- function(rawcount_dataframe, design_dataframe, filter_genes=FALSE, adjust="BH") {
@@ -452,6 +481,7 @@ def run_volcano(signature, signature_label, dataset, pvalue_threshold, logfc_thr
 
 def plot_volcano(volcano_plot_results):
     spacer = ' '*50
+    plot_name = "volcano_plot_{}.png".format(volcano_plot_results['signature_label'])
     plot_2D_scatter(
         x=volcano_plot_results['x'],
         y=volcano_plot_results['y'],
@@ -463,8 +493,10 @@ def plot_volcano(volcano_plot_results):
         title='<b>{volcano_plot_results[signature_label]} Signature | Volcano Plot</b>'.format(**locals()),
         labels=volcano_plot_results['signature_label'].split(' vs. '),
         plot_type=volcano_plot_results['plot_type'],
-        de_type='volcano'
+        de_type='volcano',
+        plot_name=plot_name
     )        
+    return plot_name
 
 def run_maplot(signature, signature_label='', pvalue_threshold=0.05, logfc_threshold=1.5, plot_type='interactive'):
 
@@ -504,6 +536,7 @@ def run_maplot(signature, signature_label='', pvalue_threshold=0.05, logfc_thres
     return volcano_plot_results
 
 def plot_maplot(volcano_plot_results):    
+    plot_name = "ma_plot_{}.png".format(volcano_plot_results['signature_label'])
     plot_2D_scatter(
         x=volcano_plot_results['x'],
         y=volcano_plot_results['y'],
@@ -514,8 +547,11 @@ def plot_maplot(volcano_plot_results):
         ylab='logFC',
         title='<b>{volcano_plot_results[signature_label]} Signature | MA Plot</b>'.format(**locals()),
         labels=volcano_plot_results['signature_label'].split(' vs. '),
-        plot_type=volcano_plot_results['plot_type']
+        plot_type=volcano_plot_results['plot_type'],
+        plot_name=plot_name
+        
     )
+    return plot_name
 
 
 def run_enrichr(signature, signature_label, geneset_size=500, fc_colname = 'logFC', sort_genes_by='t', ascending=True):
@@ -612,20 +648,20 @@ def get_enrichr_result_tables_by_library(enrichr_results, signature_label, libra
     if library_type == 'tf':
         # Libraries
         libraries = {
-            'ChEA_2016': 'A. ChEA (experimentally validated targets)',
-            'ENCODE_TF_ChIP-seq_2015': 'B. ENCODE (experimentally validated targets)',
-            'ARCHS4_TFs_Coexp': 'C. ARCHS4 (coexpressed genes)'
+            'ChEA_2016': 'ChEA (experimentally validated targets)',
+            'ENCODE_TF_ChIP-seq_2015': 'ENCODE (experimentally validated targets)',
+            'ARCHS4_TFs_Coexp': 'ARCHS4 (coexpressed genes)'
         }
     elif library_type == "ke":
         # Libraries
         libraries = {
-            'KEA_2015': 'A. KEA (experimentally validated targets)',
-            'ARCHS4_Kinases_Coexp': 'B. ARCHS4 (coexpressed genes)'
+            'KEA_2015': 'KEA (experimentally validated targets)',
+            'ARCHS4_Kinases_Coexp': 'ARCHS4 (coexpressed genes)'
         }
     elif library_type == "mirna":
         libraries = {
-        'TargetScan_microRNA_2017': 'A. TargetScan (experimentally validated targets)',
-        'miRTarBase_2017': 'B. miRTarBase (experimentally validated targets)'
+        'TargetScan_microRNA_2017': 'TargetScan (experimentally validated targets)',
+        'miRTarBase_2017': 'miRTarBase (experimentally validated targets)'
         }
 
 
@@ -645,7 +681,7 @@ def get_enrichr_result_tables_by_library(enrichr_results, signature_label, libra
     return {'enrichment_dataframe': enrichment_dataframe, 'signature_label': signature_label}
     
 
-def plot_library_barchart(enrichr_results, gene_set_library, signature_label, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive'):
+def plot_library_barchart(enrichr_results, gene_set_library, signature_label, sort_results_by='pvalue', nr_genesets=15, height=400, plot_type='interactive', plot_name="barchart.png"):
     sort_results_by = 'log10P' if sort_results_by == 'pvalue' else 'combined_score'
     fig = tools.make_subplots(rows=1, cols=2, print_grid=False)
     for i, geneset in enumerate(['upregulated', 'downregulated']):
@@ -708,10 +744,12 @@ def plot_library_barchart(enrichr_results, gene_set_library, signature_label, so
         fig.show()
     else:
         fig.show(renderer='png')
+    fig.write_image(plot_name)
 
 
 
-def results_table(enrichment_dataframe, source_label, target_label, table_counter):
+
+def results_table(enrichment_dataframe, source_label, target_label, notebook_metadata, table_counter):
 
     # Get libraries
     for gene_set_library in enrichment_dataframe['gene_set_library'].unique():
@@ -724,7 +762,6 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
         enrichment_dataframe_subset = enrichment_dataframe_subset.sort_values(['FDR', 'pvalue']).rename(columns={'pvalue': 'P-value'}).drop_duplicates(source_label)
 
         # Add links and bold for significant results
-        # if " " in enrichment_dataframe_subset[source_label][0]:
         enrichment_dataframe_subset[source_label] = ['<a href="http://www.mirbase.org/cgi-bin/query.pl?terms={}" target="_blank">{}</a>'.format(x.split(" ")[0], x) if '-miR-' in x else '<a href="http://maayanlab.cloud/Harmonizome/gene/{}" target="_blank">{}</a>'.format(x.split(" ")[0], x)for x in enrichment_dataframe_subset[source_label]]
           
         # else:
@@ -749,7 +786,6 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
         display(HTML('<style>.w-100{width: 100%;} .text-left th{text-align: left !important;}</style>'))
         display(HTML('<style>.slick-cell{overflow: visible;}.gene-tooltip{text-decoration: underline; text-decoration-style: dotted;}.gene-tooltip .gene-tooltip-text{visibility: hidden; position: absolute; left: 60%; width: 250px; z-index: 1000; text-align: center; background-color: black; color: white; padding: 5px 10px; border-radius: 5px;} .gene-tooltip:hover .gene-tooltip-text{visibility: visible;} .gene-tooltip .gene-tooltip-text::after {content: " ";position: absolute;bottom: 100%;left: 50%;margin-left: -5px;border-width: 5px;border-style: solid;border-color: transparent transparent black transparent;}</style>'))
 
-        table_counter += 1
         # Display table
         display(HTML(html_results))
         # Display gene set
@@ -759,14 +795,16 @@ def results_table(enrichment_dataframe, source_label, target_label, table_counte
             additional_description = ". The table contains browsable tables displaying the results of the Protein Kinase (PK) enrichment analysis generated using Enrichr. Every row represents a PK; significant PKs are highlighted in bold."    
         elif source_label == "miRNA":
             additional_description = ". The figure contains browsable tables displaying the results of the miRNA enrichment analysis generated using Enrichr. Every row represents a miRNA; significant miRNAs are highlighted in bold."
-        display_object(table_counter, gene_set_library+additional_description, istable=True)
-        display(create_download_link(enrichment_dataframe_subset, filename="Enrichment_analysis_{}_{}.csv".format(source_label, gene_set_library)))
-    return table_counter
+        filename="Enrichment_analysis_{}_{}.csv".format(source_label, gene_set_library)
+        table_counter, notebook_metadata = display_object(table_counter, gene_set_library+additional_description, notebook_metadata, saved_filename=filename, istable=True)
+        display(create_download_link(enrichment_dataframe_subset, filename=filename))
+        
+    return table_counter, notebook_metadata
 
-def display_table(analysis_results, source_label, table_counter):
+def display_table(analysis_results, source_label, notebook_metadata, table_counter):
     
     # Plot Table
-    return results_table(analysis_results['enrichment_dataframe'].copy(), source_label=source_label, target_label='target', table_counter=table_counter)
+    return results_table(analysis_results['enrichment_dataframe'].copy(), source_label=source_label, notebook_metadata=notebook_metadata, target_label='target', table_counter=table_counter)
 
 
 
@@ -799,7 +837,7 @@ def run_l1000cds2(signature, nr_genes=500, signature_label='', plot_type='intera
     # Return
     return l1000cds2_results
     
-def plot_l1000cds2(l1000cds2_results, counter, nr_drugs=7, height=300):
+def plot_l1000cds2(l1000cds2_results, counter, notebook_metadata, nr_drugs=7, height=300, plot_name="L1000CDS2.png"):
 
     # Check if there are results
     if not l1000cds2_results['mimic'] or not l1000cds2_results['reverse']:
@@ -849,17 +887,18 @@ def plot_l1000cds2(l1000cds2_results, counter, nr_drugs=7, height=300):
             fig.show()       
         else:
             fig.show(renderer="png")
-
-        display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), istable=False)
-
-        # Links
         
+        counter, notebook_metadata = display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), notebook_metadata, saved_filename=plot_name, istable=False)
+        notebook_metadata["figures"][str(counter-1)]["file_desc"] = [{"name": "Mimic Signature Query Results", "link":l1000cds2_results['mimic']['url']},
+                                                                     {"name": "Reverse Signature Query Results", "link":l1000cds2_results['reverse']['url']},]
+        
+        # Links        
         display(Markdown(' *Mimic Signature Query Results*:'))
         display_link(l1000cds2_results['mimic']['url'])
         display(Markdown(' *Reverse Signature Query Results*:'))
         display_link(l1000cds2_results['reverse']['url'])
-        counter += 1
-    return counter
+        
+    return counter, notebook_metadata
         
 def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     # Define results
@@ -891,7 +930,7 @@ def run_l1000fwd(signature, nr_genes=500, signature_label=''):
     # Return
     return l1000fwd_results
     
-def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
+def plot_l1000fwd(l1000fwd_results, figure_counter, table_counter, notebook_metadata, nr_drugs=7, height=300):
     
     # Check if results
     if l1000fwd_results['result_url']:
@@ -899,7 +938,7 @@ def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
         # Display IFrame
         display_link(l1000fwd_results['result_url'])
         display(IFrame(l1000fwd_results['result_url'], width="1000", height="1000"))
-
+        figure_counter, notebook_metadata = display_object(figure_counter, "L1000FWD plot for visualizing top mimickers (red) and top reversers (blue) of {}.".format(l1000fwd_results["signature_label"]), notebook_metadata, saved_filename=l1000fwd_results['result_url'], istable=False)
         # Display tables
         for direction, signature_list in l1000fwd_results['signatures'].items():
 
@@ -915,7 +954,9 @@ def plot_l1000fwd(l1000fwd_results, counter, nr_drugs=7, height=300):
             table_html = signature_dataframe.to_html(escape=False, classes='w-100')
             
             display(HTML('<style>.w-100{{width: 100% !important;}}</style><div style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">{}</div>'.format(table_html)))
-            display_object(counter, "L1000FWD Results: {} Signatures".format(direction.title()), istable=True)
-            display(create_download_link(signature_dataframe, filename="{} Signatures for {}.csv".format(direction.title(), l1000fwd_results["signature_label"])))
-            counter += 1
-    return counter
+            filename = "{} Signatures for {}.csv".format(direction.title(), l1000fwd_results["signature_label"])
+            table_counter, notebook_metadata = display_object(table_counter, "L1000FWD Results: {} Signatures of {}".format(direction.title(), l1000fwd_results["signature_label"]), notebook_metadata, saved_filename=filename, istable=True)
+            display(create_download_link(signature_dataframe, filename=filename))
+            
+    return figure_counter, table_counter, notebook_metadata
+
