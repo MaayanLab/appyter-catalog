@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "Gene_Conversion_Appyter",
   "title": "Gene Conversion Appyter",
   "version": "0.0.6",
@@ -11,7 +11,7 @@
       "email": "danieljbclarkemssm@gmail.com"
     }
   ],
-  "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/Gene_Conversion_Appyter/",
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/Gene_Conversion_Appyter/",
   "tags": [
     "Genes"
   ],
