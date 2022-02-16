@@ -1,6 +1,9 @@
+bokeh
 itables
+matplotlib
 numpy
 pandas
 plotly
+pyarrow
 requests
 scipy
