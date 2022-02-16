@@ -4,7 +4,8 @@
   "title": "CFDE Gene Partnership",
   "version": "0.2.0",
   "description": "This Appyter uses FAIR APIs from different DCCs to Resolve gene-centric information from CF DCCs.",
-  "public": false,
+  "image": "cfde-gene-partnership.png",
+  "public": true,
   "authors": [
     {
       "name": "Daniel Clarke",
