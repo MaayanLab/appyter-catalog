@@ -1,5 +1,5 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics 
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics --no-binary=fisher
 fisher==0.1.9
 pandas
 numpy==1.21.5
