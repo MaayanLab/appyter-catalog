@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
     "name": "L1000_RNAseq_Gene_Search",
     "title": "RNA-seq-like Gene Centric Signature Reverse Search (RGCSRS)",
     "version": "0.0.7",
@@ -15,7 +15,7 @@
         "email": "minji.jeon@mssm.edu"
       }
     ],
-    "url": "https://github.com/MaayanLab/appyter-catalog/tree/master/appyters/L1000_RNAseq_Gene_Search",
+    "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/L1000_RNAseq_Gene_Search",
     "tags": [
       "L1000",
       "RNA-seq",

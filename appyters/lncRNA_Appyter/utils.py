@@ -192,7 +192,7 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=30, t=65, r=30, b=35)    
     fig.write_image(file_name+".png")
-    fig.write_image(file_name+".svg")
+    #fig.write_image(file_name+".svg")
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
@@ -211,7 +211,7 @@ def plot_scatter(x,y,values,query,title,min_val,max_val,arrow_loc,rank,filename)
     plt.annotate('', (arrow_loc['x'], arrow_loc['y']),xytext=(arrow_loc['x']+0.2, arrow_loc['y']+0.6),arrowprops=dict(facecolor='black', headwidth= 8, width=0.1))
     plt.title(title,fontsize=25)
     plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.png', bbox_inches='tight', dpi=300, facecolor='white')
-    plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
+    #plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close()
 
 
@@ -553,7 +553,7 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
     # Get node colors
     color_list = list(Category20[20] + Accent[8][5:6]+ Category20b[20][0:1] + Category20b[20][4:5]+ Bokeh[8][7:]+Colorblind[8][5:6])
     color_list = [x+'90' for x in color_list] # Make node colors more opaque 
-    color_palette = list(random.sample(list(itertools.chain(*zip(color_list))),len(list(np.unique(network['Chromosome']))+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))))
+    color_palette = list(random.sample(list(itertools.chain(*zip(color_list))),len(list(np.unique(list(network['Chromosome'])+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))))))
     chrom_2_color= dict(zip(list(np.unique(list(network['Chromosome'])+list(ensembl_2_chromsome[GENES_2_ENSEMBL[QUERY]]))),color_palette ))
     colors = [chrom_2_color[x] for x in list(network['Chromosome'])]
     colors.append('red') # The lncRNA is labeled red

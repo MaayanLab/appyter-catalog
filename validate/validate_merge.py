@@ -8,16 +8,11 @@ import logging
 import nbformat as nbf
 import traceback
 import jsonschema
-import urllib.request, urllib.error
+import urllib.request
 from fsspec.core import url_to_fs
 from appyter.ext.urllib import parse_file_uri
 from PIL import Image
 from subprocess import Popen, PIPE
-
-# remove user agent from urllib.request requests
-_opener = urllib.request.build_opener()
-_opener.addheaders = [('Accept', '*/*')]
-urllib.request.install_opener(_opener)
 
 def try_json_loads(s):
   import json
@@ -32,7 +27,7 @@ def get_changed_appyters(github_action):
     changed_files = [record['filename'] for record in json.load(sys.stdin)]
   else:
     # use git
-    with Popen(['git', 'diff', '--name-only', 'origin/master'], stdout=PIPE, stderr=sys.stderr) as p:
+    with Popen(['git', 'diff', '--name-only', 'origin/main'], stdout=PIPE, stderr=sys.stderr) as p:
       changed_files = set(filter(None, map(str.strip, map(bytes.decode, p.stdout))))
   #
   appyters = {
@@ -226,7 +221,7 @@ def validate_appyter(appyter):
   #
   logger.info(f"Success!")
 
-@click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/master')
+@click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/main')
 @click.option('-v', '--verbose', count=True, default=0, help='How verbose this should be, more -v = more verbose')
 @click.option('--github-action', default=False, type=bool, is_flag=True, help='Use for receiving json on stdin from github actions')
 def validate_merge(github_action=False, verbose=0):

@@ -4,6 +4,11 @@ services:
     build: ./ingress
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-ingress:{{ version }}
     restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - ${server_name}
+          - s3.${server_name}
     command: >
       --api.insecure=true
       --providers.docker
@@ -106,20 +111,29 @@ services:
       - appyters-ingress
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`s3.${server_name}`) || (Host(`${server_name}`) && (PathPrefix(`/storage`) || PathPrefix(`/minio`)))"
-      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.routers.s3.rule=Host(`s3.${server_name}`) || (Host(`${server_name}`) && PathPrefix(`/storage`))"
+      - "traefik.http.routers.s3.service=s3"
+      - "traefik.http.services.s3.loadbalancer.server.port=9000"
+{%- if tls %}
+      - "traefik.http.routers.s3.tls=true"
+      - "traefik.http.routers.s3.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.s3.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.s3.tls.domains[1].main=s3.${server_name}"
+{%- endif %}
+      - "traefik.http.routers.minio.rule=Host(`minio.${server_name}`)"
+      - "traefik.http.routers.minio.service=minio"
+      - "traefik.http.services.minio.loadbalancer.server.port=9001"
 {%- if tls %}
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.minio.tls.domains[0].main=${server_name}"
-      - "traefik.http.routers.minio.tls.domains[1].main=s3.${server_name}"
+      - "traefik.http.routers.minio.tls.domains[0].main=minio.${server_name}"
 {%- endif %}
     environment:
       MINIO_BUCKET: ${MINIO_BUCKET}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-    ports:
-      - 9000:9000
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_SERVER_URL: http{% if tls %}s{% endif %}://s3.${server_name}
+      MINIO_BROWSER_REDIRECT_URL: http{% if tls %}s{% endif %}://minio.${server_name}
     volumes:
       - ./data/minio/.minio:/root/.minio
       - ./data/minio/:/data
