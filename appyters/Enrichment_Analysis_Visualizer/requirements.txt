@@ -1,5 +1,6 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+fisher==0.1.9
 pandas
 numpy
 seaborn
