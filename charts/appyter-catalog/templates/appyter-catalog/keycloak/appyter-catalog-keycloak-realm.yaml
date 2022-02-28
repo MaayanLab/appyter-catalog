@@ -1,0 +1,25 @@
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakRealm
+metadata:
+  name: appyter
+  namespace: {{ .Values.appytercatalog.namespace }}
+  labels:
+    realm: appyter
+spec:
+  realm:
+    realm: appyter
+    enabled: True
+    displayName: Appyter
+    registrationAllowed: true
+    verifyEmail: true
+    registrationEmailAsUsername: true
+    rememberMe: true
+    resetPasswordAllowed: true
+    smtpServer:
+      host: appyter-catalog-smtp.appyter-catalog.scv.cluster.local
+      from: admin@{{ .Values.appytercatalog.ingress.host }}
+  instanceSelector:
+    matchLabels:
+      app: keycloak
+  

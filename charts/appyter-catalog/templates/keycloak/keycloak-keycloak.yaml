@@ -1,0 +1,46 @@
+---
+apiVersion: keycloak.org/v1alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: {{ .Values.keycloak.namespace }}
+  labels:
+    app: keycloak
+spec:
+  instances: 1
+  externalAccess:
+    enabled: false
+  podDisruptionBudget:
+    enabled: true
+  externalDatabase:
+    enabled: true
+  keycloakDeploymentSpec:
+    experimental:
+      env:
+      - name: DB_VENDOR
+        value: POSTGRES
+      - name: DB_ADDR
+        valueFrom:
+          configMapKeyRef:
+            name: keycloak-db-credentials
+            key: DB_CONN
+      - name: DB_PORT
+        valueFrom:
+          configMapKeyRef:
+            name: keycloak-db-credentials
+            key: DB_PORT
+      - name: DB_DATABASE
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-db-credentials
+            key: POSTGRES_DB
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-db-credentials
+            key: POSTGRES_USER
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-db-credentials
+            key: POSTGRES_PASSWORD

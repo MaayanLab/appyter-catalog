@@ -1,0 +1,21 @@
+certmanager:
+  namespace: cert-manager
+  clusterissuer:
+    # letsencrypt:
+    #   email:
+    selfsigned: true
+postgres:
+  namespace: postgres
+  storage:
+    class: local-path
+    size: 1Gi
+keycloak:
+  namespace: keycloak
+  ingress:
+    host: keycloak.dev.appyter.maayanlab.cloud
+appytercatalog:
+  namespace: appyter-catalog
+  version: 0.1.4
+  appyterVersion: 0.18.7
+  ingress:
+    host: dev.appyter.maayanlab.cloud

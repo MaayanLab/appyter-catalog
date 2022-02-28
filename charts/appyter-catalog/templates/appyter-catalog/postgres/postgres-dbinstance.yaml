@@ -1,0 +1,13 @@
+apiVersion: kci.rocks/v1alpha1
+kind: DbInstance
+metadata:
+  name: postgres-db-instance
+  namespace: {{ .Values.postgres.namespace }}
+spec:
+  adminSecretRef:
+    Name: postgres-admin-secret
+    Namespace: postgres
+  engine: postgres
+  generic:
+    host: postgres.postgres.svc.cluster.local
+    port: 5432

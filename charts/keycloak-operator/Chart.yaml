@@ -1,0 +1,4 @@
+apiVersion: v2
+name: keycloak-operator
+version: 0.0.1
+description: A helm chart for a keycloak operator

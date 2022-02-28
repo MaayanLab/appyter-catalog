@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-catalog
+  namespace: {{ .Values.appytercatalog.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-catalog
+  template:
+    metadata:
+      labels:
+        app: appyter-catalog
+    spec:
+      containers:
+      - name: appyter-catalog
+        image: maayanlab/appyters-catalog:{{ .Values.appytercatalog.version }}
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always

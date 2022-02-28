@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyter-catalog-https-redirect
+  namespace: {{ .Values.appytercatalog.namespace }}
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.appytercatalog.ingress.host }}`)
+    middlewares:
+    - name: appyter-catalog-https-redirect
+      namespace: {{ .Values.appytercatalog.namespace }}

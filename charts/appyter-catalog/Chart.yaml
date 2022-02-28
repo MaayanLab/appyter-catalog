@@ -1,0 +1,4 @@
+apiVersion: v2
+name: appyter-catalog
+version: 0.2.0
+description: A helm chart for the appyter-catalog

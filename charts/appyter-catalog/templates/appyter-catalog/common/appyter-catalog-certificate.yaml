@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: appyter-catalog-cert
+  namespace: {{ .Values.appytercatalog.namespace }}
+spec:
+  secretName: appyter-catalog-tls
+  issuerRef:
+    name: cluster-issuer
+    kind: ClusterIssuer
+  commonName: {{ .Values.appytercatalog.ingress.host }}
+  dnsNames:
+  - {{ .Values.appytercatalog.ingress.host }}
