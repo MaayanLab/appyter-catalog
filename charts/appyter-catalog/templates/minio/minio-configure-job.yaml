@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-configure-identity-openid
+  namespace: minio
+spec:
+  template:
+    spec:
+      containers:
+      - name: configure
+        image: minio/mc
+        command: [ "/bin/sh" ]
+        args: [ "/config/script.sh" ]
+        env:
+        - name: MINIO_BUCKET
+          value: {{ .Values.minio.bucket.name }}
+        - name: MINIO_URL
+          value: http://minio.minio.svc.cluster.local:9000
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-admin-secret
+              key: rootUser
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-admin-secret
+              key: rootPassword
+        - name: CONFIG_URL
+          value: https://{{ .Values.keycloak.ingress.host }}/auth/realms/minio/.well-known/openid-configuration
+          # value: http://keycloak-discovery.keycloak.svc.cluster.local:8080/auth/realms/minio/.well-known/openid-configuration
+        - name: CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-client-secret-minio-console
+              key: CLIENT_ID
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-client-secret-minio-console
+              key: CLIENT_SECRET
+        - name: CLAIM_NAME
+          value: policy
+        - name: CLAIM_PREFIX
+          value: ""
+        - name: SCOPES
+          value: ""
+        - name: REDIRECT_URI
+          value: https://{{ .Values.minio.console.ingress.host }}/oauth_callback
+        - name: COMMENT
+          value: ""
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: config
+        configMap:
+          name: minio-configure-identity-openid-sh
+          items:
+          - key: script.sh
+            path: script.sh
+      restartPolicy: Never

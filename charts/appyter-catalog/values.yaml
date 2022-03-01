@@ -3,14 +3,34 @@ certmanager:
   clusterissuer:
     # letsencrypt:
     #   email:
-    selfsigned: true
+    selfsigned:
+      commonName: dev.appyter.maayanlab.cloud
 postgres:
   namespace: postgres
   storage:
     class: local-path
     size: 1Gi
+minio:
+  namespace: minio
+  bucket:
+    name: storage
+  ingress:
+    host: s3.dev.appyter.maayanlab.cloud
+  console:
+    ingress:
+      host: console.s3.dev.appyter.maayanlab.cloud
+  storage:
+    class: local-path
+    size: 1Gi
+mail:
+  namespace: mail
+  domain: dev.appyter.maayanlab.cloud
+  storage:
+    class: local-path
+    size: 1Gi
 keycloak:
   namespace: keycloak
+  realm: appyter
   ingress:
     host: keycloak.dev.appyter.maayanlab.cloud
 appytercatalog:

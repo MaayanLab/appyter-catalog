@@ -1,0 +1,19 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-console
+  namespace: {{ .Values.namespace }}
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.console.ingress.host }}`)
+    services:
+    - kind: Service
+      name: minio-console
+      namespace: {{ .Values.namespace }}
+      port: 80
+      passHostHeader: true
+  tls:
+    secretName: minio-console-tls

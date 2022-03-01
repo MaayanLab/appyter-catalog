@@ -1,0 +1,15 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: minio
+  namespace: {{ .Values.minio.namespace }}
+  labels:
+    client: minio
+spec:
+  realmSelector:
+    matchLabels:
+      realm: {{ .Values.keycloak.realm }}
+  client:
+    clientId: minio
+    protocol: openid-connect
+    rootUrl: https://{{ .Values.minio.ingress.host }}

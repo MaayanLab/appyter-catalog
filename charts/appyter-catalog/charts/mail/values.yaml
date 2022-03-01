@@ -1,0 +1,5 @@
+namespace: mail
+domain: dev.appyter.maayanlab.cloud
+storage:
+  class: local-path
+  size: 1Gi

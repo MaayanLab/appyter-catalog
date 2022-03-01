@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-configure-sh
+  namespace: {{ .Values.minio.namespace }}
+data:
+  script.sh: |
+    # connect to minio
+    mc alias set minio --insecure "${MINIO_URL}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}" || exit 1
+
+    # configure policy
+    cat > /tmp/public-get.json << EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Effect": "Allow",
+          "Principal": {
+            "AWS": [
+              "*"
+            ]
+          },
+          "Resource": [
+            "arn:aws:s3:::${MINIO_BUCKET}/*"
+          ],
+          "Sid": ""
+        }
+      ]
+    }
+    EOF
+
+    # create bucket
+    mc mb "minio/${MINIO_BUCKET}"
+
+    # set bucket policy
+    mc policy set-json public-get.json "minio/${MINIO_BUCKET}" || exit 1
+
+    # configure openid-connect
+    mc admin config set minio identity_openid \
+      config_url="${CONFIG_URL}" \
+      client_id="${CLIENT_ID}" \
+      client_secret="${CLIENT_SECRET}" \
+      claim_name="${CLAIM_NAME}" \
+      claim_prefix="${CLAIM_PREFIX}" \
+      scopes="${SCOPES}" \
+      redirect_uri="${REDIRECT_URI}" \
+      comment="${COMMENT}" || exit 1
+
+    # restart to apply changes
+    mc admin service restart minio

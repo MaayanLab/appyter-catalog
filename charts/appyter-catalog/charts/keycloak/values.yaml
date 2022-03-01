@@ -1,0 +1,4 @@
+namespace: keycloak
+realm: appyter
+ingress:
+  host: keycloak.dev.appyter.maayanlab.cloud

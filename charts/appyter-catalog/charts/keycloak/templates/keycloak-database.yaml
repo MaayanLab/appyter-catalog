@@ -1,0 +1,13 @@
+---
+apiVersion: kci.rocks/v1alpha1
+kind: Database
+metadata:
+  name: keycloak-db
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: keycloak-db-credentials
+  instance: postgres-db-instance
+  deletionProtected: true
+  backup:
+    enable: false
+    cron: "0 0 * * *"

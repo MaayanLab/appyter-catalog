@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-catalog-postgrest
+  namespace: {{ .Values.appytercatalog.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-catalog-postgrest
+  template:
+    metadata:
+      labels:
+        app: appyter-catalog-postgrest
+    spec:
+      containers:
+      - name: appyter-catalog-postgrest
+        image: postgrest/postgrest
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: appyter-catalog-db-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: appyter-catalog-db-credentials
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: appyter-catalog-db-credentials
+              key: POSTGRES_DB
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: appyter-catalog-db-credentials
+              key: DB_CONN
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: appyter-catalog-db-credentials
+              key: DB_PORT
+        - name: PGRST_DB_URI
+          value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+        - name: PGRST_DB_SCHEMA
+          value: api
+        - name: PGRST_DB_ANON_ROLE
+          value: guest
+        - name: PGRST_SERVER_PROXY_URI
+          value: https://{{ .Values.appytercatalog.ingress.host }}/postgrest
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always

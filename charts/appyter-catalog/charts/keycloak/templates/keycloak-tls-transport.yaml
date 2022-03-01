@@ -1,0 +1,8 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: keycloak-tls-transport
+  namespace: {{ .Values.namespace }}
+spec:
+  insecureSkipVerify: true
