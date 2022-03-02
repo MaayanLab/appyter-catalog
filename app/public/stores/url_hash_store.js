@@ -64,4 +64,5 @@ function url_hash_store() {
   }
 }
 
-export const hash = url_hash_store()
+const hash = url_hash_store()
+export default hash

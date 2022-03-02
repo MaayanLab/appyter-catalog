@@ -1,5 +1,5 @@
 <script>
-  import { hash } from '../stores';
+  import hash from '../stores/url_hash_store';
 
   import StaticMarkdown from '../components/StaticMarkdown.svelte'
   import CodeSnippet from '../components/CodeSnippet.svelte'

@@ -7,7 +7,7 @@
   import Landing from '../fragments/Landing.svelte'
   import SearchBox from '../fragments/SearchBox.svelte'
 
-  import { hash } from '../stores'
+  import hash from '../stores/url_hash_store'
   import { hashCode, intToRGB, set_gte } from '../utils.js'
 
   const base_url = window.location.origin

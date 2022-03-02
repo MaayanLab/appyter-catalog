@@ -1,5 +1,5 @@
 <script>
-  import { hash } from '../stores'
+  import hash from '../stores/url_hash_store'
 
   let { global_tags } = require('../appyters.json')
 </script>

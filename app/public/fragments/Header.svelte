@@ -1,5 +1,5 @@
 <script>
-  import { hash } from '../stores'
+  import hash from '../stores/url_hash_store'
 </script>
 
 <style>
