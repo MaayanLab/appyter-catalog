@@ -1,4 +1,3 @@
 FROM nginx
-COPY public/favicon.ico /usr/share/nginx/html/favicon.ico
-COPY public/images /usr/share/nginx/html/images/
+COPY public /usr/share/nginx/html
 COPY dist /usr/share/nginx/html

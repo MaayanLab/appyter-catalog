@@ -1,6 +1,6 @@
 <script>
   import hash from '../stores/url_hash_store'
-  import Masonry from '../components/Masonry'
+  import Masonry from '../components/Masonry.svelte'
   import { localize_appyter_image } from '../utils.js'
 
   export let base_url
@@ -83,10 +83,10 @@
         <button class="btn btn-secondary btn-sm disabled mb-1">
           View Details
         </button>
-        <button class="btn btn-sm btn-danger disabled mb-1">
+        <button class="btn btn-danger btn-sm disabled mb-1">
           Start Appyter
         </button>
-        <button class="btn btn-sm btn-secondary disabled mb-1">
+        <button class="btn btn-secondary btn-sm disabled mb-1">
           Run Locally
         </button>
       </div>
@@ -141,18 +141,16 @@
           </div>
           <p class="card-text">{@html appyter.description_html}</p>
           <div class="pb-4 d-flex flex-row flex-wrap">
-            <span class="badge badge-success m-1 p-1">v{appyter.version}</span>
-            <a
-              class="badge badge-secondary m-1 p-1"
-              href="javascript:"
+            <span class="badge bg-success m-1 p-1">v{appyter.version}</span>
+            <button
+              class="badge bg-secondary m-1 p-1"
               on:click={() => $hash.params.license = appyter.license}
-            >{appyter.license}</a>
+            >{appyter.license}</button>
             {#each appyter.tags as tag}
-              <a
-                class="badge badge-primary m-1 p-1 text-white"
-                href="javascript:"
+              <button
+                class="badge bg-primary m-1 p-1 text-white"
                 on:click={() => $hash.params.tags = [...($hash.params.tags || '').split(';').filter(t => t !== '' && t !== tag), tag].join(';')}
-              >{tag}</a>
+              >{tag}</button>
             {/each}
           </div>
           <button class="btn btn-primary btn-sm mb-1">

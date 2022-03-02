@@ -1,4 +1,6 @@
 <script>
+  import clipboardIcon from 'bootstrap-icons/icons/clipboard.svg'
+
   export let code = ''
 
   let copy_feedback = false
@@ -44,10 +46,9 @@
     </code>
   </div>
   <div class="p-3">
-    <a
+    <button
       class="btn btn-sm"
       class:btn-success={copy_feedback}
-      href="javascript:"
       title="Copy to clipboard"
       on:click={() => {
         navigator.clipboard.writeText(code_lines.join('\n'))
@@ -56,6 +57,6 @@
             setTimeout(() => copy_feedback = false, 1000)
           })
       }}
-    ><img src={require('bootstrap-icons/icons/clipboard.svg')} /></a>
+    ><img src={clipboardIcon} alt="Clipboard" /></button>
   </div>
 </div>

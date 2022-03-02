@@ -1,11 +1,13 @@
 <script>
   import hash from '../stores/url_hash_store';
+  import appytersJson from '../../public/appyters.json'
 
   import StaticMarkdown from '../components/StaticMarkdown.svelte'
   import CodeSnippet from '../components/CodeSnippet.svelte'
+  import RunningAppytersMd from './RunningAppyters.md'
 
   // constants
-  let { docker_org, library_version } = require('../appyters.json')
+  let { docker_org, library_version } = appytersJson
   let public_url = window.location.origin
   
   // derived values
@@ -93,10 +95,10 @@
   }
 </style>
 
-<div class="container content flex-grow">
+<div class="containerow">
   <div class="row">
     <div class="col-sm-12">
-      <StaticMarkdown data={require('./RunningAppyters.md')} />
+      <StaticMarkdown data={RunningAppytersMd} />
     </div>
     <div class="col-sm-12 col-xl-6">
       <h2>Step 2. Collect the necessary information to construct the Appyter image</h2>
@@ -199,28 +201,25 @@
       <p>The instructions will update in real time as the information provided in Step 2 is updated.</p>
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <a
+          <button
             on:click={() => $hash.params.run = 'notebook'}
             class:active={run === 'notebook'}
             class="nav-link"
-            href="javascript:"
-          >Jupyter Notebook</a>
+          >Jupyter Notebook</button>
         </li>
         <li class="nav-item">
-          <a
+          <button
             on:click={() => $hash.params.run = 'webform'}
             class:active={run === 'webform'}
             class="nav-link"
-            href="javascript:"
-          >Web Form</a>
+          >Web Form</button>
         </li>
         <li class="nav-item">
-          <a
+          <button
             on:click={() => $hash.params.run = 'cli'}
             class:active={run === 'cli'}
             class="nav-link"
-            href="javascript:"
-          >Command Line Application</a>
+          >Command Line Application</button>
         </li>
       </ul>
       <div class="card">

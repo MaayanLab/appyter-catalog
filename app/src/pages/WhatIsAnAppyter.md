@@ -4,7 +4,7 @@ Appyters are a collection of web-based software applications that enable users t
 
 Users that develop Jupyter notebooks for their Data Science and bioinformatics tasks can [create](/#/creating-appyters/) and [publish](/#/publishing-appyters/) their own Appyters. Appyters extend the Jupyter Notebook language to support external, end-user configurable variables. Appyters can be considered a meta Jupyter Notebook language that is compatible with standard Jupyter Notebook execution. The Appyter meta Jupyter Notebook language adds Jupyter "magics" which permit constructing output Python code with jinja2, declaration of injectable variables by means of pre-defined, or extendable "fields", and a mechanism to turn the meta Jupyter Notebook language into full-stack web-based applications. Such Appyter web-based applications facilitate users to submit their data via the web-based form, satisfying the defined fields followed by rendering and execution of a standard Jupyter Notebook given that input.
 
-<img class="img-fluid w-100 m-2 mb-4" src="../images/what-is-an-appyter-figure.svg" />
+<img class="img-fluid w-100 m-2 mb-4" src="../../public/images/what-is-an-appyter-figure.svg" />
 
 Appyters extend [BioJupies](https://amp.pharm.mssm.edu/biojupies/) by permitting rapid construction of biojupies-like applications based on the same Jupyter notebook reports that are produced, helping to turn any data analysis workflow coded in a Jupyter notebook into a parameterized web-based application.
 

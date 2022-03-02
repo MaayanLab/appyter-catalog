@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import * as JsSearch from 'js-search'
-  import mdIt from 'markdown-it'
+  import * as mdIt from 'markdown-it'
 
   import Home from '../fragments/Home.svelte'
   import Landing from '../fragments/Landing.svelte'
@@ -10,10 +10,12 @@
   import hash from '../stores/url_hash_store'
   import { hashCode, intToRGB, set_gte } from '../utils.js'
 
+  import appytersJson from '../../public/appyters.json'
+
   const base_url = window.location.origin
 
   // store appyters as list and lookup table based on name slugs
-  let { appyters: appyterList } = require('../appyters.json')
+  let { appyters: appyterList } = appytersJson
   // assemble appyter lookup table
   let appyterLookup = {}
   for (const appyter of appyterList) {
@@ -161,7 +163,7 @@
   </div>
 {/if}
 
-<div class="container content flex-grow">
+<div class="container">
   {#if appyter === undefined}
     <Home
       base_url={base_url}

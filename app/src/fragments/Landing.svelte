@@ -26,10 +26,10 @@
   <div class="col-sm-12 col-md-6 col-lg-8">
     <h2>{appyter.title}</h2>
     <span class="card-subtitle mb-2 text-muted d-flex flex-row flex-wrap">
-      <span class="badge badge-success m-1">v{appyter.version}</span>
-      <span class="badge badge-secondary m-1">{appyter.license}</span>
+      <span class="badge bg-success m-1">v{appyter.version}</span>
+      <span class="badge bg-secondary m-1">{appyter.license}</span>
       {#each appyter.tags as tag}
-        <span class="badge badge-primary m-1">{tag}</span>
+        <span class="badge bg-primary m-1">{tag}</span>
       {/each}
     </span>
     <p>

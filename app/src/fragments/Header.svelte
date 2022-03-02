@@ -1,5 +1,6 @@
 <script>
   import hash from '../stores/url_hash_store'
+  import appyterLogo from '../../public/images/appyters_logo.svg'
 </script>
 
 <style>
@@ -23,7 +24,7 @@
         <h1 class="m-0">
           <a href="#/">
             <img
-              src="{require('../images/appyters_logo.svg')}"
+              src="{appyterLogo}"
               class="img-fluid w-100 p-4"
               alt="Appyters"
             />

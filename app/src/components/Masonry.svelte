@@ -1,5 +1,5 @@
 <script>
-  import Macy from 'macy'
+  import * as Macy from 'macy'
   import { tick } from 'svelte'
 
   export let items
