@@ -4,7 +4,7 @@
   "description": "A catalog of appyter notebooks",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build --no-cache public/index.html",
+    "build": "parcel build --no-cache public/*.html",
     "dev": "parcel serve --no-cache public/index.html"
   },
   "repository": {
