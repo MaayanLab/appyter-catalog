@@ -59,6 +59,13 @@
           >
             About
           </a>
+           | 
+          <a
+            href="#/account/"
+            class:selected={$hash.path.split('/').slice(0, -1).join('/')==='/account'}
+          >
+            Account
+          </a>
         </span>
       </div>
     </div>

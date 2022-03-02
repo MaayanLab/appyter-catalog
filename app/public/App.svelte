@@ -11,6 +11,7 @@
     '/publishing-appyters': require('./pages/PublishingAppyters.svelte').default,
     '/running-appyters': require('./pages/RunningAppyters.svelte').default,
     '/about': require('./pages/About.svelte').default,
+    '/account': require('./pages/Account.svelte').default,
     [undefined]: require('./pages/NotFound.svelte').default,
   }
 </script>
@@ -25,7 +26,8 @@
   }
 
   :global(.flex-grow) {
-    flex: 1 0 auto;
+    flex: 1 1 0;
+    overflow: hidden;
   }
 
   :global(body) {
