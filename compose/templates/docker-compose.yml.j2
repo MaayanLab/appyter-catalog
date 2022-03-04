@@ -34,6 +34,19 @@ services:
 {%- if tls %}
       - 443:443
 {%- endif %}
+{%- if aws_s3_proxy %}
+      - "traefik.http.routers.storageproxy.rule=(Host(`s3.${server_name}`) || Host(`${server_name}`)) && PathPrefix(`/storage`)"
+      - "traefik.http.routers.storageproxy.service=storageproxy"
+      - "traefik.http.services.storageproxy.loadbalancer.servers[0].url=https://s3.amazonaws.com"
+      - "traefik.http.routers.storageproxy.middlewares=storageproxy-addprefix"
+      - "traefik.http.middlewares.storageproxy-addprefix.addprefix.prefix=/appyter"
+{%- if tls %}
+      - "traefik.http.routers.storageproxy.tls=true"
+      - "traefik.http.routers.storageproxy.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.storageproxy.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.storageproxy.tls.domains[1].main=s3.${server_name}"
+{%- endif %}
+{%- endif %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/ingress:/data
