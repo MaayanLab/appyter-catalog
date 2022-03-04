@@ -2,6 +2,7 @@ import click
 
 @click.command(help='Build the docker-compose.yml file')
 @click.option('--tls', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with tls support')
+@click.option('--minio', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with a minio deployment')
 def build_compose(tls):
   import os
   import json

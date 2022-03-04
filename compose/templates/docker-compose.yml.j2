@@ -114,8 +114,9 @@ services:
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
     logging: *default-logging
+{%- if minio %}
   appyters-s3:
-    build: ./s3
+    build: ./minio
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
     depends_on:
@@ -149,6 +150,7 @@ services:
       - ./data/minio/.minio:/root/.minio
       - ./data/minio/:/data
     logging: *default-logging
+{%- endif %}
 {%- for appyter in appyters %}
   appyter-{{ appyter['name'].lower() }}:
     build:
@@ -162,12 +164,14 @@ services:
     depends_on:
       - appyters-ingress
       - appyters-orchestrator
+{%- if minio %}
       - appyters-s3
+{%- endif %}
     environment:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
       - APPYTER_PORT=5000
       - APPYTER_PROXY=true
-      - APPYTER_DATA_DIR=s3://storage/appyters/#?client_kwargs.endpoint_url=http://appyters-s3:9000&key=${MINIO_ACCESS_KEY}&secret=${MINIO_SECRET_KEY}
+      - APPYTER_DATA_DIR=${APPYTERS_DATA_DIR}
       - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
       - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
       - APPYTER_DISPATCHER_IMAGE=${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
