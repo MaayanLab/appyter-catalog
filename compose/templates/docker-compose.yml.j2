@@ -7,7 +7,7 @@ x-logging:
     max-file: '10'
 services:
   appyters-ingress:
-    build: ./ingress
+    build: ./deploy/traefik
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-ingress:{{ version }}
     restart: unless-stopped
     networks:
@@ -78,7 +78,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     logging: *default-logging
   appyters-postgrest:
-    build: ./postgrest
+    build: ./deploy/postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
     depends_on:
@@ -102,7 +102,7 @@ services:
       PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${server_name}/postgrest"
     logging: *default-logging
   appyters-postgres:
-    build: ./postgres
+    build: ./deploy/postgres
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgres:{{ version }}
     restart: unless-stopped
     ports:
@@ -116,7 +116,7 @@ services:
     logging: *default-logging
 {%- if minio %}
   appyters-s3:
-    build: ./minio
+    build: ./deploy/minio
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
     depends_on:
