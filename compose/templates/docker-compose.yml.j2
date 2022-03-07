@@ -113,6 +113,10 @@ services:
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
       PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${server_name}/postgrest"
+{%- if auth %}
+      PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
+      PGRST_ROLE_CLAIM_KEY: ${PGRST_ROLE_CLAIM_KEY}
+{%- endif %}
     logging: *default-logging
   appyters-postgres:
     build: ./deploy/postgres
