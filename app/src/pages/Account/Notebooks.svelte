@@ -5,18 +5,29 @@
   const base_url = window.location.origin
 
   let notebooks
+  let offset = 0
+  let limit = 10
+  let count
 
-  async function load_notebooks() {
+  async function load_notebooks({ offset: _offset, limit: _limit }) {
     notebooks = undefined
-    const res = await fetch(`${base_url}/postgrest/user_instance`, {
+    const res = await fetch(`${base_url}/postgrest/user_instance?offset=${_offset}&limit=${_limit}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Prefer': 'count=estimated',
         'Authorization': `Bearer ${$auth.keycloak.token}`,
       },
     })
+    offset = _offset
+    limit = _limit
     notebooks = await res.json()
+    if (notebooks.length < limit) {
+      count = offset + notebooks.length
+    } else {
+      count = Number(res.headers.get('Content-Range').split('/')[1])
+    }
   }
 
   async function delete_notebook(id) {
@@ -29,14 +40,14 @@
       },
     })
     if (res.status === 204) {
-      await load_notebooks()
+      await load_notebooks({ offset, limit })
     } else {
       console.log(await res.text())
     }
   }
 
   if ($auth.state === 'auth') {
-    load_notebooks().catch(e => console.error(e))
+    load_notebooks({ offset, limit }).catch(e => console.error(e))
   }
 </script>
 
@@ -44,7 +55,7 @@
   <div class="d-flex justify-content-end py-2">
     <button
       class="btn bg-primary text-white"
-      on:click={() => load_notebooks().catch(e => console.error(e))}
+      on:click={() => load_notebooks({ offset, limit }).catch(e => console.error(e))}
     >Refresh</button>
   </div>
 
@@ -76,6 +87,39 @@
           >Delete</button></td>
         </tr>
       {/each}
+      <tr>
+        <td colspan="100%">
+          <ul class="pagination">
+            <li class="page-item">
+              <button
+                class="btn page-link" style="background-color: inherit;"
+                aria-label="Previous"
+                class:disabled={offset === 0}
+                on:click={evt => {
+                  load_notebooks({ offset: Math.max(0, offset - limit), limit }).catch(e => console.error(e))
+                }}
+              >
+                <span aria-hidden="true">&laquo;</span>
+              </button>
+            </li>
+            <li class="page-item">
+              <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
+                Showing {offset+1} - {offset + notebooks.length} {#if count}of {count} notebooks{/if}
+              </span>
+            </li>
+            <li class="page-item">
+              <button
+                class="btn page-link"
+                class:disabled={offset + limit > count}
+                style="background-color: inherit;"
+                aria-label="Next"
+              >
+                <span aria-hidden="true">&raquo;</span>
+              </button>
+            </li>
+          </ul>
+        </td>
+      </tr>
     {/if}
   </table>
 

@@ -5,18 +5,29 @@
   const base_url = window.location.origin
 
   let uploads
+  let offset = 0
+  let limit = 10
+  let count
 
-  async function load_uploads() {
+  async function load_uploads({ offset: _offset, limit: _limit }) {
     uploads = undefined
-    const res = await fetch(`${base_url}/postgrest/user_file`, {
+    const res = await fetch(`${base_url}/postgrest/user_file?offset=${_offset}&limit=${_limit}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Prefer': 'count=estimated',
         'Authorization': `Bearer ${$auth.keycloak.token}`,
       },
     })
+    offset = _offset
+    limit = _limit
     uploads = await res.json()
+    if (uploads.length < limit) {
+      count = offset + uploads.length
+    } else {
+      count = Number(res.headers.get('Content-Range').split('/')[1])
+    }
   }
 
   async function delete_upload(id) {
@@ -29,14 +40,14 @@
       },
     })
     if (res.status === 204) {
-      await load_uploads()
+      await load_uploads({ offset, limit })
     } else {
       console.log(await res.text())
     }
   }
 
   if ($auth.state === 'auth') {
-    load_uploads().catch(e => console.error(e))
+    load_uploads({ offset, limit }).catch(e => console.error(e))
   }
 </script>
 
@@ -44,11 +55,11 @@
   <div class="d-flex justify-content-end py-2">
     <button
       class="btn bg-primary text-white"
-      on:click={() => load_uploads().catch(e => console.error(e))}
+      on:click={() => load_uploads({ offset, limit }).catch(e => console.error(e))}
     >Refresh</button>
   </div>
 
-  <table class="table table-striped table-fixed">
+  <table class="table table-striped">
     <tr>
       <th scope="col" class="text-left">Filename</th>
       <th scope="col" class="text-left">Created</th>
@@ -75,6 +86,39 @@
           >Delete</button></td>
         </tr>
       {/each}
+      <tr>
+        <td colspan="100%">
+          <ul class="pagination">
+            <li class="page-item">
+              <button
+                class="btn page-link" style="background-color: inherit;"
+                aria-label="Previous"
+                class:disabled={offset === 0}
+                on:click={evt => {
+                  load_uploads({ offset: Math.max(0, offset - limit), limit }).catch(e => console.error(e))
+                }}
+              >
+                <span aria-hidden="true">&laquo;</span>
+              </button>
+            </li>
+            <li class="page-item">
+              <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
+                Showing {offset+1} - {offset + uploads.length} {#if count}of {count} uploads{/if}
+              </span>
+            </li>
+            <li class="page-item">
+              <button
+                class="btn page-link"
+                class:disabled={offset + limit > count}
+                style="background-color: inherit;"
+                aria-label="Next"
+              >
+                <span aria-hidden="true">&raquo;</span>
+              </button>
+            </li>
+          </ul>
+        </td>
+      </tr>
     {/if}
   </table>
 
