@@ -22,7 +22,16 @@ function keycloak_auth_store({ url, realm, clientId }) {
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
       }).then(authenticated => {
-        console.log({ authenticated })
+        keycloak.onTokenExpired = () => {
+          console.debug('refreshing expired token...')
+          keycloak.updateToken()
+            .success(() => {
+              set({ state: 'auth', keycloak })
+            })
+            .error(e => {
+              set({ state: 'error', keycloak })
+            })
+        }
         set({
           state: authenticated ? 'auth' : 'guest',
           keycloak: {
