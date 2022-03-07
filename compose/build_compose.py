@@ -2,7 +2,9 @@ import click
 
 @click.command(help='Build the docker-compose.yml file')
 @click.option('--tls', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with tls support')
-def build_compose(tls):
+@click.option('--minio', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with a minio deployment')
+@click.option('--aws-proxy', default=False, type=bool, is_flag=True, help='An additional proxy to aws for legacy reasons, maps /storage => aws bucket')
+def build_compose(tls, minio, aws_proxy):
   import os
   import json
   import glob
@@ -38,6 +40,8 @@ def build_compose(tls):
     root_dir=root_dir,
     version=version,
     tls=tls,
+    minio=minio,
+    aws_proxy=aws_proxy,
   )
   print(docker_compose)
 
