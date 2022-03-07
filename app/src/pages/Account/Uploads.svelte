@@ -40,6 +40,10 @@
       },
     })
     if (res.status === 204) {
+      if (offset >= count-1) {
+        // deletion would cause this page to disappear, move back a page
+        offset = Math.max(0, offset - limit)
+      }
       await load_uploads({ offset, limit })
     } else {
       console.log(await res.text())
@@ -103,14 +107,16 @@
             </li>
             <li class="page-item">
               <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
-                Showing {offset+1} - {offset + uploads.length} {#if count}of {count} uploads{/if}
+                Showing uploads {offset+1} - {offset + uploads.length} {#if count}of {count}{/if}
               </span>
             </li>
             <li class="page-item">
               <button
-                class="btn page-link"
-                class:disabled={offset + limit > count}
-                style="background-color: inherit;"
+                class="btn page-link" style="background-color: inherit;"
+                class:disabled={offset + limit >= count}
+                on:click={evt => {
+                  load_uploads({ offset: Math.min(count - 1, offset + limit), limit }).catch(e => console.error(e))
+                }}
                 aria-label="Next"
               >
                 <span aria-hidden="true">&raquo;</span>
