@@ -1,3 +1,5 @@
+create extension if not exists "uuid-ossp";
+
 -- setup anonymous user (guest)
 create role guest nologin;
 grant guest to appyters;
