@@ -83,7 +83,7 @@
           <td><a href="/storage/input/{upload.file}" download={upload.filename}>{upload.filename}</a></td>
           <td>{upload.ts}</td>
           <td class="text-center"><button
-            class="btn bg-danger text-white"
+            class="btn btn-sm bg-danger text-white"
             on:click={() => {
               delete_upload(upload.id).catch(e => console.error(e))
             }}

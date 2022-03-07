@@ -84,7 +84,7 @@
           <td><a href="/storage/input/{notebook.file}" download={notebook.filename}>{notebook.filename}</a></td>
           <td>{notebook.ts}</td>
           <td class="text-center"><button
-            class="btn bg-danger text-white"
+            class="btn btn-sm bg-danger text-white"
             on:click={() => {
               delete_notebook(notebook.id).catch(e => console.error(e))
             }}
