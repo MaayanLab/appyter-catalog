@@ -6,20 +6,20 @@
   import Loader from './fragments/Loader.svelte'
   import ErrorOccurred from './pages/ErrorOccurred.svelte'
 
-  let pages = {
-    '': () => import('./pages/Catalog.svelte'),
+  const pages = {
+    '/': () => import('./pages/Catalog.svelte'),
     '/what-is-an-appyter': () => import('./pages/WhatIsAnAppyter.svelte'),
     '/creating-appyters': () => import('./pages/CreatingAppyters.svelte'),
     '/publishing-appyters': () => import('./pages/PublishingAppyters.svelte'),
     '/running-appyters': () => import('./pages/RunningAppyters.svelte'),
     '/about': () => import('./pages/About.svelte'),
-    '/account': () => import('./pages/Account.svelte'),
+    '/account': () => import('./pages/Account/index.svelte'),
     '/404': () => import('./pages/NotFound.svelte'),
     '/500': async () => ({ default: ErrorOccurred }),
   }
   let path
   $: if ($hash.path !== undefined) {
-    let _path = $hash.path.split('/').slice(0, -1).join('/')
+    let _path = $hash.path.split('/').slice(0, 2).join('/')
     if (!(_path in pages)) _path = '/404'
     if (path !== _path) path = _path
   }
