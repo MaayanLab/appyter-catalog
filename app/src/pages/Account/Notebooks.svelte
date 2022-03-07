@@ -1,23 +1,85 @@
+<script>
+  import auth from '../../stores/keycloak_auth_store'
+  import Loader from '../../fragments/Loader.svelte'
+
+  const base_url = window.location.origin
+
+  let notebooks
+
+  async function load_notebooks() {
+    notebooks = undefined
+    const res = await fetch(`${base_url}/postgrest/user_instance`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${$auth.keycloak.token}`,
+      },
+    })
+    notebooks = await res.json()
+  }
+
+  async function delete_notebook(id) {
+    const res = await fetch(`${base_url}/postgrest/user_instance?id=${encodeURIComponent(`eq.${id}`)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${$auth.keycloak.token}`,
+      },
+    })
+    if (res.status === 204) {
+      await load_notebooks()
+    } else {
+      console.log(await res.text())
+    }
+  }
+
+  if ($auth.state === 'auth') {
+    load_notebooks().catch(e => console.error(e))
+  }
+</script>
+
 <div class="container flex-grow-1">
-  <table class="table table-striped">
+  <div class="d-flex justify-content-end py-2">
+    <button
+      class="btn bg-primary text-white"
+      on:click={() => load_notebooks().catch(e => console.error(e))}
+    >Refresh</button>
+  </div>
+
+  <table class="table table-striped table-fixed">
     <tr>
       <th scope="col">Instance ID</th>
       <th scope="col">Appyter</th>
       <th scope="col">Created</th>
       <th scope="col">Actions</th>
     </tr>
-    <tr>
-      <td><a href="/Independent_Enrichment_Analysis/6cc2a2c87d98b7d978521da5e67947dbb7c09ea1">6cc2a2c87...</a></td>
-      <td><a href="#/Independent_Enrichment_Analysis">Independent Enrichment Analysis</a></td>
-      <td>2022-02-24 10:36pm</td>
-      <td><button>Delete</button></td>
-    </tr>
-    <tr>
-      <td><a href="/Independent_Enrichment_Analysis/6cc2a2c87d98b7d978521da5e67947dbb7c09ea1">947dbb7c0...</a></td>
-      <td><a href="#/Independent_Enrichment_Analysis">Independent Enrichment Analysis</a></td>
-      <td>2022-02-24 10:48pm</td>
-      <td><button>Delete</button></td>
-    </tr>
+    {#if notebooks === undefined}
+      <tr>
+        <td class="text-center" colspan="100%"><Loader /></td>
+      </tr>
+    {:else if notebooks.length === 0}
+      <tr>
+        <td class="text-center" colspan="100%">No notebooks found</td>
+      </tr>
+    {:else}
+      {#each notebooks as notebook}
+        <tr>
+          <td><a href="/storage/input/{notebook.file}" download={notebook.filename}>{notebook.filename}</a></td>
+          <td>{notebook.ts}</td>
+          <td class="text-center"><button
+            class="btn bg-danger text-white"
+            on:click={() => {
+              delete_notebook(notebook.id).catch(e => console.error(e))
+            }}
+          >Delete</button></td>
+        </tr>
+      {/each}
+    {/if}
   </table>
-  <p>These are notebooks you've saved. Deleting a notebook from this list will only delete it if no other user has saved it.</p>
+
+  <div class="alert alert-primary">
+    These are notebooks you've saved. Deleting a notebook from this list will unlink it from your account it will then be subject for deletion as long as no other users have it linked.
+  </div>
 </div>
