@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cert-manager
+version: v1.7.1
+description: cert-manager but with crds working when included as helm dependency

@@ -1,0 +1,21 @@
+{{- if .Values.catalog.keycloakClient.create -}}
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: {{ .Values.catalog.keycloakClient.name }}
+  labels:
+    client: {{ .Values.catalog.keycloakClient.name }}
+spec:
+  realmSelector:
+    matchLabels:
+      realm: {{ .Values.keycloak.realm.name }}
+  client:
+    clientId: {{ .Values.catalog.keycloakClient.name }}
+    protocol: openid-connect
+    publicClient: true
+    standardFlowEnabled: true
+    defaultClientScopes:
+    - profile
+    # TODO: role?
+    rootUrl: https://{{ index .Values "host" }}
+{{- end -}}

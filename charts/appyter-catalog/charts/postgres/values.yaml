@@ -1,4 +1,0 @@
-namespace: postgres
-storage:
-  class: local-path
-  size: 1Gi

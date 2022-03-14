@@ -1,8 +1,0 @@
-apiVersion: v2
-name: appyter-catalog-base
-version: 0.2.0
-description: A helm chart for the appyter-catalog base dependencies.
-dependencies:
-- name: keycloak-operator
-  repository: file://../keycloak-operator
-  version: 0.0.1

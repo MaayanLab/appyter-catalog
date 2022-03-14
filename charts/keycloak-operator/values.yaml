@@ -1,1 +1,11 @@
-namespace: ""
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  name:
+
+# for deployment namespace
+watchNamespace:
+# for all namespaces
+# watchNamespace: '*'

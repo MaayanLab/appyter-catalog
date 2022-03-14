@@ -1,41 +1,97 @@
-certmanager:
-  namespace: cert-manager
-  clusterissuer:
-    # letsencrypt:
-    #   email:
-    selfsigned:
-      commonName: dev.appyter.maayanlab.cloud
-postgres:
-  namespace: postgres
-  storage:
-    class: local-path
-    size: 1Gi
-minio:
-  namespace: minio
-  bucket:
-    name: storage
-  ingress:
-    host: s3.dev.appyter.maayanlab.cloud
-  console:
-    ingress:
-      host: console.s3.dev.appyter.maayanlab.cloud
-  storage:
-    class: local-path
-    size: 1Gi
-mail:
-  namespace: mail
-  domain: dev.appyter.maayanlab.cloud
-  storage:
-    class: local-path
-    size: 1Gi
+host: localhost
+version: 0.1.4
+appyterVersion: 0.18.7
+
+appyters:
+- name: example
+  version: 0.0.5
+
+issuer:
+  create: true
+  name: issuer
+  kind: Issuer
+  spec:
+    selfSigned: {}
+
+catalog:
+  keycloakClient:
+    create: true
+    name: appyter-catalog
+
+orchestrator:
+  rbac:
+    create: true
+  serviceAccount:
+    create: true
+    name: appyters-orchestrator
+
+backend:
+  database:
+    # if true, we auto-provision a database with db-operator
+    #  if false, you must populate the configmap/secret `<name>-db-credentials`
+    #  that db-operator would have produced
+    create: true
+    name: appyters
+
+database:
+  instance:
+    # if true we'll create an actual database & a dbinstance
+    #  to configure your own database, make create false & provide
+    #  the name to your own DbInstance
+    create: true
+    name: postgres
+    storage:
+      class: local-path
+      size: 1Gi
+
+s3:
+  instance:
+    # if true, we create a minio instance to serve s3
+    # if false, you must create:
+    #  - secret/${instance.name}-credentials with username/password
+    #  - configmap/${instance.name}-credentials with endpoint/bucket
+    create: true
+    name: s3
+    storage:
+      class: local-path
+      size: 1Gi
+
+
 keycloak:
-  namespace: keycloak
-  realm: appyter
-  ingress:
-    host: keycloak.dev.appyter.maayanlab.cloud
-appytercatalog:
-  namespace: appyter-catalog
-  version: 0.1.4
-  appyterVersion: 0.18.7
-  ingress:
-    host: dev.appyter.maayanlab.cloud
+  instance:
+    # if true we'll use the keycloak operator to build a keycloak instance
+    #  otherwise you can reuse an existing keycloak instance
+    create: true
+    name: keycloak
+    database:
+      # if true, we auto-provision a database with db-operator
+      #  if false, you must populate the configmap/secret `<name>-db-credentials`
+      #  that db-operator would have produced
+      create: true
+      name: keycloak
+
+  realm:
+    create: true
+    name: appyter
+    spec:
+      enabled: True
+      displayName: Appyter
+      registrationAllowed: true
+      verifyEmail: true
+      registrationEmailAsUsername: true
+      rememberMe: true
+      resetPasswordAllowed: true
+      # smtpServer:
+      #   host: mail.mail.svc.cluster.local
+      #   from: admin@{{ .Values.mail.domain }}
+      #   port: '587'
+      #   ssl: 'on'
+
+kubernetes-secret-generator:
+  installCRDs: true
+  rbac:
+    create: true
+    # clusterRole: false
+
+cert-manager:
+  installCRDs: true

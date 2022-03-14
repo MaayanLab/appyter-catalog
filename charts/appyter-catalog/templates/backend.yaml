@@ -1,0 +1,116 @@
+{{- if .Values.backend.database.create -}}
+apiVersion: kci.rocks/v1alpha1
+kind: Database
+metadata:
+  name: {{ .Values.backend.database.name }}
+spec:
+  secretName: {{ .Values.backend.database.name }}-db-credentials
+  instance: {{ .Values.database.instance.name }}
+  deletionProtected: true
+  backup:
+    enable: false
+    cron: "0 0 * * *"
+---
+{{- end -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-postgrest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-postgrest
+  template:
+    metadata:
+      labels:
+        app: appyters-postgrest
+    spec:
+      containers:
+      - name: appyter-catalog-postgrest
+        image: maayanlab/appyters-postgrest:{{ .Values.version }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.backend.database.name }}-db-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.backend.database.name }}-db-credentials
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.backend.database.name }}-db-credentials
+              key: POSTGRES_DB
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.backend.database.name }}-db-credentials
+              key: DB_CONN
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.backend.database.name }}-db-credentials
+              key: DB_PORT
+        - name: PGRST_DB_URI
+          value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+        - name: PGRST_SERVER_PROXY_URI
+          value: https://{{ .Values.host }}/postgrest
+          # TODO
+        - name: PGRST_DB_SCHEMA
+          value: api
+        - name: PGRST_DB_ANON_ROLE
+          value: guest
+        - name: PGRST_JWT_SECRET
+          value: '{"kty":"RSA","n":""}'
+        - name: PGRST_ROLE_CLAIM_KEY
+          value: .resource_access."appyter-catalog".roles[0]
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgrest
+spec:
+  selector:
+    app: appyters-postgrest
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: appyters-postgrest-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /postgrest
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyters-postgrest
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.host }}`) && PathPrefix(`/postgrest`)
+    middlewares:
+    - name: appyters-postgrest-stripprefix
+    services:
+    - kind: Service
+      name: appyters-postgrest
+      port: 80
+      scheme: http
+      passHostHeader: true
+  tls:
+    secretName: appyters-tls

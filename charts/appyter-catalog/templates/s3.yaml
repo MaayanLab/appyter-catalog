@@ -1,0 +1,189 @@
+{{- if .Values.s3.instance.create -}}
+# TODO: create bucket in minio?
+apiVersion: secretgenerator.mittwald.de/v1alpha1
+kind: StringSecret
+metadata:
+  name: {{ .Values.s3.instance.name }}-credentials
+spec:
+  forceRegenerate: false
+  data: {}
+  fields:
+    - fieldName: username
+      encoding: base64
+      length: '15'
+    - fieldName: password
+      encoding: base64
+      length: '15'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.s3.instance.name }}-credentials
+data:
+  endpoint: https://s3.{{ .Values.s3.minio }}
+  bucket: storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-minio
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.s3.instance.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.s3.instance.storage.size }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-minio
+  template:
+    metadata:
+      labels:
+        app: appyters-minio
+    spec:
+      containers:
+      - name: minio
+        image: maayanlab/appyters-s3:{{ .Values.version }}
+        imagePullPolicy: IfNotPresent
+        command: [ "minio" ]
+        args:
+        - server
+        - /data
+        - --console-address=:9001
+        env:
+        - name: MINIO_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.s3.instance.name }}-credentials
+              key: bucket
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.s3.instance.name }}-credentials
+              key: username
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.s3.instance.name }}-credentials
+              key: password
+        - name: MINIO_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.s3.instance.name }}-credentials
+              key: endpoint
+        - name: MINIO_BROWSER_URL
+          value: https://minio.{{ .Values.host }}
+        volumeMounts:
+        - name: minio-data-pv
+          mountPath: /root/.minio
+          subPath: config
+        - name: minio-data-pv
+          mountPath: /data
+          subPath: data
+      volumes:
+      - name: minio-data-pv
+        persistentVolumeClaim:
+          claimName: appyters-minio
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-s3
+spec:
+  selector:
+    app: appyters-s3
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-minio
+spec:
+  selector:
+    app: appyters-minio
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9001
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: appyters-s3
+spec:
+  secretName: appyters-s3-tls
+  issuerRef:
+    name: {{ .Values.issuer.name }}
+    kind: {{ .Values.issuer.kind }}
+  commonName: {{ .Values.host }}
+  dnsNames:
+  - {{ .Values.host }}
+  - s3.{{ .Values.host }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyters-s3
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`s3.{{ .Values.host }}`)
+    services:
+    - kind: Service
+      name: appyters-s3
+      scheme: http
+      port: 80
+      passHostHeader: true
+  tls:
+    secretName: appyters-s3-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: appyters-minio
+spec:
+  secretName: appyters-minio-tls
+  issuerRef:
+    name: {{ .Values.issuer.name }}
+    kind: {{ .Values.issuer.kind }}
+  commonName: minio.{{ .Values.host }}
+  dnsNames:
+  - minio.{{ .Values.host }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyters-minio
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`minio.{{ .Values.host }}`)
+    services:
+    - kind: Service
+      name: appyters-minio
+      scheme: http
+      port: 80
+      passHostHeader: true
+  tls:
+    secretName: appyters-minio-tls
+{{- end -}}

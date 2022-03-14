@@ -1,4 +1,0 @@
-apiVersion: v2
-name: mail
-version: 0.0.1
-description: A helm chart for the mail

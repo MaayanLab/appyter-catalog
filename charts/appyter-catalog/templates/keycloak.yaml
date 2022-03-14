@@ -1,0 +1,97 @@
+{{- if .Values.keycloak.instance.create -}}
+{{- if .Values.keycloak.instance.database.create -}}
+apiVersion: kci.rocks/v1alpha1
+kind: Database
+metadata:
+  name: {{ .Values.keycloak.instance.database.name }}
+spec:
+  secretName: {{ .Values.keycloak.instance.database.name }}-db-credentials
+  instance: {{ .Values.database.instance.name }}
+  deletionProtected: true
+  backup:
+    enable: false
+    cron: "0 0 * * *"
+---
+{{- end -}}
+apiVersion: keycloak.org/v1alpha1
+kind: Keycloak
+metadata:
+  name: {{ .Values.keycloak.instance.name }}
+  labels:
+    app: {{ .Values.keycloak.instance.name }}
+spec:
+  instances: 1
+  externalAccess:
+    enabled: false
+  podDisruptionBudget:
+    enabled: true
+  externalDatabase:
+    enabled: true
+  keycloakDeploymentSpec:
+    experimental:
+      env:
+      - name: DB_VENDOR
+        value: POSTGRES
+      - name: DB_ADDR
+        valueFrom:
+          configMapKeyRef:
+            name: {{ .Values.keycloak.instance.database.name }}-db-credentials
+            key: DB_CONN
+      - name: DB_PORT
+        valueFrom:
+          configMapKeyRef:
+            name: {{ .Values.keycloak.instance.database.name }}-db-credentials
+            key: DB_PORT
+      - name: DB_DATABASE
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.keycloak.instance.database.name }}-db-credentials
+            key: POSTGRES_DB
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.keycloak.instance.database.name }}-db-credentials
+            key: POSTGRES_USER
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.keycloak.instance.database.name }}-db-credentials
+            key: POSTGRES_PASSWORD
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.keycloak.instance.name }}
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.host }}`)
+    services:
+    - kind: Service
+      name: {{ .Values.keycloak.instance.name }}-discovery
+      port: 8080
+      scheme: http
+      passHostHeader: true
+  tls:
+    secretName: appyters-tls
+{{- end -}}
+{{- if .Values.keycloak.realm.create -}}
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakRealm
+metadata:
+  name: {{ .Values.keycloak.realm.name }}
+  labels:
+    app: {{ .Values.keycloak.instance.name }}
+spec:
+  realm:
+    realm: {{ .Values.keycloak.realm.name }}
+    {{- range $key, $value := $.Values.keycloak.realm.spec }}
+    {{ $key }}: {{ toYaml $value }}
+    {{- end }}
+  instanceSelector:
+    matchLabels:
+      app: {{ .Values.keycloak.instance.name }}
+{{- end -}}

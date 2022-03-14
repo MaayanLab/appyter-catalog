@@ -1,4 +1,21 @@
 apiVersion: v2
 name: appyter-catalog
 version: 0.2.0
-description: A helm chart for the appyter-catalog
+description: A catalog showing available appyters
+dependencies:
+  - name: kubernetes-secret-generator
+    version: 3.3.4
+    repository: https://helm.mittwald.de
+  - name: cert-manager
+    version: v1.7.1
+    # repository: https://charts.jetstack.io
+    repository: file://../cert-manager
+  - name: kubernetes-replicator
+    version: 2.7.2
+    repository: https://helm.mittwald.de
+  - name: db-operator
+    version: v1.1.1
+    repository: https://kloeckner-i.github.io/db-operator/
+  - name: keycloak-operator
+    version: 0.0.1
+    repository: file://../keycloak-operator

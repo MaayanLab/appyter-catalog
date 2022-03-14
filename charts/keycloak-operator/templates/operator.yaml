@@ -1,35 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: keycloak-operator
-  namespace: {{ .Values.namespace }}
+  name: {{ template "keycloak-operator.fullname" . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: keycloak-operator
+      name: {{ template "keycloak-operator.fullname" . }}
   template:
     metadata:
       labels:
-        name: keycloak-operator
+        name: {{ template "keycloak-operator.fullname" . }}
     spec:
-      serviceAccountName: keycloak-operator
+      serviceAccountName: {{ template "keycloak-operator.serviceAccountName" . }}
       containers:
-        - name: keycloak-operator
-          # Replace this with the built image name
-          image: quay.io/keycloak/keycloak-operator:main
-          command:
-          - keycloak-operator
-          imagePullPolicy: Always
-          env:
-            - name: WATCH_NAMESPACE
-              value: ""
-              # valueFrom:
-              #   fieldRef:
-              #     fieldPath: metadata.namespace
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: OPERATOR_NAME
-              value: "keycloak-operator"
+      - name: keycloak-operator
+        # Replace this with the built image name
+        image: quay.io/keycloak/keycloak-operator:main
+        imagePullPolicy: IfNotPresent
+        command:
+        - keycloak-operator
+        env:
+        - name: WATCH_NAMESPACE
+          {{- if eq .Values.watchNamespace "*" }}
+          value: ""
+          {{- else if .Values.watchNamespace }}
+          value: {{ .Values.watchNamespace }}
+          {{- else }}
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+          {{- end }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value: {{ template "keycloak-operator.fullname" . }}

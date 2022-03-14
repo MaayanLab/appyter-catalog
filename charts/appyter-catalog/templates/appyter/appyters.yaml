@@ -1,0 +1,89 @@
+{{- range .Values.appyters }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyter-{{ lower .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyter-{{ lower .name }}
+  template:
+    metadata:
+      labels:
+        app: appyter-{{ lower .name }}
+    spec:
+      containers:
+      - name: appyter
+        image: maayanlab/appyter-{{ lower .name }}:{{ .version }}-{{ $.Values.appyterVersion }}
+        imagePullPolicy: IfNotPresent
+        command:
+        - appyter-catalog-helper
+        - entrypoint
+        env:
+        - name: APPYTER_PREFIX
+          value: /{{ .name }}/
+        - name: APPYTER_PORT
+          value: '5000'
+        - name: APPYTER_PROXY
+          value: 'true'
+        - name: APPYTER_DATA_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: appyters-config
+              key: APPYTER_DATA_DIR
+        - name: APPYTER_DISPATCHER
+          valueFrom:
+            configMapKeyRef:
+              name: appyters-config
+              key: APPYTER_DISPATCHER
+        - name: APPYTER_DISPATCHER_URL
+          value: http://appyter-{{ lower .name }}.{{ $.Release.Namespace }}.svc.cluster.local/{{ .name }}
+        - name: APPYTER_DISPATCHER_IMAGE
+          value: maayanlab/appyter-{{ lower .name }}:{{ .version }}-{{ default $.Values.appyterVersion .libraryVersion }}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyter-{{ lower .name }}
+spec:
+  selector:
+    app: appyter-{{ lower .name }}
+  type: ClusterIP
+  ports:
+  - name: appyter-{{ lower .name }}
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyter-{{ lower .name }}
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ $.Values.host }}`) && PathPrefix(`/{{ .name }}`)
+    middlewares:
+    - name: appyter-x-forwarded-proto
+    services:
+    - kind: Service
+      name: appyter-{{ lower .name }}
+      port: 80
+      scheme: http
+      passHostHeader: true
+  tls:
+    secretName: appyters-tls
+{{- end }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: appyter-x-forwarded-proto
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: https

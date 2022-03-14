@@ -1,0 +1,83 @@
+# TODO: is this even required? I think the appyters themselves
+#       can submit jobs directly to kubernetes.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-orchestrator
+  template:
+    metadata:
+      labels:
+        app: appyters-orchestrator
+    spec:
+      containers:
+      - name: appyter-catalog-orchestrator
+        image: maayanlab/appyters-orchestrator:{{ .Values.version }}-{{ .Values.appyterVersion }}
+        command: ["appyter", "orchestration", "dispatcher"]
+        env:
+        - name: APPYTER_HOST
+          value: '0.0.0.0'
+        - name: APPYTER_PORT
+          value: '5000'
+        - name: APPYTER_JOBS
+          value: '3'
+        - name: APPYTER_JOBS_PER_IMAGE
+          value: '1'
+        - name: APPYTER_DISPATCH
+          value: 'kubernetes'
+        - name: APPYTER_DEBUG
+          value: 'false'
+        imagePullPolicy: IfNotPresent
+      serviceAccount: {{ .Values.orchestrator.serviceAccount.name }}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-orchestrator
+spec:
+  selector:
+    app: appyters-orchestrator
+  type: ClusterIP
+  ports:
+  - name: appyters-orchestrator
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+{{- if .Values.orchestrator.serviceAccount.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.orchestrator.serviceAccount.name }}
+{{- end }}
+{{- if .Values.orchestrator.rbac.create }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: appyters-orchestrator
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: appyters-orchestrator
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.orchestrator.serviceAccount.name }}
+roleRef:
+  kind: Role
+  name: appyters-orchestrator
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

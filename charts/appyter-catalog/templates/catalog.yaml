@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-catalog
+  template:
+    metadata:
+      labels:
+        app: appyters-catalog
+    spec:
+      containers:
+      - name: appyter-catalog
+        image: maayanlab/appyters-catalog:{{ .Values.version }}
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-catalog
+spec:
+  selector:
+    app: appyters-catalog
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: appyters-catalog
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.host }}`)
+    services:
+    - kind: Service
+      name: appyters-catalog
+      port: 80
+      scheme: http
+      passHostHeader: true
+  tls:
+    secretName: appyters-tls

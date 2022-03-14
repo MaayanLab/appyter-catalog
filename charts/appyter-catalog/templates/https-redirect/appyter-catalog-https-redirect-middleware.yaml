@@ -1,9 +1,0 @@
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: appyter-catalog-https-redirect
-  namespace: {{ .Values.appytercatalog.namespace }}
-spec:
-  redirectScheme:
-    scheme: https
-    permanent: true

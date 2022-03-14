@@ -1,0 +1,91 @@
+{{- if .Values.database.instance.create -}}
+apiVersion: secretgenerator.mittwald.de/v1alpha1
+kind: StringSecret
+metadata:
+  name: appyters-postgres-admin
+spec:
+  forceRegenerate: false
+  data:
+    username: postgres
+  fields:
+    - fieldName: password
+      encoding: base64
+      length: '15'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: appyters-postgres
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.database.instance.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.database.instance.storage.size }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appyters-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appyters-postgres
+  template:
+    metadata:
+      labels:
+        app: appyters-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: maayanlab/appyters-postgres:{{ .Values.version }}
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: appyters-postgres-admin
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: appyters-postgres-admin
+              key: password
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: postgres-data-pv
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-data-pv
+        persistentVolumeClaim:
+          claimName: appyters-postgres
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appyters-postgres
+spec:
+  selector:
+    app: appyters-postgres
+  type: ClusterIP
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+---
+apiVersion: kci.rocks/v1alpha1
+kind: DbInstance
+metadata:
+  name: {{ .Values.database.instance.name }}
+spec:
+  adminSecretRef:
+    Name: appyters-postgres-admin
+    Namespace: {{ .Release.Namespace }}
+  engine: postgres
+  generic:
+    host: appyters-postgres.{{ .Release.Namespace }}.svc.cluster.local
+    port: 5432
+{{- end }}

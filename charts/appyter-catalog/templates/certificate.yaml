@@ -1,0 +1,23 @@
+{{- if .Values.issuer.create -}}
+apiVersion: cert-manager.io/v1
+kind: {{ .Values.issuer.kind }}
+metadata:
+  name: {{ .Values.issuer.name }}
+spec:
+  {{- range $key, $value := $.Values.issuer.spec }}
+  {{ $key }}: {{ toYaml $value }}
+  {{- end }}
+---
+{{- end -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: appyters
+spec:
+  secretName: appyters-tls
+  issuerRef:
+    name: {{ .Values.issuer.name }}
+    kind: {{ .Values.issuer.kind }}
+  commonName: {{ .Values.host }}
+  dnsNames:
+  - {{ .Values.host }}
