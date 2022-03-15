@@ -12,4 +12,4 @@ bokeh
 umap-learn
 cmake==3.18.4
 MulticoreTSNE
-react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2
+react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
