@@ -1,0 +1,12 @@
+# python dependencies should be collected and kept in this file
+#  one line for each dependency. this file can be used to install
+#  dependencies with `pip install -r requirements.txt`
+appyter
+numpy
+pandas
+matplotlib
+sklearn
+seaborn
+IPython
+bokeh
+react_scatter_board
