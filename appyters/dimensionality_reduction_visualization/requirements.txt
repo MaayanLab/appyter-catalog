@@ -9,4 +9,6 @@ sklearn
 seaborn
 IPython
 bokeh
+cmake==3.18.4
+MulticoreTSNE
 react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2
