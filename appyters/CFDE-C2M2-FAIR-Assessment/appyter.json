@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "CFDE-C2M2-FAIR-Assessment",
   "title": "CFDE C2M2 FAIR Assessment",
   "version": "0.1.2",

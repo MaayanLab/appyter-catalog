@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "Enrichr_Manhattan_Plot",
   "title": "Enrichr Manhattan Plot Appyter",
   "version": "0.0.5",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "ChEA3_Consensus_Transcription_Factors",
   "title": "ChEA3 Consensus Transcription Factors",
   "version": "0.0.2",

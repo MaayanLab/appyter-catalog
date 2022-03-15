@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "ABA_Aging_Harmonizome_ETL",
   "title": "Harmonizome ETL: Aging, Dementia, and Traumatic Brain Injury Study",
   "version": "0.1.3",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "Gene_Centric_GEO_Reverse_Search",
   "title": "Gene Centric GEO Reverse Search",
   "version": "0.0.4",
@@ -23,8 +23,8 @@
       "email": "megan.wojciechowicz@icahn.mssm.edu"
     },
     {
-      "name": "Daniel Clarke",
-      "email": "daniel.clarke@mssm.edu"
+      "name": "Daniel J. B. Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
     },
     {
       "name": "Avi Ma'ayan",

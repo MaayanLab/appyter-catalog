@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="230px" height="36px" viewBox="0 0 230 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>logo-glygen-white 36@2x</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Logos" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="logo-glygen-white-36" transform="translate(-1.000000, -5.000000)" fill="#FFFFFF">
+            <g id="Group" transform="translate(177.000000, 9.000000)" fill-rule="nonzero">
+                <path d="M40.7,15 L14.2,7.9 C13.5,7.7 12.8,8.1 12.6,8.8 L12.6,8.8 C12.4,9.5 12.8,10.2 13.5,10.4 L40,17.5 C40.7,17.7 41.4,17.3 41.6,16.6 C41.8,15.9 41.4,15.2 40.7,15 Z" id="Shape"></path>
+                <path d="M52.9,0.7 C52.4,0.2 51.6,0.3 51.1,0.9 L43.4,10.1 L17.4,3.1 C16.7,2.9 16,3.3 15.8,4 C15.6,4.7 16,5.4 16.7,5.6 L43.2,12.7 C43.6,12.8 44.1,12.8 44.4,12.6 C44.6,12.5 44.8,12.3 45,12.1 L53,2.6 C53.5,1.9 53.4,1.1 52.9,0.7 Z" id="Shape"></path>
+                <path d="M36.9,19.2 L10.4,12.1 C10,12 9.5,12 9.2,12.2 C9,12.3 8.8,12.5 8.6,12.7 L0.6,22.2 C0.1,22.7 0.2,23.5 0.8,24 C1.3,24.5 2.1,24.4 2.6,23.8 L10.3,14.6 L36.3,21.6 C37,21.8 37.7,21.4 37.9,20.7 C38,20.1 37.6,19.4 36.9,19.2 Z" id="Shape"></path>
+            </g>
+            <text id="GlyGen" font-family="Georgia-Bold, Georgia" font-size="36" font-weight="bold" letter-spacing="3">
+                <tspan x="0" y="33">GlyGen</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
     "name": "STEAP_post_processing_analysis",
     "title": "STEAP Post-Processing Analysis",
     "version": "0.0.1",

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "RNAseq_Data_Metadata_Analysis",
   "title": "General RNA-seq Data and Metadata Viewer",
   "version": "0.0.3",

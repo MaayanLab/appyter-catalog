@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "CCLE_Harmonizome_ETL",
   "title": "Harmonizome ETL: Cancer Cell Line Encyclopedia",
   "version": "0.1.3",
