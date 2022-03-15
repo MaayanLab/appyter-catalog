@@ -1,0 +1,3 @@
+# lncHUB2
+
+lncHUB2 is a resource that provides both known and inferred knowledge for 15,862 long non-coding RNAs (lncRNAs). For each lncRNA, lncHUB2 displays the gene cooridnates, canonical/alternative transcript sequences, and publications per year. Using a lncRNA-gene co-expression matrix generated from RNA-seq data, lncHUB2 predicts biological functions and small molecules that may modulate the expression of lncRNAs. Additionally,lncHUB2 provides information regarding lncRNA expression in various tissues and cell lines as well as lncRNA-lncRNA expression similarities. 
