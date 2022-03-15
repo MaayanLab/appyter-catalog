@@ -12,4 +12,3 @@ bokeh
 colorcet
 pyvis
 kaleido
-requests
