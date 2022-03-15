@@ -36,7 +36,7 @@ def get_changed_appyters_gh_action():
     )
 
 def get_changed_appyters_git():
-  with Popen(['git', 'diff', '--name-status', 'origin/master'], stdout=PIPE, stderr=sys.stderr) as p:
+  with Popen(['git', 'diff', '--name-status', 'origin/main'], stdout=PIPE, stderr=sys.stderr) as p:
     for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
       op, filename, *rest = line.split()
       prev = rest[-1] if rest else None
