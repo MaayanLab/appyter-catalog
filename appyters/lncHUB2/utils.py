@@ -1,4 +1,3 @@
-
 import requests
 import os,json
 import urllib.request
@@ -26,6 +25,71 @@ import s3fs
 import seaborn as sns
 import matplotlib.pyplot as plt
 from bokeh.models import Title
+from collections import Counter
+import h5py as h5
+
+
+
+def convert_cal_to_string(num):
+    if num < 10:
+        num = '0' + str(num)
+    else:
+        num = str(num)
+    return(num)
+
+
+def autorif_plot(df,query,path,show_cumulative_pubs=False):
+    
+    month_2_days = {1:list(range(1,32)),
+                2:list(range(1,30)),
+                3:list(range(1,32)),
+                4:list(range(1,31)),
+                5:list(range(1,32)),
+                6:list(range(1,31)),
+                7:list(range(1,32)),
+                8:list(range(1,32)),
+                9:list(range(1,31)),
+                10:list(range(1,32)),
+                11:list(range(1,31)),
+                12:list(range(1,32))}
+    
+    cumulative_pubs = []
+    year_2_total_pubs = {}
+    x_axis_years = []
+    for year in range(1992,2022):
+        d_count = -1/366
+        all_pub_dates = [x for x in df['date'] if x.startswith(str(year)+'-')]
+        year_2_total_pubs[year] = len(all_pub_dates)
+        all_pub_dict = Counter(all_pub_dates)
+        if show_cumulative_pubs == True:
+            for month in range(1,13):
+                month_str = convert_cal_to_string(month)
+                for day in month_2_days[month]:
+                    d_count = d_count+ 1/366
+                    x_axis_years.append(year+d_count)
+                    day_str = convert_cal_to_string(day)
+                    full_string_date = str(str(year) + '-' + month_str + '-' + day_str)
+                    if  full_string_date in  list(all_pub_dict.keys()):
+                        cumulative_pubs.append(all_pub_dict[ full_string_date ])
+                    else:
+                        cumulative_pubs.append(0)
+    cumulative_pubs = np.cumsum(cumulative_pubs)
+
+    fig1, ax1 = plt.subplots(figsize=(8, 8))
+    if show_cumulative_pubs == True:
+        ax1.plot(x_axis_years, cumulative_pubs,color='red')
+    ax1.bar([int(x) for x in pd.DataFrame.from_dict(year_2_total_pubs,orient='index').index] , pd.DataFrame.from_dict(year_2_total_pubs,orient='index').reset_index()[0], align='center')
+    plt.xlabel('Year',fontsize=20)
+    plt.ylabel('Publications',fontsize=20)
+    plt.xticks(list(range(1992,2022)),fontsize=12, rotation=90)
+    plt.yticks(fontsize=12)
+    plt.title(query,fontsize=25)
+    plt.tight_layout()
+    plt.savefig(path + '.png',facecolor='white',bbox_inches='tight', dpi = 300)
+    plt.savefig(path + '.svg',facecolor='white',bbox_inches='tight')
+    plt.savefig(path + '.pdf',facecolor='white',bbox_inches='tight')
+    plt.show()
+
 
 # Get Enrichr link
 def Enrichr_API(enrichr_gene_list, description):
@@ -103,11 +167,13 @@ def plot_bar(df,title,x_label,y_label,filename):
     plt.xticks(rotation=60,fontsize=15,ha='right')
     plt.title(title,fontsize=20)
     plt.savefig(filename+'.png',facecolor='white',bbox_inches='tight')
+    plt.savefig(filename+'.svg',facecolor='white',bbox_inches='tight')
+    plt.savefig(filename+'.pdf',facecolor='white',bbox_inches='tight')
     plt.close()
   
 
 # Plot the top terms for each prediction library
-def plot_results(library_names, results_dfs, file_name, top_results=15):
+def plot_results(library_names, results_dfs, file_name, top_results=15, pvalue=False):
     
     fig = make_subplots(rows=1, cols=2, print_grid=False,shared_xaxes=False)
     max_scores = []
@@ -115,14 +181,25 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
         results_df = results_dfs[i][0:top_results].sort_values(by='Mean Pearson Correlation')
         library_name = library_names[i]
         max_scores.append(np.max(results_df['Mean Pearson Correlation']))
-        bar = go.Bar(x=results_df['Mean Pearson Correlation'],
-            y=results_df['Term'],
-            orientation='h',
-            name=library_name,
-            showlegend=False,
-            hovertext=['<b>Term: {Term}</b><br><b>Mean Pearson Correlation</b>: <i>{Mean Pearson Correlation:.3}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
-            hoverinfo='text', 
-            marker={'color': 'lightskyblue'})
+        if pvalue == False:
+            bar = go.Bar(x=results_df['Mean Pearson Correlation'],
+                y=results_df['Term'],
+                orientation='h',
+                name=library_name,
+                showlegend=False,
+                hovertext=['<b>Term:</b>{Term}<br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
+                hoverinfo='text', 
+                marker={'color': 'lightskyblue'})
+        if pvalue == True:
+                bar = go.Bar(x=results_df['Mean Pearson Correlation'],
+                y=results_df['Term'],
+                orientation='h',
+                name=library_name,
+                showlegend=False,
+                hovertext=['<b>Term:</b>{Term}<br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
+                hoverinfo='text', 
+                marker={'color': 'lightskyblue'})
+            
         fig.append_trace(bar, 1, i+1)
         
         #Get text
@@ -179,7 +256,7 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
             showlegend=False,
             text=text_shortened,
             textposition="middle right",
-            textfont={'color': 'black','size':10})
+            textfont={'color': 'black','size':12})
         fig.append_trace(text, 1, i+1)
     
     annotations= [{'x': 0.25, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
@@ -192,7 +269,8 @@ def plot_results(library_names, results_dfs, file_name, top_results=15):
     fig['layout']['yaxis2'].update(showticklabels=False)
     fig['layout']['margin'].update(l=30, t=65, r=30, b=35)    
     fig.write_image(file_name+".png")
-    #fig.write_image(file_name+".svg")
+    fig.write_image(file_name+".svg")
+    fig.write_image(file_name+".pdf")
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
@@ -203,15 +281,17 @@ def plot_scatter(x,y,values,query,title,min_val,max_val,arrow_loc,rank,filename)
     fig = plt.figure(figsize=(20,15))
     plt.scatter(x, y, s=6, c=values, cmap=plt.cm.get_cmap('seismic'), vmin = min_val, vmax = max_val)
     cb = plt.colorbar()
-    cb.set_label(label='Z-score',fontsize=15)
-    plt.xlabel('UMAP 1',fontsize=20)
-    plt.ylabel('UMAP 2',fontsize=20)
-    plt.xticks(fontsize=15)
-    plt.yticks(fontsize=15)
+    cb.set_label(label='Z-score',fontsize=20)
+    cb.ax.tick_params(labelsize=15) 
+    plt.xlabel('UMAP 1',fontsize=30)
+    plt.ylabel('UMAP 2',fontsize=30)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
     plt.annotate('', (arrow_loc['x'], arrow_loc['y']),xytext=(arrow_loc['x']+0.2, arrow_loc['y']+0.6),arrowprops=dict(facecolor='black', headwidth= 8, width=0.1))
-    plt.title(title,fontsize=25)
-    plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.png', bbox_inches='tight', dpi=300, facecolor='white')
-    #plt.savefig(filename+query+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.title(title,fontsize=30)
+    plt.savefig(filename+query.replace('/','-')+'_'+title+'_rank'+str(rank) +'.png', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.savefig(filename+query.replace('/','-')+'_'+title+'_rank'+str(rank) +'.svg', bbox_inches='tight', facecolor='white')
+    plt.savefig(filename+query.replace('/','-')+'_'+title+'_rank'+str(rank) +'.pdf', bbox_inches='tight', facecolor='white')
     plt.close()
 
 
@@ -313,7 +393,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     else:
         tooltips = [
             ("lncRNA", "@names"),
-            ("Label", "@values"),
+            ("Z-score", "@values"),
         ]
     
     if highlight_query!=None:
@@ -608,4 +688,36 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
         ''')
     # Display network
     return(g,network,all_edges_df)
-        
+
+
+def get_bf_pvalues(bf_file, pval_file, query):
+    
+    s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
+
+    f = h5.File(s3.open(bf_file, 'rb'), 'r') 
+    data = f['data/mean_pearson_corr']
+    cols = [x.decode('UTF-8') for x in f["meta/columns/terms"]]
+    idx =  [x.decode('UTF-8') for x in f["meta/rows/lncRNAs"]]
+    query_idx = np.where(np.asarray(idx) == query)[0][0] 
+    precomputed_avg_coexp = pd.DataFrame(data[query_idx,:])
+    precomputed_avg_coexp.index = cols
+    precomputed_avg_coexp.columns = ['Mean Pearson Correlation']
+    precomputed_avg_coexp = precomputed_avg_coexp.sort_values(by='Mean Pearson Correlation', ascending=False)
+    f.close()
+
+
+    f = h5.File(s3.open(pval_file, 'rb'), 'r') 
+    data = f['data/pvalue']
+    cols = [x.decode('UTF-8') for x in f["meta/columns/terms"]]
+    idx =  [x.decode('UTF-8') for x in f["meta/rows/lncRNAs"]]
+    query_idx = np.where(np.asarray(idx) == query)[0][0] 
+    precomputed_pval = pd.DataFrame(data[query_idx,:])
+    precomputed_pval.index = cols
+    precomputed_pval.columns = ['P-value']
+    f.close()
+
+    precomputed_avg_coexp = precomputed_avg_coexp.merge(precomputed_pval,left_index=True,right_index=True)
+    precomputed_avg_coexp = precomputed_avg_coexp.reset_index()
+    precomputed_avg_coexp = precomputed_avg_coexp.rename({'index': 'Term'}, axis='columns')
+
+    return(precomputed_avg_coexp)
