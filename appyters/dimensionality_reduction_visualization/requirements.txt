@@ -1,11 +1,16 @@
+# python dependencies should be collected and kept in this file
+#  one line for each dependency. this file can be used to install
+#  dependencies with `pip install -r requirements.txt`
 appyter
-bokeh
-IPython
-matplotlib
-MulticoreTSNE
 numpy
 pandas
-react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
-seaborn
+matplotlib
 sklearn
+seaborn
+IPython
+bokeh
 umap-learn
+cmake==3.18.4
+MulticoreTSNE
+react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
+
