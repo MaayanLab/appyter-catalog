@@ -13,13 +13,13 @@
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/dimensionality_reduction_visualization",
   "tags": [
-    "React",
-    "react-scatter-board",
-    "bokeh",
+    "Visualization",
+    "Dimensionality Reduction",
+    "2D",
     "3D",
     "interactive",
     "downloadable",
-    "MulticoreTSNE"
+    "Exploration"
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
