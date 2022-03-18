@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "dimensionality_reduction_visualization",
-  "title": "Dimensionality_reduction_visualization",
+  "title": "PCA, t-SNE, UMAP Appyter",
   "version": "0.0.1",
-  "description": "An appyter for to perform visualization using PCA, t-SNE, and UMAP methods.",
+  "description": "An Appyter to perform visualization of a data matrix using PCA, t-SNE, and UMAP methods.",
   "image": "scatter_screenshot.png",
   "authors": [
     {
@@ -11,13 +11,15 @@
       "email": "pan_juncheng@yahoo.com"
     }
   ],
-  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/dimensionality_reduction_visualization",
   "tags": [
-    "React",
-    "react-scatter-board",
-    "PCA",
-    "UMAP",
-    "t_SNE"
+    "Visualization",
+    "Dimensionality Reduction",
+    "2D",
+    "3D",
+    "interactive",
+    "downloadable",
+    "Exploration"
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
