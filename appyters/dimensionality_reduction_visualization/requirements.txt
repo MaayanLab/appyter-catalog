@@ -10,6 +10,5 @@ seaborn
 IPython
 bokeh
 umap-learn
-cmake==3.18.4
-MulticoreTSNE
+MulticoreTSNE git+https://github.com/maayanlab/Multicore-TSNE
 react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
