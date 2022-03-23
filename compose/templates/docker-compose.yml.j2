@@ -13,8 +13,8 @@ services:
     networks:
       default:
         aliases:
-          - ${server_name}
-          - s3.${server_name}
+          - ${SERVER_NAME}
+          - s3.${SERVER_NAME}
     command: >
       --api.insecure=true
       --providers.docker
@@ -24,7 +24,7 @@ services:
       --entrypoints.web.http.redirections.entrypoint.to=websecure
       --entrypoints.web.http.redirections.entrypoint.scheme=https
       --entrypoints.websecure.address=:443
-      --certificatesresolvers.letsencrypt-prod.acme.email=${letsencrypt_email}
+      --certificatesresolvers.letsencrypt-prod.acme.email=${LETSENCRYPT_EMAIL}
       --certificatesresolvers.letsencrypt-prod.acme.storage=/data/acme.json
       --certificatesresolvers.letsencrypt-prod.acme.tlschallenge=true
 {%- endif %}
@@ -35,7 +35,7 @@ services:
       - 443:443
 {%- endif %}
 {%- if aws_s3_proxy %}
-      - "traefik.http.routers.storageproxy.rule=(Host(`s3.${server_name}`) || Host(`${server_name}`)) && PathPrefix(`/storage`)"
+      - "traefik.http.routers.storageproxy.rule=(Host(`s3.${SERVER_NAME}`) || Host(`${SERVER_NAME}`)) && PathPrefix(`/storage`)"
       - "traefik.http.routers.storageproxy.service=storageproxy"
       - "traefik.http.services.storageproxy.loadbalancer.servers[0].url=https://s3.amazonaws.com"
       - "traefik.http.routers.storageproxy.middlewares=storageproxy-addprefix"
@@ -43,8 +43,8 @@ services:
 {%- if tls %}
       - "traefik.http.routers.storageproxy.tls=true"
       - "traefik.http.routers.storageproxy.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.storageproxy.tls.domains[0].main=${server_name}"
-      - "traefik.http.routers.storageproxy.tls.domains[1].main=s3.${server_name}"
+      - "traefik.http.routers.storageproxy.tls.domains[0].main=${SERVER_NAME}"
+      - "traefik.http.routers.storageproxy.tls.domains[1].main=s3.${SERVER_NAME}"
 {%- endif %}
 {%- endif %}
     volumes:
@@ -60,20 +60,20 @@ services:
       - appyters-postgrest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`${server_name}`)"
+      - "traefik.http.routers.app.rule=Host(`${SERVER_NAME}`)"
       - "traefik.http.services.app.loadbalancer.server.port=80"
     logging: *default-logging
 {%- if tls %}
       - "traefik.http.routers.app.tls=true"
       - "traefik.http.routers.app.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.app.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.app.tls.domains[0].main=${SERVER_NAME}"
 {% endif %}
   appyters-orchestrator:
     build:
       context: ./appyter
       args:
-        - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${appyter_tag:-v}${appyter_version}
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${appyter_tag:-}${appyter_version}
+        - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${APPYTER_TAG:-v}${LIBRARY_VERSION}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     restart: unless-stopped
     ports:
       - 5000:5000
@@ -99,20 +99,20 @@ services:
       - appyters-postgres
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.postgrest.rule=Host(`${server_name}`) && PathPrefix(`/postgrest`)"
+      - "traefik.http.routers.postgrest.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/postgrest`)"
       - "traefik.http.services.postgrest.loadbalancer.server.port=3000"
       - "traefik.http.routers.postgrest.middlewares=postgrest-stripprefix"
       - "traefik.http.middlewares.postgrest-stripprefix.stripprefix.prefixes=/postgrest"
 {%- if tls %}
       - "traefik.http.routers.postgrest.tls=true"
       - "traefik.http.routers.postgrest.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.postgrest.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.postgrest.tls.domains[0].main=${SERVER_NAME}"
 {%- endif %}
     environment:
       PGRST_DB_URI: "postgres://appyters:${POSTGRES_PASSWORD}@appyters-postgres:5432/appyters"
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: guest
-      PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${server_name}/postgrest"
+      PGRST_SERVER_PROXY_URI: "http{% if tls %}s{% endif %}://${SERVER_NAME}/postgrest"
 {%- if auth %}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
       PGRST_ROLE_CLAIM_KEY: ${PGRST_ROLE_CLAIM_KEY}
@@ -140,29 +140,29 @@ services:
       - appyters-ingress
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.s3.rule=Host(`s3.${server_name}`) || (Host(`${server_name}`) && PathPrefix(`/storage`))"
+      - "traefik.http.routers.s3.rule=Host(`s3.${SERVER_NAME}`) || (Host(`${SERVER_NAME}`) && PathPrefix(`/storage`))"
       - "traefik.http.routers.s3.service=s3"
       - "traefik.http.services.s3.loadbalancer.server.port=9000"
 {%- if tls %}
       - "traefik.http.routers.s3.tls=true"
       - "traefik.http.routers.s3.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.s3.tls.domains[0].main=${server_name}"
-      - "traefik.http.routers.s3.tls.domains[1].main=s3.${server_name}"
+      - "traefik.http.routers.s3.tls.domains[0].main=${SERVER_NAME}"
+      - "traefik.http.routers.s3.tls.domains[1].main=s3.${SERVER_NAME}"
 {%- endif %}
-      - "traefik.http.routers.minio.rule=Host(`minio.${server_name}`)"
+      - "traefik.http.routers.minio.rule=Host(`minio.${SERVER_NAME}`)"
       - "traefik.http.routers.minio.service=minio"
       - "traefik.http.services.minio.loadbalancer.server.port=9001"
 {%- if tls %}
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.routers.minio.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.minio.tls.domains[0].main=minio.${server_name}"
+      - "traefik.http.routers.minio.tls.domains[0].main=minio.${SERVER_NAME}"
 {%- endif %}
     environment:
       MINIO_BUCKET: ${MINIO_BUCKET}
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
-      MINIO_SERVER_URL: http{% if tls %}s{% endif %}://s3.${server_name}
-      MINIO_BROWSER_REDIRECT_URL: http{% if tls %}s{% endif %}://minio.${server_name}
+      MINIO_SERVER_URL: http{% if tls %}s{% endif %}://s3.${SERVER_NAME}
+      MINIO_BROWSER_REDIRECT_URL: http{% if tls %}s{% endif %}://minio.${SERVER_NAME}
     volumes:
       - ./data/minio/.minio:/root/.minio
       - ./data/minio/:/data
@@ -174,8 +174,8 @@ services:
       context: {{ os.path.relpath(appyter['path'], root_dir) }}
       dockerfile: Dockerfile
       args:
-        - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${appyter_tag:-v}${appyter_version}
-    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
+        - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${APPYTER_TAG:-v}${LIBRARY_VERSION}
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     command: appyter-catalog-helper entrypoint
     restart: unless-stopped
     depends_on:
@@ -191,17 +191,17 @@ services:
       - APPYTER_DATA_DIR=${APPYTERS_DATA_DIR}
       - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
       - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
-      - APPYTER_DISPATCHER_IMAGE=${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${appyter_tag:-}${appyter_version}
+      - APPYTER_DISPATCHER_IMAGE=${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${server_name}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
       - "traefik.http.services.{{ appyter['name'].lower() }}.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.{{ appyter['name'].lower() }}.headers.customrequestheaders.X-Forwarded-Proto=http{% if tls %}s{% endif %}"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.middlewares={{ appyter['name'].lower() }}@docker"
 {%- if tls %}
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
-      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${server_name}"
+      - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${SERVER_NAME}"
     logging: *default-logging
 {% endif %}
 {%- endfor %}

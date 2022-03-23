@@ -8,7 +8,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 docker_org = os.environ['DOCKER_REGISTRY']
-library_version = os.environ['appyter_version']
+library_version = os.environ['LIBRARY_VERSION']
 
 appyter_path = os.path.join(root_dir, 'appyters')
 def get_appyters(appyter_path):
@@ -41,15 +41,15 @@ appyters = list(get_appyters(appyter_path))
 config = json.load(open(os.path.join(os.path.dirname(__file__), 'templates', 'appyters.json'), 'r'))
 config['appyters'] = appyters
 config['docker_org'] = docker_org
-config['library_version'] = os.environ['appyter_version']
-if os.environ.get('keycloak_url'):
+config['library_version'] = os.environ['LIBRARY_VERSION']
+if os.environ.get('KEYCLOAK_URL'):
   config['keycloak'] = dict(
-    url=os.environ['keycloak_url'],
-    realm=os.environ['keycloak_realm'],
-    clientId=os.environ['keycloak_client_id'],
+    url=os.environ['KEYCLOAK_URL'],
+    realm=os.environ['KEYCLOAK_REALM'],
+    clientId=os.environ['KEYCLOAK_CLIENT_ID'],
   )
-if os.environ.get('ga_id'):
-  config['ga_id'] = os.environ['ga_id']
+if os.environ.get('GA_ID'):
+  config['ga_id'] = os.environ['GA_ID']
 
 if __name__ == '__main__':
   print(json.dumps(config))
