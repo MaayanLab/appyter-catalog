@@ -5,7 +5,7 @@ import click
 @click.option('--minio', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with a minio deployment')
 @click.option('--auth', default=False, type=bool, is_flag=True, help='Whether or not to build the docker-compose.yml with a authentication support')
 @click.option('--aws-proxy', default=False, type=bool, is_flag=True, help='An additional proxy to aws for legacy reasons, maps /storage => aws bucket')
-def build_compose(tls, minio, aws_proxy):
+def build_compose(tls, minio, auth, aws_proxy):
   import os
   import json
   import glob
