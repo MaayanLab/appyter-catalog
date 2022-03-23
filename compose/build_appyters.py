@@ -42,6 +42,12 @@ config = json.load(open(os.path.join(os.path.dirname(__file__), 'templates', 'ap
 config['appyters'] = appyters
 config['docker_org'] = docker_org
 config['library_version'] = os.environ['appyter_version']
+if os.environ.get('keycloak_url'):
+  config['keycloak'] = dict(
+    url=os.environ['keycloak_url'],
+    realm=os.environ['keycloak_realm'],
+    clientId=os.environ['keycloak_client_id'],
+  )
 
 if __name__ == '__main__':
   print(json.dumps(config))
