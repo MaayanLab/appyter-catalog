@@ -48,6 +48,8 @@ if os.environ.get('keycloak_url'):
     realm=os.environ['keycloak_realm'],
     clientId=os.environ['keycloak_client_id'],
   )
+if os.environ.get('ga_id'):
+  config['ga_id'] = os.environ['ga_id']
 
 if __name__ == '__main__':
   print(json.dumps(config))
