@@ -1,11 +1,12 @@
-import { readable, writable } from 'svelte/store'
+import appyterJson from '../../public/appyters.json'
+import { writable } from 'svelte/store'
 
-function keycloak_auth_store({ url, realm, clientId }) {
+function keycloak_auth_store(keycloakProps) {
   const initStore = {}
   try {
     Object.assign(initStore, {
       state: 'init',
-      keycloak: new Keycloak({ url, realm, clientId }),
+      keycloak: new Keycloak(keycloakProps),
     })
   } catch (e) {
     console.error(e)
@@ -51,10 +52,6 @@ function keycloak_auth_store({ url, realm, clientId }) {
   return { subscribe }
 }
 
-const auth = keycloak_auth_store({
-  url: 'https://keycloak.maayanlab.cloud/auth/',
-  realm: 'appyters',
-  clientId: 'appyter-catalog',
-})
+const auth = keycloak_auth_store(appyterJson.keycloak)
 
 export default auth
