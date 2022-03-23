@@ -3,6 +3,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
 import TerserWebpackPlugin from 'terser-webpack-plugin'
+import indexHtml from './src/index.html.js'
 
 export default function (_env, argv) {
   const __dirname = path.resolve();
@@ -73,7 +74,7 @@ export default function (_env, argv) {
         chunkFilename: 'assets/css/[name].[contenthash:8].chunk.css'
       }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, 'src', 'index.html'),
+        templateContent: indexHtml,
         inject: true,
       }),
       new webpack.DefinePlugin({
