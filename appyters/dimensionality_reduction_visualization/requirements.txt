@@ -13,6 +13,6 @@ seaborn
 scanpy
 scipy
 umap-learn
-MulticoreTSNE git+https://github.com/maayanlab/Multicore-TSNE
+MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE
 react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
 normalization @ git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
