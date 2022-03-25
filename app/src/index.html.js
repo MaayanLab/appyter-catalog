@@ -47,7 +47,7 @@ export default () => `
       gtag('config', ${JSON.stringify(appyterJson.ga_id)});
     </script>
     ` : ''}
-    ${appyterJson.keycloak !== undefined ? `<script src=${JSON.stringify(appyterJson.keycloak.url)}></script>` : ''}
+    ${appyterJson.keycloak !== undefined ? `<script src=${JSON.stringify(appyterJson.keycloak.url + '/js/keycloak.js')}></script>` : ''}
   </head>
   <body>
   </body>
