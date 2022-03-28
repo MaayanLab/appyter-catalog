@@ -29,6 +29,9 @@
       name: 'Logout',
       onclick: () => $auth.keycloak.logout(),
     },
+    '/404': {
+      component: () => import('../NotFound.svelte'),
+    },
     '/500': {
       component: async () => ({ default: ErrorOccurred }),
     },
