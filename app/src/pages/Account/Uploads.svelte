@@ -56,6 +56,8 @@
 </script>
 
 <div class="container flex-grow-1">
+  <h1>Uploads</h1>
+
   <div class="d-flex justify-content-end py-2">
     <button
       class="btn bg-primary text-white"
