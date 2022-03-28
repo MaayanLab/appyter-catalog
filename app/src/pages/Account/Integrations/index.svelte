@@ -7,6 +7,9 @@
     '/': {
       component: () => import('./Listing.svelte'),
     },
+    '/cavatica': {
+      component: () => import('./Cavatica.svelte'),
+    },
     '/404': {
       component: () => import('../../NotFound.svelte'),
     },
