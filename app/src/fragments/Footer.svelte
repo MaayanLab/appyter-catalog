@@ -1,7 +1,7 @@
 <script>
-  import icahnLogo from '../../public/images/icahn_cb.png'
-  import maayanlabLogo from '../../public/images/maayanlab_logo.png'
-  import githubLogo from '../../public/images/GitHub-Mark.png'
+  import icahnLogo from '@/public/images/icahn_cb.png'
+  import maayanlabLogo from '@/public/images/maayanlab_logo.png'
+  import githubLogo from '@/public/images/GitHub-Mark.png'
 </script>
 
 <div class="footer mt-4 pt-4 bg-white">

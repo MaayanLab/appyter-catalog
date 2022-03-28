@@ -1,5 +1,5 @@
 <script>
-  import StaticMarkdown from '../components/StaticMarkdown.svelte'
+  import StaticMarkdown from '@/components/StaticMarkdown.svelte'
   import PublishingAppytersMd from './PublishingAppyters.md'
 </script>
 

@@ -1,5 +1,5 @@
 <script>
-  import auth from '../../stores/keycloak_auth_store'
+  import auth from '@/stores/keycloak_auth_store'
 </script>
 
 <div class="container flex-grow-1">

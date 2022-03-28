@@ -28,6 +28,10 @@ export default function (_env, argv) {
     resolve: {
       extensions: ['.mjs', '.js', '.md', '.svelte'],
       mainFields: ['svelte', 'browser', 'module', 'main'],
+      alias: {
+        '@/public': path.resolve(__dirname, 'public'),
+        '@': path.resolve(__dirname, 'src'),
+      },
     },
     module: {
       rules: [
@@ -133,6 +137,9 @@ export default function (_env, argv) {
       compress: true,
       allowedHosts: 'all',
       hot: true,
+      client: {
+        webSocketURL: 'wss://appyters.u8sand.net/ws',
+      },
     }
   };
 };

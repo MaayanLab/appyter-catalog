@@ -1,7 +1,7 @@
 <script>
-  import auth from '../../../stores/keycloak_auth_store'
-  import cavaticaGuideApiKey from '../../../../public/images/CAVATICA-guide-apikey.png'
-  import cavaticaGuideProject from '../../../../public/images/CAVATICA-guide-project.png'
+  import auth from '@/stores/keycloak_auth_store'
+  import cavaticaGuideApiKey from '@/public/images/CAVATICA-guide-apikey.png'
+  import cavaticaGuideProject from '@/public/images/CAVATICA-guide-project.png'
 
   const base_url = window.location.origin
   let savedConfig = {

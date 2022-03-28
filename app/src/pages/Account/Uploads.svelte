@@ -1,6 +1,6 @@
 <script>
-  import auth from '../../stores/keycloak_auth_store'
-  import Loader from '../../fragments/Loader.svelte'
+  import auth from '@/stores/keycloak_auth_store'
+  import Loader from '@/fragments/Loader.svelte'
 
   const base_url = window.location.origin
 

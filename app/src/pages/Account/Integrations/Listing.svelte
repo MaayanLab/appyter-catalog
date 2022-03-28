@@ -1,6 +1,6 @@
 <script>
-  import cavaticaLogo from '../../../../public/images/CAVATICA.png'
-  import hash from '../../../stores/url_hash_store'
+  import cavaticaLogo from '@/public/images/CAVATICA.png'
+  import hash from '@/stores/url_hash_store'
 </script>
 
 <div class="container flex-grow-1">

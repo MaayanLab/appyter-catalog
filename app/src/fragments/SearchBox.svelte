@@ -1,6 +1,6 @@
 <script>
-  import hash from '../stores/url_hash_store'
-  import appytersJson from '../../public/appyters.json'
+  import hash from '@/stores/url_hash_store'
+  import appytersJson from '@/public/appyters.json'
 
   let { global_tags } = appytersJson
 </script>

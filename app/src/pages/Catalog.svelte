@@ -3,14 +3,14 @@
   import * as JsSearch from 'js-search'
   import * as mdIt from 'markdown-it'
 
-  import Home from '../fragments/Home.svelte'
-  import Landing from '../fragments/Landing.svelte'
-  import SearchBox from '../fragments/SearchBox.svelte'
+  import Home from '@/fragments/Home.svelte'
+  import Landing from '@/fragments/Landing.svelte'
+  import SearchBox from '@/fragments/SearchBox.svelte'
 
-  import hash from '../stores/url_hash_store'
-  import { hashCode, intToRGB, set_gte } from '../utils.js'
+  import hash from '@/stores/url_hash_store'
+  import { hashCode, intToRGB, set_gte } from '@/utils.js'
 
-  import appytersJson from '../../public/appyters.json'
+  import appytersJson from '@/public/appyters.json'
 
   const base_url = window.location.origin
 

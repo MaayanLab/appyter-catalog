@@ -1,7 +1,7 @@
 <script>
-  import hash from '../../../stores/url_hash_store'
-  import Loader from '../../../fragments/Loader.svelte'
-  import ErrorOccurred from '../../ErrorOccurred.svelte'
+  import hash from '@/stores/url_hash_store'
+  import Loader from '@/fragments/Loader.svelte'
+  import ErrorOccurred from '@/pages/ErrorOccurred.svelte'
 
   const pages = {
     '/': {

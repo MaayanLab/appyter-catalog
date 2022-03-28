@@ -1,6 +1,6 @@
-import appyterJson from '../../public/appyters.json'
+import appyterJson from '@/public/appyters.json'
 import { writable } from 'svelte/store'
-import hash from './url_hash_store.js'
+import hash from '@/stores/url_hash_store.js'
 
 function keycloak_auth_store(keycloakProps) {
   const initStore = {}

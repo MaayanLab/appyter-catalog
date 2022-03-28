@@ -1,6 +1,6 @@
 <script>
-  import hash from '../stores/url_hash_store'
-  import appyterLogo from '../../public/images/appyters_logo.svg'
+  import hash from '@/stores/url_hash_store'
+  import appyterLogo from '@/public/images/appyters_logo.svg'
 </script>
 
 <style>

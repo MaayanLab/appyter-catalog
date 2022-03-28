@@ -1,7 +1,7 @@
 <script>
-  import hash from '../stores/url_hash_store'
-  import Masonry from '../components/Masonry.svelte'
-  import { localize_appyter_image } from '../utils.js'
+  import hash from '@/stores/url_hash_store'
+  import Masonry from '@/components/Masonry.svelte'
+  import { localize_appyter_image } from '@/utils.js'
 
   export let base_url
   export let loaded

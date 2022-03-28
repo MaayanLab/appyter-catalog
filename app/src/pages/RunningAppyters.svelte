@@ -1,9 +1,9 @@
 <script>
-  import hash from '../stores/url_hash_store';
-  import appytersJson from '../../public/appyters.json'
+  import hash from '@/stores/url_hash_store';
+  import appytersJson from '@/public/appyters.json'
 
-  import StaticMarkdown from '../components/StaticMarkdown.svelte'
-  import CodeSnippet from '../components/CodeSnippet.svelte'
+  import StaticMarkdown from '@/components/StaticMarkdown.svelte'
+  import CodeSnippet from '@/components/CodeSnippet.svelte'
   import RunningAppytersMd from './RunningAppyters.md'
 
   // constants

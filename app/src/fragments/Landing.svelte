@@ -1,5 +1,5 @@
 <script>
-  import { localize_appyter_image } from '../utils.js'
+  import { localize_appyter_image } from '@/utils.js'
 
   export let base_url
   export let appyter
