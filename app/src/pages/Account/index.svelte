@@ -17,9 +17,9 @@
       name: 'Uploads',
       component: () => import('./Uploads.svelte'),
     },
-    '/config': {
-      name: 'Configuration',
-      component: () => import('./Configuration.svelte'),
+    '/integrations': {
+      name: 'Integrations',
+      component: () => import('./Integrations/index.svelte'),
     },
     '/account': {
       name: 'Account Management',
@@ -40,6 +40,7 @@
   let path
   $: if ($hash.path !== undefined) {
     let _path = `/${$hash.path.split('/').slice(2, 3).join('/')}`
+    console.log({$: _path})
     if (!(_path in pages)) _path = '/404'
     if (path !== _path) path = _path
   }
@@ -56,6 +57,8 @@
           })
       })
   }
+
+  $: console.log($auth)
 </script>
 
 {#if $auth.state === 'init'}
@@ -99,7 +102,7 @@
                 $hash.path = `/account${p}`
               }
             }}
-            class:active={$hash.path === `/account${p}`}
+            class:active={path === p}
             data-toggle="pill"
             role="tab"
           >{pages[p].name}</button>
