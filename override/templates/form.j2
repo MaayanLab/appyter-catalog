@@ -3,6 +3,6 @@
 {% block script %}
 {{ super() }}
 <script>
-require(['pagehit'], function (pagehit) { pagehit() })
+window._config.pagehit()
 </script>
 {% endblock %}
