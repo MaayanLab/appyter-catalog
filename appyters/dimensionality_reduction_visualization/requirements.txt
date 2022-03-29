@@ -7,8 +7,12 @@ pandas
 matplotlib
 sklearn
 seaborn
+scanpy
 IPython
 bokeh
 umap-learn
-MulticoreTSNE git+https://github.com/maayanlab/Multicore-TSNE
+scipy
+qnorm
+MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE
 react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
+maayanlab_bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics.git
