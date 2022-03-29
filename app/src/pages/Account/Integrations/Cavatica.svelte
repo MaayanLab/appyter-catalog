@@ -55,21 +55,21 @@
 
   <div class="container flex-grow-1 my-4">
     <div class="form-group col-sm-12">
-      <label for="api_key">CAVATICA API Key</label>
+      <label for="cavatica_api_key">CAVATICA API Key</label>
       <input
         type="text"
         class="form-control"
-        id="api_key"
+        id="cavatica_api_key"
         placeholder="e.g. 08cd35123..."
         bind:value={config.cavatica_api_key}
       />
     </div>
     <div class="form-group col-sm-12">
-      <label for="project">CAVATICA Project (default)</label>
+      <label for="cavatica_project">CAVATICA Project (default)</label>
       <input
         type="text"
         class="form-control"
-        id="project"
+        id="cavatica_project"
         placeholder="e.g. youruser/yourproject"
         bind:value={config.cavatica_project}
       />
