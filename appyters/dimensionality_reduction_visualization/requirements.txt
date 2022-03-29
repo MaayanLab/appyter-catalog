@@ -7,7 +7,7 @@ pandas
 matplotlib
 sklearn
 seaborn
-scanpy
+scanpy[leiden]
 IPython
 bokeh
 umap-learn
