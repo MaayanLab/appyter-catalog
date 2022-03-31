@@ -924,7 +924,7 @@ def plot_l1000cds2(l1000cds2_results, counter, notebook_metadata, nr_drugs=7, he
 
     else:
         # Bar charts
-        fig = tools.make_subplots(rows=1, cols=2, print_grid=False)
+        fig = tools.make_subplots(rows=1, cols=2, print_grid=False);
         for i, direction in enumerate(['mimic', 'reverse']):
             drug_counts = l1000cds2_results[direction]['table'].groupby('pert_desc').size().sort_values(
                 ascending=False).iloc[:nr_drugs].iloc[::-1]
@@ -969,17 +969,22 @@ def plot_l1000cds2(l1000cds2_results, counter, notebook_metadata, nr_drugs=7, he
             fig.show()
         else:
             fig.show(renderer="png")
-        
-        counter, notebook_metadata = display_object(counter, "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(nr_drugs, l1000cds2_results['signature_label']), notebook_metadata, saved_filename=plot_name, istable=False)
-        notebook_metadata["figures"][str(counter-1)]["file_desc"] = [{"name": "Mimic Signature Query Results", "link":l1000cds2_results['mimic']['url']},
-                                                                     {"name": "Reverse Signature Query Results", "link":l1000cds2_results['reverse']['url']},]
-        
-        # Links        
+
+
+        counter, notebook_metadata = display_object(counter,
+                                                    "Top {} Mimic/Reverse Small Molecule from L1000CDS2 for {}.".format(
+                                                        nr_drugs, l1000cds2_results['signature_label']),
+                                                    notebook_metadata, saved_filename=plot_name, istable=False)
+        notebook_metadata["figures"][str(counter - 1)]["file_desc"] = [
+            {"name": "Mimic Signature Query Results", "link": l1000cds2_results['mimic']['url']},
+            {"name": "Reverse Signature Query Results", "link": l1000cds2_results['reverse']['url']}, ]
+
+        # Links
         display(Markdown(' *Mimic Signature Query Results*:'))
         display_link(l1000cds2_results['mimic']['url'])
         display(Markdown(' *Reverse Signature Query Results*:'))
         display_link(l1000cds2_results['reverse']['url'])
-        
+
     return counter, notebook_metadata
 
 def run_l1000fwd(signature, nr_genes=500, signature_label=''):
