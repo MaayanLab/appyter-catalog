@@ -1,0 +1,27 @@
+{{- if env "PASSTHROUGH" }}
+http:
+  routers:
+    web-catalog-dev:
+      entryPoints:
+        - web
+      rule: Host(`{{ env "SERVER_NAME" }}`)
+      middlewares:
+        - x-forwarded-proto-https
+      service: web-catalog-dev
+    web-appyter-example-dev:
+      entryPoints:
+        - web
+      rule: Host(`{{ env "SERVER_NAME" }}`) && PathPrefix(`/example`)
+      middlewares:
+        - x-forwarded-proto-https
+      service: web-appyter-example-dev
+  services:
+    web-catalog-dev:
+      loadBalancer:
+        servers:
+          - url: http://{{ env "PASSTHROUGH" }}:1234
+    web-appyter-example-dev:
+      loadBalancer:
+        servers:
+          - url: http://{{ env "PASSTHROUGH" }}:5000
+{{- end }}

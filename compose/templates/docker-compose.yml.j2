@@ -19,6 +19,8 @@ services:
       --api.insecure=true
       --providers.docker
       --providers.docker.exposedByDefault=false
+      --providers.file.directory=/config
+      --providers.file.watch=true
       --entrypoints.web.address=:80
 {%- if tls %}
       --entrypoints.web.http.redirections.entrypoint.to=websecure
@@ -28,6 +30,9 @@ services:
       --certificatesresolvers.letsencrypt-prod.acme.storage=/data/acme.json
       --certificatesresolvers.letsencrypt-prod.acme.tlschallenge=true
 {%- endif %}
+    environment:
+      - SERVER_NAME
+      - PASSTHROUGH
     ports:
       - 80:80
       - 8080:8080
@@ -49,6 +54,7 @@ services:
 {%- endif %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./deploy/traefik/config:/config
       - ./data/ingress:/data
     logging: *default-logging
   appyters-catalog:
