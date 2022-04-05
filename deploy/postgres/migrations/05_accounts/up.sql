@@ -114,5 +114,52 @@ create policy "user_instance_policy" on "user_instance"
 grant all on "user_instance" to "standard";
 
 create view "api"."user_instance" as
-select * from "user_instance";
-alter view "api"."user_instance" owner to "standard";
+select
+  ui.id,
+  ui.user,
+  row_to_json(i.*) as instance,
+  ui.ts,
+  ui.metadata
+from "user_instance" ui
+inner join "instance" i on i."id" = ui."instance"
+;
+grant all on "api"."user_instance" to "standard";
+
+create or replace function api_user_instance_delete()
+returns trigger as
+$$
+begin
+  delete from "public"."user_instance"
+  where "public"."user_instance".id = old."id";
+  return new;
+end
+$$
+language 'plpgsql';
+
+create trigger api_user_instance_delete_trigger
+instead of delete
+on "api"."user_instance"
+for each row
+execute procedure api_user_instance_delete();
+
+create or replace function "api"."add_instance"("instance" varchar, "metadata" jsonb)
+returns void as
+$$
+#variable_conflict use_column
+begin
+  insert into "public"."instance" ("id", "metadata")
+  values ("instance", "metadata")
+  on conflict ("id")
+  do nothing;
+
+  perform "ensure_user"();
+
+  insert into "public"."user_instance" ("instance")
+  values ("add_instance"."instance")
+  on conflict ("user", "instance")
+  do nothing;
+end
+$$
+language 'plpgsql'
+security definer;
+grant execute on function "api"."add_instance"(varchar, jsonb) to "standard";
