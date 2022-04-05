@@ -20,6 +20,7 @@ function keycloak_auth_store(keycloakProps) {
   ;(async () => {
     const { keycloak } = initStore
     if ('init' in keycloak) {
+      const keycloakLogout = keycloak.logout
       Object.assign(keycloak, {
         getValidToken: async () => {
           try {
@@ -31,7 +32,7 @@ function keycloak_auth_store(keycloakProps) {
           return keycloak.token
         },
         logout: () => {
-          keycloak.logout()
+          keycloakLogout()
           set({ state: 'guest', keycloak })
         },
       })
