@@ -82,7 +82,7 @@ create table "user_file" (
   "ts" timestamp default now(),
   "metadata" jsonb,
   primary key ("id"),
-  unique ("user", "instance", "filename"),
+  unique ("user", "file", "filename"),
   foreign key ("user") references "user" ("id"),
   foreign key ("file") references "file" ("id")
 );
@@ -95,6 +95,57 @@ grant all on "user_file" to "standard";
 create view "api"."user_file" as
 select * from "user_file";
 alter view "api"."user_file" owner to "standard";
+
+create or replace function "api"."add_file"("file" varchar, "filename" varchar, "metadata" jsonb)
+returns void as
+$$
+#variable_conflict use_column
+begin
+  insert into "public"."file" ("id", "metadata")
+  values ($1, $3)
+  on conflict ("id")
+  do nothing;
+
+  perform "ensure_user"();
+
+  insert into "public"."user_file" ("file", "filename")
+  values ($1, $2)
+  on conflict ("user", "file", "filename")
+  do nothing;
+end
+$$
+language 'plpgsql'
+security definer;
+grant execute on function "api"."add_file"(varchar, varchar, jsonb) to "standard";
+
+create view "api"."user_file" as
+select
+  uf.id,
+  row_to_json(f.*) as file,
+  uf.filename,
+  uf.ts,
+  uf.metadata
+from "user_file" uf
+inner join "file" f on f."id" = uf."file"
+;
+grant all on "api"."user_file" to "standard";
+
+create or replace function api_user_file_delete()
+returns trigger as
+$$
+begin
+  delete from "public"."user_file"
+  where "public"."user_file".id = old."id";
+  return new;
+end
+$$
+language 'plpgsql';
+
+create trigger api_user_file_delete_trigger
+instead of delete
+on "api"."user_file"
+for each row
+execute procedure api_user_file_delete();
 
 create table "user_instance" (
   "id" uuid default uuid_generate_v4(),
@@ -116,7 +167,6 @@ grant all on "user_instance" to "standard";
 create view "api"."user_instance" as
 select
   ui.id,
-  ui.user,
   row_to_json(i.*) as instance,
   ui.ts,
   ui.metadata
