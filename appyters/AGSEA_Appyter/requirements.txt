@@ -2,6 +2,7 @@ appyter @ git+https://github.com/Maayanlab/appyter
 gseapy @ git+https://github.com/BioNinja/gseapy#egg=gseapy
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
 geode @ git+https://github.com/Maayanlab/geode
+blitzgsea @ git+https://github.com/Maayanlab/blitzgsea
 pandas
 numpy
 scipy
