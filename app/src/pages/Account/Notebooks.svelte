@@ -1,6 +1,7 @@
 <script>
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
+  import { url_for } from '@/utils'
 
   const base_url = window.location.origin
 
@@ -84,7 +85,13 @@
     {:else}
       {#each notebooks as notebook}
         <tr>
-          <td><a href="/{notebook.instance.metadata.appyter.info.name}/{notebook.instance.id}/">{notebook.instance.id.slice(0, 8)}...</a></td>
+          <td><a href={url_for({
+            path: `/${notebook.instance.metadata.appyter.info.name}/${notebook.instance.id}/`,
+            params: {
+              storage: notebook.instance.metadata.storage,
+              executor: notebook.instance.metadata.executor,
+            },
+          })}>{notebook.instance.id.slice(0, 8)}...</a></td>
           <td><a href="/#/{notebook.instance.metadata.appyter.info.name}">{notebook.instance.metadata.appyter.info.title}</a></td>
           <td>{notebook.instance.metadata.appyter.info.version}</td>
           <td>{notebook.ts}</td>

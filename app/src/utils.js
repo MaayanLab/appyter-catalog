@@ -43,3 +43,20 @@ export function human_size(size) {
   }
   return `${size.toFixed(2)} ${unit}`
 }
+
+function params_stringify(params) {
+  if (params === undefined) return ''
+  return Object.keys(params)
+    .filter(param => params[param] !== undefined && params[param] !== '')
+    .map((param) => [param, params[param]].map(encodeURIComponent).join('='))
+    .join('&')
+}
+
+export function url_for({ path, params }) {
+  const params_encoded = params_stringify(params)
+  if (params_encoded === '') {
+    return path
+  } else {
+    return `${path}?${params_encoded}`
+  }
+}
