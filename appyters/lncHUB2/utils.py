@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from plotly.subplots import make_subplots
 from plotly.offline import iplot
-import plotly.graph_objs as go
+import plotly.express as px
 from bokeh.plotting import figure, show
 from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Select, Legend, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
 from bokeh.layouts import row, column
@@ -106,11 +106,11 @@ def Enrichr_API(enrichr_gene_list, description):
 
     response = requests.post(ENRICHR_URL, files=payload)
     if not response.ok:
-        raise Exception('Error analyzing gene list')
-
-    data = json.loads(response.text)
-    short_id = data["shortId"]
-    return('https://maayanlab.cloud/Enrichr/enrich?dataset='+ str(short_id))
+        return('Error')
+    else:
+        data = json.loads(response.text)
+        short_id = data["shortId"]
+        return('https://maayanlab.cloud/Enrichr/enrich?dataset='+ str(short_id))
 
 # Load Enrichr libraries
 def loadLibrary(library: str, overwrite: bool = False) -> str:
@@ -170,107 +170,44 @@ def plot_bar(df,title,x_label,y_label,filename):
     plt.savefig(filename+'.svg',facecolor='white',bbox_inches='tight')
     plt.savefig(filename+'.pdf',facecolor='white',bbox_inches='tight')
     plt.close()
-  
 
-# Plot the top terms for each prediction library
-def plot_results(library_names, results_dfs, file_name, top_results=15, pvalue=False):
-    
-    fig = make_subplots(rows=1, cols=2, print_grid=False,shared_xaxes=False)
-    max_scores = []
-    for i in range(0,2):
-        results_df = results_dfs[i][0:top_results].sort_values(by='Mean Pearson Correlation')
-        library_name = library_names[i]
-        max_scores.append(np.max(results_df['Mean Pearson Correlation']))
-        if pvalue == False:
-            bar = go.Bar(x=results_df['Mean Pearson Correlation'],
-                y=results_df['Term'],
-                orientation='h',
-                name=library_name,
-                showlegend=False,
-                hovertext=['<b>Term:</b>{Term}<br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
-                hoverinfo='text', 
-                marker={'color': 'lightskyblue'})
-        if pvalue == True:
-                bar = go.Bar(x=results_df['Mean Pearson Correlation'],
-                y=results_df['Term'],
-                orientation='h',
-                name=library_name,
-                showlegend=False,
-                hovertext=['<b>Term:</b>{Term}<br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
-                hoverinfo='text', 
-                marker={'color': 'lightskyblue'})
-            
-        fig.append_trace(bar, 1, i+1)
-        
-        #Get text
-        text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
-        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
-        text = go.Scatter(
-            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
-            y=bar['y'],
-            mode='text',
-            hoverinfo='none',
-            showlegend=False,
-            text=text_shortened,
-            textposition="middle right",
-            textfont={'color': 'black','size':8})
-        fig.append_trace(text, 1, i+1)
-    
-    annotations= [{'x': 0.25, 'y': 1.1, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.1, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
-    fig['layout'].update(height = 500, hovermode='closest', annotations=annotations)
-    fig.update_layout(title='',height = 500,title_font_size = 25,title_x=0.5)
-    
-    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='Mean Pearson Correlation' ,range=(0,max_scores[0]+max_scores[0]*.01))
-    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='Mean Pearson Correlation',range=(0,max_scores[1]+max_scores[1]*.01))
-    fig['layout']['yaxis1'].update(showticklabels=False)
-    fig['layout']['yaxis2'].update(showticklabels=False)
-    fig['layout']['margin'].update(l=30, t=65, r=30, b=35)
 
-    # Show plot
+def plot_results(library_names, results_dfs, file_name, direction, top_results=15):
+
+    df0 = results_dfs[0].sort_values(by='P-value',ascending= True)
+    df1 = results_dfs[1].sort_values(by='P-value',ascending= True)
+    df0 = df0[0:top_results].sort_values(by='P-value',ascending= False)
+    df1 = df1[0:top_results].sort_values(by='P-value',ascending= False)
+
+    fig = make_subplots(rows=1, cols=2,subplot_titles=[library_names[0].replace('_',' '),library_names[1].replace('_', ' ')],horizontal_spacing = 0.02)
+    fig1 = px.bar(x= df0["-Log10(P-value)"], y=df0["Term"], orientation="h",color=df0["Mean Pearson Correlation"])
+    fig1.update_traces(text=df0['Term'],insidetextanchor="start",textfont_size=15,textposition='inside',hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i>'.format(**rowData) for index, rowData in df0.iterrows()])
+    fig1.update_yaxes(showticklabels=False)
+    fig1.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'})
+
+
+    fig2 = px.bar(x=  df1["-Log10(P-value)"], y= df1["Term"], orientation="h",color= df1["Mean Pearson Correlation"])
+    fig2.update_traces(text= df1['Term'],insidetextanchor="start", textfont_size=15,textposition='inside',hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i>'.format(**rowData) for index, rowData in  df1.iterrows()])
+    fig2.update_yaxes(showticklabels=False)
+    fig2.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'})
+
+
+    fig.add_trace(fig1['data'][0], row=1, col=1)
+    fig.add_trace(fig2['data'][0], row=1, col=2)
+    fig.update_yaxes(showticklabels=False)
+    fig.update_xaxes(title_text='-Log10(P-value)')
+    fig.update_annotations(font_size=20)
+    if direction == 'right-tailed-pvalue':
+        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'},width=1200,height=800,colorscale_sequential=px.colors.sequential.Reds,font=dict(size=15),coloraxis_colorbar=dict(title="MPC"))
+    if direction == 'left-tailed-pvalue':
+        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'},width=1200,height=800,colorscale_sequentialminus=px.colors.sequential.Blues_r,font=dict(size=15),coloraxis_colorbar=dict(title="MPC"))
+
+    fig.write_image(file_name+'_'+direction+".png")
+    fig.write_image(file_name+'_'+direction+".svg")
+    fig.write_image(file_name+'_'+direction+".pdf")
+
     iplot(fig)
 
-    fig = make_subplots(rows=1, cols=2, print_grid=False,shared_xaxes=False)
-    max_scores = []
-    for i in range(0,2):
-        results_df = results_dfs[i][0:top_results].sort_values(by='Mean Pearson Correlation')
-        library_name = library_names[i]
-        max_scores.append(np.max(results_df['Mean Pearson Correlation']))
-        bar = go.Bar(x=results_df['Mean Pearson Correlation'],
-            y=results_df['Term'],
-            orientation='h',
-            name=library_name,
-            showlegend=False,
-            hovertext=['<b>Term: {Term}</b><br><b>Mean Pearson Correlation</b>: <i>{Mean Pearson Correlation:.3}</i>'.format(**rowData) for index, rowData in results_df[0:top_results].iterrows()],
-            hoverinfo='text', 
-            marker={'color': 'lightskyblue'})
-        fig.append_trace(bar, 1, i+1)
-        
-        #Get text
-        text_shortened = ['<b>{}</b>'.format(rowData['Term']) for index, rowData in results_df[0:top_results].iterrows()]
-        text_shortened = [str(x[0:50] + '...' + x[-25::]) if len(x) > 75 else x for x in text_shortened] # if text is longer than image, shorten text
-        text = go.Scatter(
-            x=[max(bar['x'])/50 for x in range(len(bar['y']))],
-            y=bar['y'],
-            mode='text',
-            hoverinfo='none',
-            showlegend=False,
-            text=text_shortened,
-            textposition="middle right",
-            textfont={'color': 'black','size':12})
-        fig.append_trace(text, 1, i+1)
-    
-    annotations= [{'x': 0.25, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[0]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'},{'x': 0.75, 'y': 1.05, 'text': '<span style="color: black; font-size: 12pt; font-weight: 600;">' +library_names[1]+'</span>', 'showarrow': False, 'xref': 'paper', 'yref': 'paper', 'xanchor': 'center'}]
-    fig['layout'].update(height = 600, width = 1000, hovermode='closest', annotations=annotations)
-    fig.update_layout(title='',title_font_size = 30,title_x=0.5)
-    
-    fig['layout']['xaxis1'].update(domain=[0, 0.49], title='Mean Pearson Correlation' ,range=(0,max_scores[0]+max_scores[0]*.01))
-    fig['layout']['xaxis2'].update(domain=[0.51, 1], title='Mean Pearson Correlation',range=(0,max_scores[1]+max_scores[1]*.01))
-    fig['layout']['yaxis1'].update(showticklabels=False)
-    fig['layout']['yaxis2'].update(showticklabels=False)
-    fig['layout']['margin'].update(l=30, t=65, r=30, b=35)    
-    fig.write_image(file_name+".png")
-    fig.write_image(file_name+".svg")
-    fig.write_image(file_name+".pdf")
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
@@ -719,5 +656,7 @@ def get_bf_pvalues(bf_file, pval_file, query):
     precomputed_avg_coexp = precomputed_avg_coexp.merge(precomputed_pval,left_index=True,right_index=True)
     precomputed_avg_coexp = precomputed_avg_coexp.reset_index()
     precomputed_avg_coexp = precomputed_avg_coexp.rename({'index': 'Term'}, axis='columns')
+    precomputed_avg_coexp = precomputed_avg_coexp.sort_values(by='P-value', ascending=True)  # sort data by P-value
+    precomputed_avg_coexp['-Log10(P-value)'] = [-np.log10(x) for x in precomputed_avg_coexp['P-value']] # add lof transformed p-values
 
     return(precomputed_avg_coexp)
