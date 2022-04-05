@@ -20,30 +20,29 @@ function keycloak_auth_store(keycloakProps) {
   ;(async () => {
     const { keycloak } = initStore
     if ('init' in keycloak) {
+      Object.assign(keycloak, {
+        getValidToken: async () => {
+          try {
+            await keycloak.updateToken(30)
+          } catch (e) {
+            console.error(e)
+            set({ state: 'guest', keycloak })
+          }
+          return keycloak.token
+        },
+        logout: () => {
+          keycloak.logout()
+          set({ state: 'guest', keycloak })
+        },
+      })
       keycloak.init({
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
         redirectUri: window.location.href + (window.location.href.includes('?') ? '' : '?'),
       }).then(authenticated => {
-        keycloak.onTokenExpired = () => {
-          console.debug('refreshing expired token...')
-          keycloak.updateToken()
-            .success(() => {
-              set({ state: 'auth', keycloak })
-            })
-            .error(e => {
-              set({ state: 'error', keycloak })
-            })
-        }
         set({
           state: authenticated ? 'auth' : 'guest',
-          keycloak: {
-            ...keycloak,
-            logout: () => {
-              keycloak.logout()
-              set({ state: 'guest', keycloak })
-            }
-          },
+          keycloak,
         })
         // cleanup keycloak auth params
         hash.update($hash => {

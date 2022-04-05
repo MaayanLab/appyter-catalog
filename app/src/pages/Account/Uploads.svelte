@@ -18,7 +18,7 @@
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Prefer': 'count=estimated',
-        'Authorization': `Bearer ${$auth.keycloak.token}`,
+        'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
       },
     })
     offset = _offset
@@ -37,7 +37,7 @@
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${$auth.keycloak.token}`,
+        'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
       },
     })
     if (res.status === 204) {

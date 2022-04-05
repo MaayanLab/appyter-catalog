@@ -16,7 +16,7 @@
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${$auth.keycloak.token}`,
+        'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
       },
       body: JSON.stringify(props !== undefined ? props : { config: null }),
     })
