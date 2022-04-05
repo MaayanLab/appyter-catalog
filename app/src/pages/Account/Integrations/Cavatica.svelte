@@ -28,7 +28,6 @@
     }
   }
 
-  $: console.log(config)
   $: if ($auth.state === 'auth') {
     ensure_config().catch(e => console.error(e))
   }

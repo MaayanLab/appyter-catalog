@@ -21,7 +21,6 @@
   let path
   $: if ($hash.path !== undefined) {
     let _path = `/${$hash.path.split('/').slice(3, 4).join('/')}`
-    console.log(_path)
     if (!(_path in pages)) _path = '/404'
     if (path !== _path) path = _path
   }

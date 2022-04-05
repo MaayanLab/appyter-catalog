@@ -46,7 +46,7 @@
       }
       await load_notebooks({ offset, limit })
     } else {
-      console.log(await res.text())
+      console.error(await res.text())
     }
   }
 

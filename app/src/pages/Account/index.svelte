@@ -40,7 +40,6 @@
   let path
   $: if ($hash.path !== undefined) {
     let _path = `/${$hash.path.split('/').slice(2, 3).join('/')}`
-    console.log({$: _path})
     if (!(_path in pages)) _path = '/404'
     if (path !== _path) path = _path
   }
@@ -57,8 +56,6 @@
           })
       })
   }
-
-  $: console.log($auth)
 </script>
 
 {#if $auth.state === 'init'}

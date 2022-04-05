@@ -47,7 +47,7 @@
       }
       await load_uploads({ offset, limit })
     } else {
-      console.log(await res.text())
+      console.error(await res.text())
     }
   }
 
