@@ -67,8 +67,9 @@
 
   <table class="table table-striped table-fixed">
     <tr>
-      <th scope="col">Instance ID</th>
+      <th scope="col">Instance</th>
       <th scope="col">Appyter</th>
+      <th scope="col">Version</th>
       <th scope="col">Created</th>
       <th scope="col">Actions</th>
     </tr>
@@ -83,7 +84,9 @@
     {:else}
       {#each notebooks as notebook}
         <tr>
-          <td><a href="/storage/input/{notebook.file}" download={notebook.filename}>{notebook.filename}</a></td>
+          <td><a href="/{notebook.instance.metadata.appyter.info.name}/{notebook.instance.id}/">{notebook.instance.id.slice(0, 8)}...</a></td>
+          <td><a href="/#/{notebook.instance.metadata.appyter.info.name}">{notebook.instance.metadata.appyter.info.title}</a></td>
+          <td>{notebook.instance.metadata.appyter.info.version}</td>
           <td>{notebook.ts}</td>
           <td class="text-center"><button
             class="btn btn-sm bg-danger text-white"
