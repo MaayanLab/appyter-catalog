@@ -1,6 +1,7 @@
 <script>
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
+  import { human_size } from '@/utils'
 
   const base_url = window.location.origin
 
@@ -68,6 +69,7 @@
   <table class="table table-striped">
     <tr>
       <th scope="col" class="text-left">Filename</th>
+      <th scope="col" class="text-left">Size</th>
       <th scope="col" class="text-left">Created</th>
       <th scope="col" class="text-center">Actions</th>
     </tr>
@@ -82,7 +84,14 @@
     {:else}
       {#each uploads as upload}
         <tr>
-          <td><a href="/storage/input/{upload.file}" download={upload.filename}>{upload.filename}</a></td>
+          <td>
+            {#if upload.file.id.startsWith('storage://')}
+              <a href={upload.file.id.replace(/^storage:\/\//, '/storage/')} download={upload.filename}>{upload.filename}</a>
+            {:else}
+              {upload.file.id}
+            {/if}
+          </td>
+          <td>{human_size(upload.file.metadata.size)}</td>
           <td>{upload.ts}</td>
           <td class="text-center"><button
             class="btn btn-sm bg-danger text-white"
