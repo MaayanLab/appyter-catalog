@@ -20,7 +20,7 @@
   let path
   $: if ($hash.path !== undefined) {
     let _path = $hash.path.split('/').slice(0, 2).join('/')
-    if (!(_path in pages)) _path = '/404'
+    if (!(_path in pages)) _path = '/'
     if (path !== _path) path = _path
   }
 

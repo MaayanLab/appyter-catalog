@@ -134,8 +134,12 @@
     const curPath = $hash.path.slice(1)
     if (curPath !== lastPath) {
       appyter = appyterLookup[$hash.path.slice(1)]
-      pagehit(appyter)
-      lastPath = curPath
+      if ($hash.path.slice(1) && appyter === undefined) {
+        $hash.path = '/404'
+      } else {
+        pagehit(appyter)
+        lastPath = curPath
+      }
     }
     window.scrollTo(0,0)
   }
