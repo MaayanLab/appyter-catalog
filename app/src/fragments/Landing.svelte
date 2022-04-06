@@ -1,5 +1,5 @@
 <script>
-  import { localize_appyter_image } from '@/utils.js'
+  import AppyterImage from '@/components/AppyterImage.svelte'
 
   export let base_url
   export let appyter
@@ -7,21 +7,7 @@
 
 <div class="row">
   <div class="col-sm-12 col-md-6 col-lg-4 align-self-center">
-    <div 
-      class="card-img-top"
-      style={[
-        `background-color: ${appyter.color}`,
-        appyter.image !== undefined ? (
-          `background-image: url('${localize_appyter_image(base_url, appyter)}')`
-        ) : undefined,
-        `background-repeat: no-repeat`,
-        `background-size: cover`,
-        `background-position: center`,
-        `width: 100%`,
-        `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
-      ].filter((el) => el !== undefined).join('; ')}
-    >
-    </div>
+    <AppyterImage base_url={base_url} appyter={appyter} />
   </div>
   <div class="col-sm-12 col-md-6 col-lg-8">
     <h2>{appyter.title}</h2>

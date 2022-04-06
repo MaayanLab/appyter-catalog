@@ -1,7 +1,7 @@
 <script>
   import hash from '@/stores/url_hash_store'
   import Masonry from '@/components/Masonry.svelte'
-  import { localize_appyter_image } from '@/utils.js'
+  import AppyterImage from '@/components/AppyterImage.svelte'
 
   export let base_url
   export let loaded
@@ -97,20 +97,7 @@
       class="link-unstyled"
     >
       <div class="card">
-        <div
-          class="card-img-top"
-          style={[
-            `background-color: ${appyter.color}`,
-            appyter.image !== undefined ? (
-              `background-image: url('${localize_appyter_image(base_url, appyter)}')`
-            ) : undefined,
-            `background-repeat: no-repeat`,
-            `background-size: cover`,
-            `background-position: center`,
-            `width: 100%`,
-            `padding-top: 56.25%`, // 720 / 1280 = 0.5625, this preserves aspect ratio of div
-          ].filter((el) => el !== undefined).join('; ')}
-        ></div>
+        <AppyterImage base_url={base_url} appyter={appyter} />
         <div class="card-body">
           <h3 class="card-title">{appyter.title}</h3>
           <div class="d-flex flex-row flex-nowrap pt-1 pb-2">

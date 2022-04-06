@@ -1,7 +1,7 @@
 <script>
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
-  import { human_size } from '@/utils'
+  import human_size from '@/utils/human_size'
 
   const base_url = window.location.origin
 

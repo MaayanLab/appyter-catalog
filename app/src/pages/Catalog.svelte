@@ -8,7 +8,9 @@
   import SearchBox from '@/fragments/SearchBox.svelte'
 
   import hash from '@/stores/url_hash_store'
-  import { hashCode, intToRGB, set_gte } from '@/utils.js'
+  import hashCode from '@/utils/hash_code'
+  import intToRGB from '@/utils/int_to_rgb'
+  import set_gte from '@/utils/set_gte'
 
   import appytersJson from '@/public/appyters.json'
 
