@@ -4,11 +4,11 @@
   import cavaticaGuideProject from '@/public/images/CAVATICA-guide-project.png'
 
   const base_url = window.location.origin
-  let savedConfig = {
+  let savedConfig = {}
+  let config = {
     cavatica_api_key: '',
     cavatica_project: '',
   }
-  let config = {}
 
   async function ensure_config(props) {
     const res = await fetch(`${base_url}/postgrest/rpc/user_config`, {
