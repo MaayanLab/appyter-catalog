@@ -58,6 +58,17 @@
   Object.assign(window._config, {
     CATALOG_ORIGIN: window.location.origin,
     CATALOG_APP_NAME: window.location.pathname.split('/')[1],
+    keycloak: {
+      params: {
+        url: 'https://keycloak.maayanlab.cloud/auth',
+        realm: 'appyters',
+        clientId: 'appyter-catalog',
+      },
+      init: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window._config.CATALOG_ORIGIN + '/silent-check-sso.html',
+      },
+    },
     pagehit: function (view) {
       var app = window.location.pathname.split('/')[1]
       fetch(window._config.CATALOG_ORIGIN + '/postgrest/rpc/pagehit', {
