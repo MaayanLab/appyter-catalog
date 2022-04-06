@@ -1,0 +1,18 @@
+# python dependencies should be collected and kept in this file
+#  one line for each dependency. this file can be used to install
+#  dependencies with `pip install -r requirements.txt`
+appyter
+numpy
+pandas
+matplotlib
+sklearn
+seaborn
+scanpy[leiden]
+IPython
+bokeh
+umap-learn
+scipy
+qnorm
+MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE
+react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
+maayanlab_bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics.git

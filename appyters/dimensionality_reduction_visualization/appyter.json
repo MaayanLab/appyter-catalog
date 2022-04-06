@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "dimensionality_reduction_visualization",
+  "title": "PCA, t-SNE, UMAP Appyter",
+  "version": "0.0.3",
+  "description": "An Appyter to perform visualization of a data matrix using PCA, t-SNE, and UMAP methods.",
+  "image": "scatter_screenshot.png",
+  "authors": [
+    {
+      "name": "Juncheng Pan",
+      "email": "pan_juncheng@yahoo.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/dimensionality_reduction_visualization",
+  "tags": [
+    "Visualization",
+    "Dimensionality Reduction",
+    "2D",
+    "3D",
+    "interactive",
+    "downloadable",
+    "Exploration"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "dimensionality_reduction_visualization.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}

@@ -21,25 +21,66 @@ def try_json_loads(s):
   except:
     s
 
-def get_changed_appyters(github_action):
-  if github_action:
-    # load files from stdin
-    changed_files = [record['filename'] for record in json.load(sys.stdin)]
-  else:
-    # use git
-    with Popen(['git', 'diff', '--name-only', 'origin/main'], stdout=PIPE, stderr=sys.stderr) as p:
-      changed_files = set(filter(None, map(str.strip, map(bytes.decode, p.stdout))))
-  #
-  appyters = {
-    file.split('/', maxsplit=3)[1]
-    for file in changed_files
-    if file.startswith('appyters/')
+def get_changed_appyters_gh_action():
+  ops = {
+    'added': 'A',
+    'renamed': 'R',
+    'modified': 'M',
+    'removed': 'D',
   }
-  for appyter in appyters:
-    logging.getLogger(appyter).info(f"Changed")
-    assert f"appyters/{appyter}/appyter.json" in changed_files, 'Expected update to appyter.json version'
-  #
-  return appyters
+  for record in json.load(sys.stdin):
+    yield dict(
+      filename=record['filename'],
+      status=ops[record['status']],
+      prev=record.get('previous_filename'),
+    )
+
+def get_changed_appyters_git():
+  with Popen(['git', 'diff', '--name-status', 'origin/main'], stdout=PIPE, stderr=sys.stderr) as p:
+    for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
+      op, filename, *rest = line.split()
+      prev = rest[-1] if rest else None
+      yield dict(
+        filename=filename,
+        status=op[0],
+        prev=prev,
+      )
+
+def dict_groupby(iterator, grouper, keyfunc):
+  groups = {}
+  for element in iterator:
+    group = grouper(element)
+    if group not in groups:
+      groups[group] = {}
+    key = keyfunc(element)
+    groups[group][key] = element
+  return groups
+
+def get_changed_appyters(github_action):
+  changed_files = list(get_changed_appyters_gh_action() if github_action else get_changed_appyters_git())
+  current = dict_groupby(
+    [
+      record
+      for record in changed_files
+      if record['filename'].startswith('appyters/')
+    ] + [
+      dict(
+        filename=record['prev'],
+        status='D',
+        prev=None,
+      )
+      for record in changed_files
+      if record.get('prev') and record['prev'].startswith('appyters/')
+    ],
+    grouper=lambda record: record['filename'].split('/', maxsplit=3)[1],
+    keyfunc=lambda record: record['filename'].split('/', maxsplit=3)[2],
+  )
+  logging.debug(f"{current=}")
+  for appyter, changes in reversed(list(current.items())):
+    logging.getLogger(appyter).info(f"Changes detected")
+    appyterJson = changes.get('appyter.json')
+    assert appyterJson, f"Expected appyter.json modification for {appyter}"
+    yield appyter
 
 def validate_appyter(appyter):
   logger = logging.getLogger(appyter)
