@@ -1,6 +1,7 @@
 <script>
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
+  import url_for from '@/utils/url_for'
   import human_size from '@/utils/human_size'
 
   const base_url = window.location.origin
@@ -12,7 +13,13 @@
 
   async function load_uploads({ offset: _offset, limit: _limit }) {
     uploads = undefined
-    const res = await fetch(`${base_url}/postgrest/user_file?offset=${_offset}&limit=${_limit}`, {
+    const res = await fetch(url_for({
+      path: `${base_url}/postgrest/user_file`,
+      params: {
+        offset: _offset,
+        limit: _limit
+      },
+    }), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +39,10 @@
   }
 
   async function delete_upload(id) {
-    const res = await fetch(`${base_url}/postgrest/user_file?id=${encodeURIComponent(`eq.${id}`)}`, {
+    const res = await fetch(url_for({
+      path: `${base_url}/postgrest/user_file`,
+      params: { id: `eq.${id}` }
+    }), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

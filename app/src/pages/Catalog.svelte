@@ -11,6 +11,7 @@
   import hashCode from '@/utils/hash_code'
   import intToRGB from '@/utils/int_to_rgb'
   import set_gte from '@/utils/set_gte'
+  import url_for from '@/utils/url_for'
 
   import appytersJson from '@/public/appyters.json'
 
@@ -69,9 +70,12 @@
 
   // get appyter hits
   async function get_pagehits() {
-    const response = await fetch(
-      `${base_url}/postgrest/pagehits?url=like.${encodeURIComponent(`${base_url}%`)}`
-    )
+    const response = await fetch(url_for({
+      path: `${base_url}/postgrest/pagehits`,
+      params: {
+        url: `like.${base_url}%`,
+      }
+    }))
     const pagehits = await response.json()
     for (const {url, hits} of pagehits) {
       if (url.startsWith(base_url + '/#')) {

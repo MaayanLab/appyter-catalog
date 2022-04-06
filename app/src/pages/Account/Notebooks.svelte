@@ -1,7 +1,7 @@
 <script>
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
-  import { url_for } from '@/utils'
+  import url_for from '@/utils/url_for'
 
   const base_url = window.location.origin
 
@@ -12,7 +12,13 @@
 
   async function load_notebooks({ offset: _offset, limit: _limit }) {
     notebooks = undefined
-    const res = await fetch(`${base_url}/postgrest/user_instance?offset=${_offset}&limit=${_limit}`, {
+    const res = await fetch(url_for({
+      path: `${base_url}/postgrest/user_instance`,
+      params: {
+        offset: _offset,
+        limit: _limit,
+      },
+    }), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +38,12 @@
   }
 
   async function delete_notebook(id) {
-    const res = await fetch(`${base_url}/postgrest/user_instance?id=${encodeURIComponent(`eq.${id}`)}`, {
+    const res = await fetch(url_for({
+      path: `${base_url}/postgrest/user_instance`,
+      params: {
+        id: `eq.${id}`,
+      },
+    }), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
