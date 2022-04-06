@@ -56,24 +56,24 @@
 </script>
 <script>
   Object.assign(window._config, {
-    CATALOG_URL: window.location.origin
-    CATALOG_APP_NAME: window.location.pathname.split('/')[1]
+    CATALOG_ORIGIN: window.location.origin,
+    CATALOG_APP_NAME: window.location.pathname.split('/')[1],
     pagehit: function (view) {
       var app = window.location.pathname.split('/')[1]
-      fetch(window._config.CATALOG_URL + '/postgrest/rpc/pagehit', {
+      fetch(window._config.CATALOG_ORIGIN + '/postgrest/rpc/pagehit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         data: JSON.stringify({
-          pageurl: window._config.CATALOG_URL + '/' + window._config.CATALOG_APP_NAME + (view !== undefined ? ('#' + view) : ''),
+          pageurl: window._config.CATALOG_ORIGIN + '/' + window._config.CATALOG_APP_NAME + (view !== undefined ? ('#' + view) : ''),
         }),
       }).catch(function (e) {
         console.error(e)
       })
     },
     report_error: function (error) {
-      fetch(window._config.CATALOG_URL + '/postgrest/rpc/report_error', {
+      fetch(window._config.CATALOG_ORIGIN + '/postgrest/rpc/report_error', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
