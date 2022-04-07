@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from plotly.subplots import make_subplots
 from plotly.offline import iplot
-import plotly.express as px
+import plotly.graph_objs as go
 from bokeh.plotting import figure, show
 from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Select, Legend, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
 from bokeh.layouts import row, column
@@ -172,6 +172,7 @@ def plot_bar(df,title,x_label,y_label,filename):
     plt.close()
 
 
+
 def plot_results(library_names, results_dfs, file_name, direction, top_results=15):
 
     df0 = results_dfs[0].sort_values(by='P-value',ascending= True)
@@ -179,35 +180,85 @@ def plot_results(library_names, results_dfs, file_name, direction, top_results=1
     df0 = df0[0:top_results].sort_values(by='P-value',ascending= False)
     df1 = df1[0:top_results].sort_values(by='P-value',ascending= False)
 
-    fig = make_subplots(rows=1, cols=2,subplot_titles=[library_names[0].replace('_',' '),library_names[1].replace('_', ' ')],horizontal_spacing = 0.02)
-    fig1 = px.bar(x= df0["-Log10(P-value)"], y=df0["Term"], orientation="h",color=df0["Mean Pearson Correlation"])
-    fig1.update_traces(text=df0['Term'],insidetextanchor="start",textfont_size=15,textposition='inside',hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i>'.format(**rowData) for index, rowData in df0.iterrows()])
-    fig1.update_yaxes(showticklabels=False)
-    fig1.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'})
 
-
-    fig2 = px.bar(x=  df1["-Log10(P-value)"], y= df1["Term"], orientation="h",color= df1["Mean Pearson Correlation"])
-    fig2.update_traces(text= df1['Term'],insidetextanchor="start", textfont_size=15,textposition='inside',hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i>'.format(**rowData) for index, rowData in  df1.iterrows()])
-    fig2.update_yaxes(showticklabels=False)
-    fig2.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'})
-
-
-    fig.add_trace(fig1['data'][0], row=1, col=1)
-    fig.add_trace(fig2['data'][0], row=1, col=2)
-    fig.update_yaxes(showticklabels=False)
-    fig.update_xaxes(title_text='-Log10(P-value)')
-    fig.update_annotations(font_size=20)
     if direction == 'right-tailed-pvalue':
-        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'},width=1200,height=800,colorscale_sequential=px.colors.sequential.Reds,font=dict(size=15),coloraxis_colorbar=dict(title="MPC"))
+        detect = [x for x in list(df0['Mean Pearson Correlation']) if x < 0]
+        if len(detect) == 0:
+            color0 = 'redor'
+        else:
+            color0 = 'tealrose'
+        detect = [x for x in list(df1['Mean Pearson Correlation']) if x < 0]
+        if len(detect) == 0:
+            color1 = 'redor'
+        else:
+            color1 = 'tealrose'
+                
     if direction == 'left-tailed-pvalue':
-        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)'},width=1200,height=800,colorscale_sequentialminus=px.colors.sequential.Blues_r,font=dict(size=15),coloraxis_colorbar=dict(title="MPC"))
+        detect = [x for x in list(df0['Mean Pearson Correlation']) if x > 0]
+        if len(detect) == 0:
+            color0 = 'teal_r'
+        else:
+            color0 = 'tealrose'
+        detect = [x for x in list(df1['Mean Pearson Correlation']) if x > 0]
+        if len(detect) == 0:
+            color1 = 'teal_r'
+        else:
+            color1 = 'tealrose'
+
+    fig = make_subplots(rows=1, cols=2,subplot_titles=(library_names[0].replace('_',' '),library_names[1].replace('_', ' ')),horizontal_spacing = 0.12)
+
+    fig1 = go.Bar(x=df0['-Log10(P-value)'],
+        y=df0['Term'],
+        orientation='h',
+        name=None,
+        showlegend=False,
+        marker={'color': np.array(df0['Mean Pearson Correlation']),'showscale':True,'opacity':0.8, 'coloraxis':'coloraxis1' },
+        text=df0['Term'],
+        insidetextanchor="start", 
+        textfont_size=15,
+        textposition='inside',
+        cliponaxis=True,
+        hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i><extra></extra>'.format(**rowData) for index, rowData in df0.iterrows()],
+        textangle=0,
+        textfont_color='black'
+        )
+
+
+
+    fig2 = go.Bar(x=df1['-Log10(P-value)'],
+        y=df1['Term'],
+        orientation='h',
+        name=None,
+        showlegend=False,
+        marker={'color': np.array(df1['Mean Pearson Correlation']),'showscale':True,'opacity':0.8,'coloraxis':'coloraxis2' },
+        text=df1['Term'],
+        insidetextanchor="start", 
+        textfont_size=15,
+        textposition='inside',
+        cliponaxis=True,
+        hovertemplate=['<b>Term:</b><i>{Term}</i><br><b>Mean Pearson Correlation:</b> <i>{Mean Pearson Correlation:.3}</i><br><b>P-value:</b> <i>{P-value:.5}</i><br><b>-Log10(P-value):</b> <i>{-Log10(P-value):.5}</i><extra></extra>'.format(**rowData) for index, rowData in df1.iterrows()],
+        textangle=0,
+        textfont_color='black'
+        )
+
+    
+    fig.add_trace(fig1, row=1, col=1)
+    fig.add_trace(fig2, row=1, col=2)
+    fig.layout.coloraxis1.colorbar.x = 0.46
+    fig['layout'].update({'plot_bgcolor': 'rgba(0, 0, 0, 0)'},width=1200,height=800,uniformtext_minsize=10, uniformtext_mode='show', coloraxis=dict(colorscale=color0, colorbar_x=0.46, colorbar_thickness=23, colorbar_title='MPC'),coloraxis2=dict(colorscale=color1, colorbar_thickness=23,colorbar_title='MPC'))
+    fig['layout']['yaxis1'].update(showticklabels=False)
+    fig['layout']['yaxis2'].update(showticklabels=False)
+    fig['layout']['xaxis1'].update(title='-log10(p-value)')
+    fig['layout']['xaxis2'].update(title='-log10(p-value)')
+
 
     fig.write_image(file_name+'_'+direction+".png")
     fig.write_image(file_name+'_'+direction+".svg")
     fig.write_image(file_name+'_'+direction+".pdf")
+    
+        
 
     iplot(fig)
-
 
 def str_to_int(string, mod):
     string = re.sub(r"\([^()]*\)", "", string).strip()
