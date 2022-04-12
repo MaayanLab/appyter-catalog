@@ -154,11 +154,24 @@ def setup_cli():
   ''' This will be used to setup the docker image
   '''
   import tempfile
+  from subprocess import run
   click.echo('Loading `appyter.json`...')
   appyter = json.load(open('/app/appyter.json', 'r'))
   #
   click.echo('Inserting appyter info into ipynb...')
   insert_info(appyter['appyter']['file'], appyter)
+  #
+  click.echo('Generating appyter.cwl...')
+  with open('appyter.cwl', 'w') as fw:
+    assert run(
+      [
+        'appyter', 'nbinspect', 'cwl',
+        '-i', '/app/appyter.json',
+        appyter['appyter']['file'],
+      ],
+      stdout=fw,
+      stderr=sys.stderr,
+    ).returncode == 0
   #
   click.echo('Testing appyter override...')
   # this will perform merge_j2_directories *now* at docker build time
