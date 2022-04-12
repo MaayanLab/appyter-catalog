@@ -87,7 +87,6 @@ services:
       APPYTER_HOST: "0.0.0.0"
       APPYTER_JOBS: "3"
       APPYTER_JOBS_PER_IMAGE: "1"
-      APPYTER_DISPATCH: "docker"
       APPYTER_DEBUG: "false"
     command:
       - appyter
@@ -195,9 +194,7 @@ services:
       - APPYTER_PORT=5000
       - APPYTER_PROXY=true
       - APPYTER_DATA_DIR=${APPYTERS_DATA_DIR}
-      - APPYTER_DISPATCHER=http://appyters-orchestrator:5000
-      - APPYTER_DISPATCHER_URL=http://appyter-{{ appyter['name'].lower() }}:5000/{{ appyter['name'] }}
-      - APPYTER_DISPATCHER_IMAGE=${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
+      - APPYTER_EXECUTOR=dispatch::http://appyters-orchestrator:5000#?params.executor=docker::${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/{{ appyter['name'] }}/`)"
