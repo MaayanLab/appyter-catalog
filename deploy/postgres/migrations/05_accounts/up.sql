@@ -14,26 +14,37 @@ create table "user" (
 alter table "user" enable row level security;
 create policy "user_policy" on "user"
   for all to "standard"
-  using ("id" = current_setting('request.jwt.claim.email', true))
-  with check ("id" = current_setting('request.jwt.claim.email', true));
+  using ("id" = current_setting('request.jwt.claim.email', false))
+  with check ("id" = current_setting('request.jwt.claim.email', false));
 
 -- ensure the user is registered in our database
-create or replace function "ensure_user"() returns void as
+create or replace function "ensure_user"() returns boolean as
 $$
+declare
+  email varchar;
 begin
-  insert into "public"."user" ("id", "metadata", "ts")
-  values (
-    current_setting('request.jwt.claim.email', true),
-    json_build_object(
-      'name', current_setting('request.jwt.claim.name', true)
-    ),
-    now()
-  )
-  on conflict ("id")
-  do nothing;
+  select nullif(current_setting('request.jwt.claim.email', true), '')
+  into email;
+
+  if email is not null then
+    insert into "public"."user" ("id", "metadata", "ts")
+    values (
+      email,
+      json_build_object(
+        'name', current_setting('request.jwt.claim.name', true)
+      ),
+      now()
+    )
+    on conflict ("id")
+    do nothing;
+    return true;
+  else
+    return false;
+  end if;
 end
 $$
 language 'plpgsql';
+grant execute on function "ensure_user"() to "guest";
 grant execute on function "ensure_user"() to "standard";
 
 -- save user configuration
@@ -55,7 +66,9 @@ $$
 declare
   _config json;
 begin
-  perform "ensure_user"();
+  if (select "ensure_user"() is false) then
+    raise exception 'Must be logged in to use user_config';
+  end if;
   if config is null then
     select uc."config"
     from "user_config" uc
@@ -103,16 +116,17 @@ begin
   on conflict ("id")
   do nothing;
 
-  perform "ensure_user"();
-
-  insert into "public"."user_file" ("file", "filename")
-  values ($1, $2)
-  on conflict ("user", "file", "filename")
-  do nothing;
+  if (select "ensure_user"()) then
+    insert into "public"."user_file" ("file", "filename")
+    values ($1, $2)
+    on conflict ("user", "file", "filename")
+    do nothing;
+  end if;
 end
 $$
 language 'plpgsql'
 security definer;
+grant execute on function "api"."add_file"(varchar, varchar, jsonb) to "guest";
 grant execute on function "api"."add_file"(varchar, varchar, jsonb) to "standard";
 
 create or replace view "api"."user_file" as
@@ -131,8 +145,8 @@ create or replace function api_user_file_delete()
 returns trigger as
 $$
 begin
-  delete from "public"."user_file"
-  where "public"."user_file".id = old."id";
+  delete from "public"."user_file" uf
+  where uf.id = old."id";
   return new;
 end
 $$
@@ -147,7 +161,7 @@ execute procedure api_user_file_delete();
 
 create table "user_instance" (
   "id" uuid default uuid_generate_v4(),
-  "user" varchar default current_setting('request.jwt.claim.email', true),
+  "user" varchar default current_setting('request.jwt.claim.email', false),
   "instance" varchar,
   "ts" timestamp default now(),
   "metadata" jsonb,
@@ -159,8 +173,8 @@ create table "user_instance" (
 alter table "user_instance" enable row level security;
 create policy "user_instance_policy" on "user_instance"
   for all to "standard"
-  using ("user" = current_setting('request.jwt.claim.email', true))
-  with check ("user" = current_setting('request.jwt.claim.email', true));
+  using ("user" = current_setting('request.jwt.claim.email', false))
+  with check ("user" = current_setting('request.jwt.claim.email', false));
 
 create or replace view "api"."user_instance" as
 select
@@ -201,14 +215,15 @@ begin
   on conflict ("id")
   do nothing;
 
-  perform "ensure_user"();
-
-  insert into "public"."user_instance" ("instance")
-  values ("add_instance"."instance")
-  on conflict ("user", "instance")
-  do nothing;
+  if (select "ensure_user"()) then
+    insert into "public"."user_instance" ("instance")
+    values ("add_instance"."instance")
+    on conflict ("user", "instance")
+    do nothing;
+  end if;
 end
 $$
 language 'plpgsql'
 security definer;
+grant execute on function "api"."add_instance"(varchar, jsonb) to "guest";
 grant execute on function "api"."add_instance"(varchar, jsonb) to "standard";
