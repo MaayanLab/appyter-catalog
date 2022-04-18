@@ -13,9 +13,10 @@ create table "user" (
 );
 alter table "user" enable row level security;
 create policy "user_policy" on "user"
-  for all to "standard"
+  for all
   using ("id" = current_setting('request.jwt.claim.email', false))
   with check ("id" = current_setting('request.jwt.claim.email', false));
+grant all on "user" to "standard";
 
 -- ensure the user is registered in our database
 create or replace function "ensure_user"() returns boolean as
@@ -59,6 +60,7 @@ create policy "user_config_policy" on "user_config"
   for all to "standard"
   using ("user" = current_setting('request.jwt.claim.email', true))
   with check ("user" = current_setting('request.jwt.claim.email', true));
+grant all on "user_config" to "standard";
 
 -- end point for fetching/writing user config
 create or replace function "api"."user_config"(config json) returns json as
@@ -74,6 +76,12 @@ begin
     from "user_config" uc
     where uc."user" = current_setting('request.jwt.claim.email', true)
     into _config;
+
+    if _config is null then
+      insert into "public"."user_config" ("config")
+      values ('{}'::json);
+      _config := '{}'::json;
+    end if;
   else
     insert into "public"."user_config" ("user", "config")
     values (current_setting('request.jwt.claim.email', true), "config")
@@ -101,10 +109,11 @@ create table "user_file" (
   foreign key ("file") references "file" ("id")
 );
 alter table "user_file" enable row level security;
-create policy "user_file_policy" on "user_file"
-  for all to "standard"
+create policy "user_file_policy" on "user_file" for all
   using ("user" = current_setting('request.jwt.claim.email', true))
   with check ("user" = current_setting('request.jwt.claim.email', true));
+grant all on "user_file" to "standard";
+grant select on "file" to "standard";
 
 create or replace function "api"."add_file"("file" varchar, "filename" varchar, "metadata" jsonb)
 returns void as
@@ -171,10 +180,11 @@ create table "user_instance" (
   foreign key ("instance") references "instance" ("id")
 );
 alter table "user_instance" enable row level security;
-create policy "user_instance_policy" on "user_instance"
-  for all to "standard"
+create policy "user_instance_policy" on "user_instance" for all
   using ("user" = current_setting('request.jwt.claim.email', false))
   with check ("user" = current_setting('request.jwt.claim.email', false));
+grant all on "user_instance" to "standard";
+grant select on "instance" to "standard";
 
 create or replace view "api"."user_instance" as
 select
