@@ -101,7 +101,7 @@
         <div class="card-body">
           <h3 class="card-title">{appyter.title}</h3>
           <div class="d-flex flex-row flex-nowrap pt-1 pb-2">
-            <div class="d-flex flex-column pr-2">
+            <div class="d-flex flex-column pe-2">
             {#if appyter.views }
               <div class="text-grey text-nowrap">
                 Views: {appyter.views}
@@ -113,7 +113,7 @@
               </div>
             {/if}
             </div>
-            <div class="d-flex flex-column pl-2">
+            <div class="d-flex flex-column ps-2">
               {#if appyter.form_views }
                 <div class="text-grey text-nowrap">
                 Starts: {appyter.form_views}
