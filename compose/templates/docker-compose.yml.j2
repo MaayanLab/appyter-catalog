@@ -222,6 +222,7 @@ services:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
       - APPYTER_PORT=5000
       - APPYTER_PROXY=true
+      - APPYTER_PUBLIC_URL=http{% if tls %}s{% endif %}://${SERVER_NAME}/{{ appyter['name'] }}/
       - APPYTER_DATA_DIR=${APPYTERS_DATA_DIR}
       - APPYTER_EXECUTOR=dispatch::http://appyters-orchestrator:5000#?params.executor=docker::${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     labels:
