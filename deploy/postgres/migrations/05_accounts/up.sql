@@ -227,3 +227,21 @@ language 'plpgsql'
 security definer;
 grant execute on function "api"."add_instance"(varchar, jsonb) to "guest";
 grant execute on function "api"."add_instance"(varchar, jsonb) to "standard";
+
+create view "orphaned_file" as
+select *
+from "file" f
+where not exists (
+  select 1
+  from "user_file" uf
+  where uf."file" = f."id"
+);
+
+create view "orphaned_instance" as
+select *
+from "instance" i
+where not exists (
+  select 1
+  from "user_instance" ui
+  where ui."instance" = i."id"
+);
