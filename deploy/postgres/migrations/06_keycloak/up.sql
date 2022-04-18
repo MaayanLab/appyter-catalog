@@ -1,1 +1,1 @@
-drop schema keycloak;
+create schema keycloak;

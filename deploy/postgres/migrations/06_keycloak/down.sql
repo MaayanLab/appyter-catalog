@@ -1,1 +1,1 @@
-delete schema keycloak;
+drop schema keycloak;
