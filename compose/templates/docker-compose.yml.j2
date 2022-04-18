@@ -216,7 +216,7 @@ services:
     #  - appyters-ingress
     #  - appyters-orchestrator
 {%- if minio %}
-      - appyters-s3
+    #  - appyters-s3
 {%- endif %}
     environment:
       - APPYTER_PREFIX=/{{ appyter['name'] }}/
