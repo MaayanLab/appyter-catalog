@@ -76,7 +76,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        data: JSON.stringify({
+        body: JSON.stringify({
           pageurl: window._config.CATALOG_ORIGIN + '/' + window._config.CATALOG_APP_NAME + (view !== undefined ? ('#' + view) : ''),
         }),
       }).catch(function (e) {
@@ -89,7 +89,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        data: JSON.stringify(error),
+        body: JSON.stringify(error),
       }).catch(function (e) {
         console.error(e)
       })
