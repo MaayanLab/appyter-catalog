@@ -68,12 +68,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`${SERVER_NAME}`)"
       - "traefik.http.services.app.loadbalancer.server.port=80"
-    logging: *default-logging
 {%- if tls %}
       - "traefik.http.routers.app.tls=true"
       - "traefik.http.routers.app.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.app.tls.domains[0].main=${SERVER_NAME}"
 {% endif %}
+    logging: *default-logging
   appyters-orchestrator:
     build:
       context: ./appyter
@@ -234,6 +234,6 @@ services:
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls=true"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${SERVER_NAME}"
-    logging: *default-logging
 {% endif %}
+    logging: *default-logging
 {%- endfor %}
