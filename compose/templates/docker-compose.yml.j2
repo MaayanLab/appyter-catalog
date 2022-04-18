@@ -61,9 +61,9 @@ services:
     build: ./app
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-catalog:{{ version }}
     restart: unless-stopped
-    depends_on:
-      - appyters-ingress
-      - appyters-postgrest
+    #depends_on:
+    #  - appyters-ingress
+    #  - appyters-postgrest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`${SERVER_NAME}`)"
@@ -99,9 +99,9 @@ services:
     build: ./deploy/postgrest
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-postgrest:{{ version }}
     restart: unless-stopped
-    depends_on:
-      - appyters-ingress
-      - appyters-postgres
+    #depends_on:
+    #  - appyters-ingress
+    #  - appyters-postgres
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.postgrest.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/postgrest`)"
@@ -141,8 +141,8 @@ services:
     build: ./deploy/minio
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-s3:{{ version }}
     restart: unless-stopped
-    depends_on:
-      - appyters-ingress
+    #depends_on:
+    #  - appyters-ingress
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.s3.rule=Host(`s3.${SERVER_NAME}`) || (Host(`${SERVER_NAME}`) && PathPrefix(`/storage`))"
@@ -212,9 +212,9 @@ services:
     image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     command: appyter-catalog-helper entrypoint
     restart: unless-stopped
-    depends_on:
-      - appyters-ingress
-      - appyters-orchestrator
+    #depends_on:
+    #  - appyters-ingress
+    #  - appyters-orchestrator
 {%- if minio %}
       - appyters-s3
 {%- endif %}
