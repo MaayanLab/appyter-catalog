@@ -173,6 +173,35 @@ services:
       - ./data/minio/:/data
     logging: *default-logging
 {%- endif %}
+{%- if auth %}
+  appyters-auth:
+    build: ./deploy/keycloak
+    image: ${DOCKER_REGISTRY:-maayanlab}/appyters-auth:{{ version }}
+    restart: unless-stopped
+    environment:
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: "${KEYCLOAK_PASSWORD}"
+      KEYCLOAK_FRONTEND_URL: "${KEYCLOAK_URL}"
+      DB_VENDOR: postgres
+      DB_ADDR: appyters-postgres
+      DB_DATABASE: appyters
+      DB_SCHEMA: keycloak
+      DB_USER: appyters
+      DB_PASSWORD: "${POSTGRES_PASSWORD}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.appyters-auth.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/auth/`)"
+      - "traefik.http.services.appyters-auth.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.appyters-auth.headers.customrequestheaders.X-Forwarded-Proto=http"
+      - "traefik.http.routers.appyters-auth.middlewares=appyters-auth@docker"
+{%- if tls %}
+      - "traefik.http.routers.appyters-auth.tls=true"
+      - "traefik.http.routers.appyters-auth.tls.certresolver=letsencrypt-prod"
+      - "traefik.http.routers.appyters-auth.tls.domains[0].main=${SERVER_NAME}"
+{%- endif %}
+    logging: *default-logging
+{%- endif %}
 {%- for appyter in appyters %}
   appyter-{{ appyter['name'].lower() }}:
     build:
