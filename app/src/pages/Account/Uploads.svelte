@@ -114,7 +114,9 @@
       <tr>
         <td colspan="100%">
           {#if !count}
-            No uploads found.
+            <div class="text-center">
+              No uploads found.
+            </div>
           {:else}
             <ul class="pagination">
               <li class="page-item">

@@ -117,7 +117,9 @@
       <tr>
         <td colspan="100%">
           {#if !count}
-            No notebooks found.
+            <div class="text-center">
+              No notebooks found.
+            </div>
           {:else}
             <ul class="pagination">
               <li class="page-item">
