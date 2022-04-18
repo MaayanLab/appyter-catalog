@@ -19,7 +19,7 @@ def prepare_appyter(appyter_path, config):
   if os.path.exists(override_path):
     shutil.rmtree(override_path)
   shutil.copytree(
-    os.path.join(os.path.dirname(__file__), '..', 'override'),
+    os.path.join(os.path.dirname(__file__), '..', 'deploy/override'),
     os.path.join(appyter_path, 'override'),
   )
   shutil.copy(

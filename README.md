@@ -33,7 +33,7 @@ The appter-catalog does several things to permit integration of several independ
 4. PR is accepted if and only if the validation and manual review is passed
 5. `Makefile` can be used to facilitate the remaining steps
 6. Run `compose/build_dockerfile.py` for each appyter to inject `override`s, `catalog_helper`, and construct a Dockerfile for the `appyter`
-    1. When built, the files in `override` will be merged (using `compose/catalog_helper.py`) with the appyter's own `appyter` overrides
+    1. When built, the files in `deploy/override` will be merged (using `compose/catalog_helper.py`) with the appyter's own `appyter` overrides
 7. Run `compose/build_appyters.py` to build a unified `appyters.json` file, containing information about each appyter for the `app`
 8. Run `cd app && npm i && npm run build` to build the `app` (written in nodejs) with the most recently rendered `appyters.json`
 9. Run `compose/build_compose.py` to build a application wide `docker-compose.yml` which includes a unified proxy for serving all apps on one endpoint
