@@ -191,7 +191,7 @@ services:
       DB_PASSWORD: "${POSTGRES_PASSWORD}"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.appyters-auth.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/auth/`)"
+      - "traefik.http.routers.appyters-auth.rule=Host(`${SERVER_NAME}`) && PathPrefix(`/auth`)"
       - "traefik.http.services.appyters-auth.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.appyters-auth.headers.customrequestheaders.X-Forwarded-Proto=http"
       - "traefik.http.routers.appyters-auth.middlewares=appyters-auth@docker"
