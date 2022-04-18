@@ -76,7 +76,7 @@ services:
     logging: *default-logging
   appyters-orchestrator:
     build:
-      context: ./appyter
+      context: ./deploy/appyter
       args:
         - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${APPYTER_TAG:-v}${LIBRARY_VERSION}
     image: ${DOCKER_REGISTRY:-maayanlab}/appyters-orchestrator:{{ version }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
