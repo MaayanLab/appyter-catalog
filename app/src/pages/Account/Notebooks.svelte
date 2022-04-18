@@ -116,37 +116,41 @@
       {/each}
       <tr>
         <td colspan="100%">
-          <ul class="pagination">
-            <li class="page-item">
-              <button
-                class="btn page-link" style="background-color: inherit;"
-                aria-label="Previous"
-                class:disabled={offset === 0}
-                on:click={evt => {
-                  load_notebooks({ offset: Math.max(0, offset - limit), limit }).catch(e => console.error(e))
-                }}
-              >
-                <span aria-hidden="true">&laquo;</span>
-              </button>
-            </li>
-            <li class="page-item">
-              <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
-                Showing notebooks {offset+1} - {offset + notebooks.length} {#if count}of {count}{/if}
-              </span>
-            </li>
-            <li class="page-item">
-              <button
-                class="btn page-link" style="background-color: inherit;"
-                class:disabled={offset + limit >= count}
-                on:click={evt => {
-                  load_notebooks({ offset: Math.min(count - 1, offset + limit), limit }).catch(e => console.error(e))
-                }}
-                aria-label="Next"
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </button>
-            </li>
-          </ul>
+          {#if !count}
+            No notebooks found.
+          {:else}
+            <ul class="pagination">
+              <li class="page-item">
+                <button
+                  class="btn page-link" style="background-color: inherit;"
+                  aria-label="Previous"
+                  class:disabled={offset === 0}
+                  on:click={evt => {
+                    load_notebooks({ offset: Math.max(0, offset - limit), limit }).catch(e => console.error(e))
+                  }}
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </button>
+              </li>
+              <li class="page-item">
+                <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
+                  Showing notebooks {offset+1} - {offset + notebooks.length} of {count}
+                </span>
+              </li>
+              <li class="page-item">
+                <button
+                  class="btn page-link" style="background-color: inherit;"
+                  class:disabled={offset + limit >= count}
+                  on:click={evt => {
+                    load_notebooks({ offset: Math.min(count - 1, offset + limit), limit }).catch(e => console.error(e))
+                  }}
+                  aria-label="Next"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </button>
+              </li>
+            </ul>
+          {/if}
         </td>
       </tr>
     {/if}
