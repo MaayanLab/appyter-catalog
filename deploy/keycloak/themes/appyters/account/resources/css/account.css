@@ -30,6 +30,8 @@ header .navbar {
 .navbar-pf {
     background: white;
     color: black;
+    border: 0;
+    border-top: 0;
 }
 
 .navbar-pf .navbar-utility {
