@@ -194,6 +194,7 @@ select
   ui.metadata
 from "user_instance" ui
 inner join "instance" i on i."id" = ui."instance"
+where i.metadata is not null and i.metadata->'appyter' is not null
 ;
 alter view "api"."user_instance" owner to "standard";
 
