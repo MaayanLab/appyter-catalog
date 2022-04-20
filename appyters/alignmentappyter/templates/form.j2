@@ -1,0 +1,53 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+body {
+  font: 16px Arial;
+  text-align: center;
+}
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <div class="mt-3 row">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='xalign.png') }}" style="width:180px" class="img-fluid float-right">
+        </div>
+        <div class="col-7 text-left">
+          
+            <div>
+              This Appyter builds an alignment index for the specified species using the Ensembl database cDNA entries. Once the index is built the appyter will commence to generate transcript and gene level counts.
+              <br><br>
+              To start alignment, choose an alignment algorithm, species, and specify FASTQ file paths.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

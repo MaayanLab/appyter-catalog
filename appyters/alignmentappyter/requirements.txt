@@ -1,0 +1,5 @@
+jupyter
+matplotlib
+numpy
+pandas
+xalign @ git+https://github.com/Maayanlab/xalign.git
