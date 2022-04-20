@@ -203,7 +203,7 @@ returns trigger as
 $$
 begin
   delete from "public"."user_instance" ui
-  where ui.id = old."id"
+  where ui.id = old."id";
   return new;
 end
 $$
