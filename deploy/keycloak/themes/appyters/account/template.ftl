@@ -153,18 +153,21 @@
             <span class="text-muted">
               <a
                 href="/#/what-is-an-appyter/"
+                style="white-space: nowrap"
               >
                 What is an Appyter?
               </a>
                 |
               <a
                 href="/#/creating-appyters/"
+                style="white-space: nowrap"
               >
                 Creating Appyters
               </a>
               | 
               <a
                 href="/#/publishing-appyters/"
+                style="white-space: nowrap"
               >
                 Publishing Appyters
               </a>
@@ -174,26 +177,20 @@
               >
                 About
               </a>
-              | 
-              <a
-                href="/#/account/"
-              >
-                Account
-              </a>
-              <#if realm.internationalizationEnabled>
-                |
-                <div class="kc-dropdown" id="kc-locale-dropdown">
-                  <a href="#" id="kc-current-locale-link">${locale.current}</a>
-                  <ul>
-                    <#list locale.supported as l>
-                      <li class="kc-dropdown-item"><a href="${l.url}">${l.label}</a></li>
-                    </#list>
-                  </ul>
-                </div>
-              </#if>
               <#if referrer?has_content && referrer.url?has_content>
                 |
-                <a href="${referrer.url}" id="referrer" style="font-weight: 600">${msg("backTo",referrer.name)}</a>
+                <a
+                  href="${referrer.url}"
+                  id="referrer"
+                  style="font-weight: 600; white-space: nowrap"
+                >
+                  ${msg("backTo",referrer.name)}
+                </a>
+              <#else>
+                | 
+                <a href="/#/account/">
+                  Account
+                </a>
               </#if>
             </span>
           </div>
