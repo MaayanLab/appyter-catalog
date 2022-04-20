@@ -5,7 +5,8 @@ dash-table
 flask
 appyter @ git+https://github.com/Maayanlab/appyter
 geode @ git+https://github.com/Maayanlab/geode
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+
 ipython
 matplotlib
 matplotlib_venn

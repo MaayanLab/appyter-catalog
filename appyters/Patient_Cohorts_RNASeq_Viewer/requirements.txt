@@ -2,7 +2,8 @@ appyter @ git+https://github.com/Maayanlab/appyter
 requests
 pandas
 numpy
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+
 seaborn
 matplotlib
 umap-learn

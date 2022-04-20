@@ -1,5 +1,5 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
 numba==0.50.1
 ipykernel==5.3.4
 rpy2==3.4.2
