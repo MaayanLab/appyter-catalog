@@ -96,7 +96,7 @@
         <tr>
           <td>
             {#if upload.file.id.startsWith('storage://')}
-              <a href={upload.file.id.replace(/^storage:\/\//, '/storage/')} download={upload.filename}>{upload.filename}</a>
+              <a href={upload.file.id.replace(/^storage:\/\//, '/storage/appyters/')} download={upload.filename}>{upload.filename}</a>
             {:else}
               {upload.file.id}
             {/if}
