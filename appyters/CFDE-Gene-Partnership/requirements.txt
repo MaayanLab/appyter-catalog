@@ -1,4 +1,5 @@
 bokeh
+jinja2>=3.0,<3.1
 itables
 matplotlib
 numpy

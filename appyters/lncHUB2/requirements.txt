@@ -9,6 +9,7 @@ plotly
 ipython
 s3fs
 bokeh
+jinja2>=3.0,<3.1
 colorcet
 pyvis
 kaleido

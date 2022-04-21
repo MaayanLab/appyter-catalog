@@ -5,3 +5,4 @@ requests
 matplotlib
 ipython
 bokeh==2.0.2
+jinja2>=3.0,<3.1
