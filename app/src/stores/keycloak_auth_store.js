@@ -37,11 +37,11 @@ function keycloak_auth_store(keycloakProps) {
           set({ state: 'guest', keycloak })
         },
       })
-      const authenticated = await with_timeout(keycloak.init({
+      const authenticated = await with_timeout(keycloak.init, 5000)({
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
         redirectUri: window.location.href + (window.location.href.includes('?') ? '' : '?'),
-      }), 5000)
+      })
       set({
         state: authenticated ? 'auth' : 'guest',
         keycloak,
