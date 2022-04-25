@@ -1,10 +1,28 @@
 <script>
+  import { Modal } from 'bootstrap'
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
   import url_for from '@/utils/url_for'
   import human_size from '@/utils/human_size'
 
   const base_url = window.location.origin
+
+  let modalRef
+  let bsModal
+  let prompt_delete
+
+  $: if (modalRef) {
+    bsModal = new Modal(modalRef)
+    modalRef.addEventListener('hidden.bs.modal', () => prompt_delete = undefined)
+  }
+
+  $: if (bsModal !== undefined) {
+    if (prompt_delete !== undefined) {
+      bsModal.show()
+    } else {
+      bsModal.hide()
+    }
+  }
 
   let uploads
   let offset = 0
@@ -106,7 +124,7 @@
           <td class="text-center"><button
             class="btn btn-sm bg-danger text-white"
             on:click={() => {
-              delete_upload(upload.id).catch(e => console.error(e))
+              prompt_delete = upload
             }}
           >Delete</button></td>
         </tr>
@@ -157,5 +175,36 @@
 
   <div class="alert alert-primary">
     These are data files you've uploaded. Deleting a data file from this list will unlink it from your account it will then be subject for deletion as long as no other users have it linked.
+  </div>
+</div>
+
+<div bind:this={modalRef} class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure you want to delete this file?</h5>
+      </div>
+      <div class="modal-body">
+        {#if prompt_delete !== undefined}
+        <b>File ID:</b>&nbsp;
+        {#if prompt_delete.file.id.startsWith('storage://')}
+          <a href={prompt_delete.file.id.replace(/^storage:\/\//, '/storage/appyters/')} download={prompt_delete.filename}>{prompt_delete.filename}</a>
+        {:else}
+          {prompt_delete.file.id}
+        {/if}<br />
+        <b>Size:</b>&nbsp;{human_size(prompt_delete.file.metadata.size)}<br />
+        <b>Created:</b>&nbsp;{prompt_delete.ts}
+        {/if}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" on:click={() => {
+          delete_upload(prompt_delete.id).catch(e => console.error(e))
+          prompt_delete = undefined
+        }}>Delete</button>
+        <button type="button" class="btn btn-secondary" on:click={() => {
+          prompt_delete = undefined
+        }}>Cancel</button>
+      </div>
+    </div>
   </div>
 </div>

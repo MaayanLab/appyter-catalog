@@ -1,9 +1,27 @@
 <script>
+  import { Modal } from 'bootstrap'
   import auth from '@/stores/keycloak_auth_store'
   import Loader from '@/fragments/Loader.svelte'
   import url_for from '@/utils/url_for'
 
   const base_url = window.location.origin
+
+  let modalRef
+  let bsModal
+  let prompt_delete
+
+  $: if (modalRef) {
+    bsModal = new Modal(modalRef)
+    modalRef.addEventListener('hidden.bs.modal', () => prompt_delete = undefined)
+  }
+
+  $: if (bsModal !== undefined) {
+    if (prompt_delete !== undefined) {
+      bsModal.show()
+    } else {
+      bsModal.hide()
+    }
+  }
 
   let notebooks
   let offset = 0
@@ -113,7 +131,7 @@
           <td class="text-center"><button
             class="btn btn-sm bg-danger text-white"
             on:click={() => {
-              delete_notebook(notebook.id).catch(e => console.error(e))
+              prompt_delete = notebook
             }}
           >Delete</button></td>
         </tr>
@@ -164,5 +182,38 @@
 
   <div class="alert alert-primary">
     These are notebooks you've saved. Deleting a notebook from this list will unlink it from your account it will then be subject for deletion as long as no other users have it linked.
+  </div>
+</div>
+
+
+<div bind:this={modalRef} class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure you want to delete this notebook?</h5>
+      </div>
+      <div class="modal-body">
+        {#if prompt_delete !== undefined}
+        <b>Instance:</b>&nbsp;<a href={url_for({
+          path: `/${prompt_delete.instance.metadata.appyter.info.name}/${prompt_delete.instance.id}/`,
+          params: {
+            storage: prompt_delete.instance.metadata.storage,
+            executor: prompt_delete.instance.metadata.executor,
+          },
+        })}>{prompt_delete.instance.id}</a><br />
+        <b>Appyter:</b>&nbsp;<a href="/#/{prompt_delete.instance.metadata.appyter.info.name}">{prompt_delete.instance.metadata.appyter.info.title}</a> v{prompt_delete.instance.metadata.appyter.info.version}<br />
+        <b>Created:</b>&nbsp;{prompt_delete.ts}
+        {/if}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" on:click={() => {
+          delete_notebook(prompt_delete.id).catch(e => console.error(e))
+          prompt_delete = undefined
+        }}>Delete</button>
+        <button type="button" class="btn btn-secondary" on:click={() => {
+          prompt_delete = undefined
+        }}>Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
