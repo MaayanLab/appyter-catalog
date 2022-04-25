@@ -2,13 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "DrugShot",
   "title": "DrugShot",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "This appyter queries search terms in PubMed and returns a list of drugs that share PMIDs, with additional drugs prioritized from prediction matrices.",
   "image":"drugshot_logo.png",
   "authors": [
     {
       "name": "Eryk Kropiwnicki",
       "email": "eryk.kropiwnicki@icahn.mssm.edu"
+    },
+    {
+      "name": "Zhuorui (Sherry) Xie",
+      "email": "sxie04@gmail.com"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
@@ -21,7 +25,8 @@
     "profile": "biojupies",
     "extras": [
       "toc",
-      "toggle-code"
+      "toggle-code",
+      "hide-code"
     ]
   }
 }
