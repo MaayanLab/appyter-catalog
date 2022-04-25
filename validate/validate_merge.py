@@ -10,7 +10,7 @@ import traceback
 import jsonschema
 import urllib.request
 from fsspec.core import url_to_fs
-from appyter.ext.urllib import parse_file_uri
+from appyter.ext.urllib import URI
 from PIL import Image
 from subprocess import Popen, PIPE
 
@@ -205,9 +205,8 @@ def validate_appyter(appyter):
             logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
             early_stopping = True
           else:
-            uri_parsed = parse_file_uri(field_examples[default_file])
-            uri_parsed.fragment = default_file
-            default_args[file_field] = str(uri_parsed)
+            uri_parsed = URI(field_examples[default_file])
+            default_args[file_field] = str(uri_parsed.with_fragment(default_file))
       else:
         logger.warning(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
