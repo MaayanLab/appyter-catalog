@@ -71,8 +71,12 @@
   <h1>Notebooks</h1>
 
   <div class="d-flex justify-content-end py-2">
+    <a
+      class="btn bg-success text-white mx-1"
+      href="/#/"
+    >Create</a>
     <button
-      class="btn bg-primary text-white"
+      class="btn bg-primary text-white mx-1"
       on:click={() => load_notebooks({ offset, limit }).catch(e => console.error(e))}
     >Refresh</button>
   </div>
