@@ -244,6 +244,7 @@ def validate_appyter(appyter):
     '--security-opt', 'apparmor:unconfined',
     f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
     'appyter', 'nbexecute',
+    '--fuse=true',
     f"/data/{nbfile}",
   ], stdout=PIPE, stderr=sys.stderr) as p:
     procLogger = logger.getChild(f"appyter nbexecute {nbfile}")
