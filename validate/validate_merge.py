@@ -10,6 +10,7 @@ import traceback
 import jsonschema
 import urllib.request
 from fsspec.core import url_to_fs
+from appyter import __version__ as appyter_library_version
 from appyter.ext.urllib import URI
 from PIL import Image
 from subprocess import Popen, PIPE
@@ -82,9 +83,9 @@ def get_changed_appyters(github_action):
     assert appyterJson, f"Expected appyter.json modification for {appyter}"
     yield appyter
 
-def validate_appyter(appyter):
+def validate_appyter(appyter, library_version=appyter_library_version):
   logger = logging.getLogger(appyter)
-
+  #
   logger.info("Preparing temporary directory...")
   tmp_directory = os.path.realpath('.tmp')
   os.makedirs(tmp_directory, exist_ok=True)
@@ -149,9 +150,11 @@ def validate_appyter(appyter):
     print(prepare_appyter(os.path.join('appyters', appyter), config), file=fw)
   #
   logger.info("Building Dockerfile...")
+  appyter_tag = f"maayanlab/appyter-{config['name'].lower()}:{config['version']}-{library_version}"
   with Popen([
     'docker', 'build',
-    '-t', f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    '--build-arg', f"appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@v{library_version}",
+    '-t', appyter_tag,
     '.',
   ], cwd=os.path.join('appyters', appyter), stdout=PIPE, stderr=sys.stderr) as p:
     for line in filter(None, map(str.strip, map(bytes.decode, p.stdout))):
@@ -162,7 +165,7 @@ def validate_appyter(appyter):
   with Popen([
     'docker', 'run',
     '-e', 'APPYTER_PREFIX=', # hotfix because prefix is baked-in and necessary at production initialization time, but should be empty here
-    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    appyter_tag,
     'appyter', 'nbinspect',
     nbfile,
   ], stdout=PIPE, stderr=sys.stderr) as p:
@@ -221,7 +224,7 @@ def validate_appyter(appyter):
   with Popen([
     'docker', 'run',
     '-v', f"{tmp_directory}:/data",
-    "-i", f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    "-i", appyter_tag,
     'appyter', 'nbconstruct',
     f"--output=/data/{nbfile}",
     nbfile,
@@ -242,7 +245,7 @@ def validate_appyter(appyter):
     '--device', '/dev/fuse',
     '--cap-add', 'SYS_ADMIN',
     '--security-opt', 'apparmor:unconfined',
-    f"maayanlab/appyters-{config['name'].lower()}:{config['version']}",
+    appyter_tag,
     'appyter', 'nbexecute',
     '--fuse=true',
     f"/data/{nbfile}",
@@ -264,7 +267,8 @@ def validate_appyter(appyter):
 @click.command(help='Performs validation tests for all appyters that were changed when diffing against origin/main')
 @click.option('-v', '--verbose', count=True, default=0, help='How verbose this should be, more -v = more verbose')
 @click.option('--github-action', default=False, type=bool, is_flag=True, help='Use for receiving json on stdin from github actions')
-def validate_merge(github_action=False, verbose=0):
+@click.option('--library-version', envvar='LIBRARY_VERSION', default=appyter_library_version, type=str, help='The appyter library version to use')
+def validate_merge(github_action=False, verbose=0, library_version=appyter_library_version):
   logging.basicConfig(level=30 - (verbose*10))
   valid = True
   for appyter in get_changed_appyters(github_action):
@@ -277,7 +281,7 @@ def validate_merge(github_action=False, verbose=0):
       continue
     #
     try:
-      validate_appyter(appyter)
+      validate_appyter(appyter, library_version=library_version)
     except Exception as e:
       logger.error(str(e))
       logger.error(traceback.format_exc())
