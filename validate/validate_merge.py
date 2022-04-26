@@ -293,4 +293,10 @@ def validate_merge(github_action=False, verbose=0, library_version=appyter_libra
     sys.exit(1)
 
 if __name__ == '__main__':
+  try:
+    from dotenv import load_dotenv
+    load_dotenv()
+  except ImportError:
+    logging.warn("Install dotenv to load env from .env")
+  #
   validate_merge()
