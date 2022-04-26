@@ -27,9 +27,15 @@
   let offset = 0
   let limit = 10
   let count
+  let count_type = 'estimated'
 
   async function load_notebooks({ offset: _offset, limit: _limit }) {
     notebooks = undefined
+    if (count !== undefined && (_offset + limit) >= count) {
+      count_type = 'exact'
+    } else {
+      count_type = 'estimated'
+    }
     const res = await fetch(url_for({
       path: `${base_url}/postgrest/user_instance`,
       params: {
@@ -41,7 +47,7 @@
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Prefer': 'count=estimated',
+        'Prefer': `count=${count_type}`,
         'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
       },
     })
@@ -50,6 +56,7 @@
     notebooks = await res.json()
     if (notebooks.length < limit) {
       count = offset + notebooks.length
+      count_type = 'exact'
     } else {
       count = Number(res.headers.get('Content-Range').split('/')[1])
     }
@@ -158,7 +165,7 @@
               </li>
               <li class="page-item">
                 <span class="page-link text-black" style="background-color: inherit; border: 0;" aria-label="Next">
-                  Showing notebooks {offset+1} - {offset + notebooks.length} of {count}
+                  Showing notebooks {offset+1} - {offset + notebooks.length} of {#if count_type === 'estimated'}about {/if}{count}
                 </span>
               </li>
               <li class="page-item">
