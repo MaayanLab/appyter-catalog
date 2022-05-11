@@ -24,6 +24,9 @@
     "appyter": {
       "file": "xalign.ipynb",
       "profile": "biojupies",
+      "hints": [
+        "executor:cavatica"
+      ],
       "extras": [
         "toc",
         "toggle-code"
