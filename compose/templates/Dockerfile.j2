@@ -109,6 +109,9 @@ ENV APPYTER_IPYNB "{{ config['appyter']['file'] }}"
 {%- if 'profile' in config['appyter'] %}
 ENV APPYTER_PROFILE "{{ config['appyter']['profile'] }}"
 {%- endif %}
+{%- if 'hints' in config['appyter'] %}
+ENV APPYTER_HINTS '{{ json.dumps(config["appyter"]["hints"]) }}'
+{%- endif %}
 {%- if 'extras' in config['appyter'] %}
 ENV APPYTER_EXTRAS '{{ json.dumps(config["appyter"]["extras"]) }}'
 {%- endif %}
