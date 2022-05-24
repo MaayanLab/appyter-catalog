@@ -83,6 +83,13 @@
           "description": "The pre-made profile to base the appyter off of",
           "type": "string"
         },
+        "hints": {
+          "description": "Appyter operability hints or restrictions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "extras": {
           "description": "Any extras to enable in your appyter",
           "type": "array",
