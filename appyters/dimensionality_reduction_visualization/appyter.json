@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "dimensionality_reduction_visualization",
   "title": "PCA, t-SNE, UMAP Appyter",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An Appyter to perform visualization of a data matrix using PCA, t-SNE, and UMAP methods.",
   "image": "scatter_screenshot.png",
   "authors": [
@@ -19,7 +19,8 @@
     "3D",
     "interactive",
     "downloadable",
-    "Exploration"
+    "Exploration",
+    "Machine Learning"  
   ],
   "license": "CC-BY-NC-SA-4.0",
   "appyter": {
