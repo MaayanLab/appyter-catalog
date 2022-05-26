@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "Tumor_Gene_Target_Screener",
+  "title": "Tumor Gene Target Screener",
+  "version": "0.0.1",
+  "description": "An appyter for gene target screening of tumors",
+  "authors": [
+    {
+      "name": "Daniel J. B. Clarke",
+      "email": "danieljbclarkemssm@gmail.com"
+    }
+  ],
+  "image": "thumbnail.png",
+  "url": "https://github.com/maayanLab/appyter-catalog",
+  "tags": [
+    "RNA-seq",
+    "Differential Expression Analysis"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "public": false,
+  "appyter": {
+    "file": "Tumor_Gene_Target_Screener.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "toggle-code"
+    ]
+  }
+}
