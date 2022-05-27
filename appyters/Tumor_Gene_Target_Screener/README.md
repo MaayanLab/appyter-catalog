@@ -11,6 +11,6 @@ ARCHS4 provides access to gene counts from HiSeq 2000, HiSeq 2500 and NextSeq 50
 
 [1] Bosse, Kristopher R et al. "Identification of GPC2 as an Oncoprotein and Candidate Immunotherapeutic Target in High-Risk Neuroblastoma." Cancer cell vol. 32,3 (2017): 295-309.e12. <https://doi.org/10.1016/j.ccell.2017.08.003>
 
-[2] <http://www.gtexportal.org/>
+[2] Lonsdale, John, et al. "The genotype-tissue expression (GTEx) project." Nature genetics 45.6 (2013): 580-585. <https://doi.org/10.1038/ng.265>
 
 [3] Lachmann A, Torre D, Keenan AB, Jagodnik KM, Lee HJ, Wang L, Silverstein MC, Ma'ayan A. Massive mining of publicly available RNA-seq data from human and mouse. Nature Communications 9. Article number: 1366 (2018), <https://doi.org/10.1038/s41467-018-03751-6>
