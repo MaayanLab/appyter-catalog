@@ -7,4 +7,3 @@ pandas
 plotly
 qnorm
 rpy2
-seaborn
