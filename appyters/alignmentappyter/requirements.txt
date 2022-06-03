@@ -2,4 +2,4 @@ jupyter
 matplotlib
 numpy
 pandas
-xalign @ git+https://github.com/Maayanlab/xalign.git
+xalign @ git+https://github.com/Maayanlab/xalign.git@v0.1.66
