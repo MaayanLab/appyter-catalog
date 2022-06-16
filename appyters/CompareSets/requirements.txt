@@ -1,10 +1,10 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 ipython
-venn
 matplotlib
-requests
-tabulate
-scipy
-upsetplot
 plotly
+requests
+scipy
 supervenn
+tabulate
+upsetplot==0.6.1
+venn
