@@ -1,5 +1,4 @@
 import sh
-import re
 import os
 import json
 import glob
@@ -18,10 +17,10 @@ def get_appyters(appyter_path):
       appyter,
       path=path,
       long_description=open(os.path.join(path, 'README.md'), 'r').read(),
-      # find the oldest commit containing the appyter's appyter.json (follow for detecting renames)
+      # find the oldest commit containing the appyter's README (follow for detecting renames)
       creation_timestamp=str(sh.tail(
         sh.git.log(
-          '--follow', r'--pretty=format:%aI', '--', os.path.join(path, 'appyter.json'),
+          '--follow', r'--pretty=format:%aI', '--', os.path.join(path, 'README.md'),
           _tty_out=False,
         ),
         '-n1'
