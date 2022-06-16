@@ -8,6 +8,8 @@ The Genotype-Tissue Expression (GTEx) Project was supported by the Common Fund o
 
 ARCHS4 provides access to gene counts from HiSeq 2000, HiSeq 2500 and NextSeq 500 platforms for human and mouse experiments from GEO and SRA. [3] We processed ARCHS4 Version 11 to produce gene summary statistics.
 
+Immunotherapeutic candidates must have limited expression in normal tissues to be considered safe targets, so proteomic visualizations of the highly expressed genes in normal tissues may be useful in assessing gene candidacy. Proteomics data were obtained from the [Human Protein Atlas](https://www.proteinatlas.org/about/download) with IHC-based expression profiling and the [Human Proteome Map](https://www.humanproteomemap.org/download.php) with MS-based expression quantification. 
+
 
 [1] Bosse, Kristopher R et al. "Identification of GPC2 as an Oncoprotein and Candidate Immunotherapeutic Target in High-Risk Neuroblastoma." Cancer cell vol. 32,3 (2017): 295-309.e12. <https://doi.org/10.1016/j.ccell.2017.08.003>
 
