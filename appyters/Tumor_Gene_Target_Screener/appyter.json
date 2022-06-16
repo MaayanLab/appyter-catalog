@@ -2,12 +2,16 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "Tumor_Gene_Target_Screener",
   "title": "Tumor Gene Target Screener",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "An appyter for gene target screening of tumors",
   "authors": [
     {
       "name": "Daniel J. B. Clarke",
       "email": "danieljbclarkemssm@gmail.com"
+    },
+    {
+      "name": "Eden Z. Deng",
+      "email": "edenzdeng@gmail.com"
     }
   ],
   "image": "thumbnail.png",
