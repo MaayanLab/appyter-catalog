@@ -11,7 +11,7 @@
     }
   ],
   "image": "thumbnail.png",
-  "url": "https://github.com/maayanLab/scEnrichr",
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/scEnrichr",
   "tags": [
     "Enrichr",
     "scRNA-seq",
