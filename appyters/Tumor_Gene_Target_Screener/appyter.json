@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "Tumor_Gene_Target_Screener",
   "title": "Tumor Gene Target Screener",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "An appyter for gene target screening of tumors",
   "authors": [
     {
