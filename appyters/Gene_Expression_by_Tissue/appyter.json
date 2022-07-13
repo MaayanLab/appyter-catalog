@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+    "name": "Gene_Expression_by_Tissue",
+    "title": "Gene_Expression_by_Tissue",
+    "version": "0.0.1",
+    "description": "An appyter for viewing a gene's expression in tissue",
+    "authors": [
+      {
+        "name": "Giacomo Marino",
+        "email": "giacomobmarino@gmail.com"
+      }
+    ],
+    "image": "thumbnail.png",
+    "url": "https://github.com/maayanLab/appyter-catalog",
+    "tags": [
+      "RNA-seq",
+      "Expression Analysis"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "public": false,
+    "appyter": {
+      "file": "Gene_Expression_by_Tissue.ipynb",
+      "profile": "biojupies",
+      "extras": [
+        "toc",
+        "toggle-code"
+      ]
+    }
+  }
