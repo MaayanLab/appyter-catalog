@@ -3,7 +3,7 @@
     "name": "Gene_Expression_by_Tissue",
     "title": "Gene_Expression_by_Tissue",
     "version": "0.0.1",
-    "description": "An appyter for viewing a gene's expression in tissue",
+    "description": "An appyter for viewing a gene's expression in humans across cells and tissues",
     "authors": [
       {
         "name": "Giacomo Marino",
