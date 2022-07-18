@@ -1,14 +1,6 @@
 appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
 matplotlib
-matplotlib_venn
 numpy
 pandas
 plotly
-qnorm
-s3fs
-aiobotocore==2.1.1
-botocore==1.23.24
-kubernetes
-s3fs==2022.1.0
-supervisor
