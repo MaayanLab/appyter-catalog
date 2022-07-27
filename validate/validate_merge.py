@@ -22,6 +22,11 @@ def try_json_loads(s):
   except:
     s
 
+def ensure_list(v):
+  if v is None: return []
+  elif type(v) == list: return v
+  else: return [v]
+
 def get_changed_appyters_gh_action():
   ops = {
     'added': 'A',
@@ -188,30 +193,32 @@ def validate_appyter(appyter, library_version=appyter_library_version):
   file_fields = {
     field['args']['name']
     for field in inspect
-    if field['field'] == 'FileField'
+    if field['field'] in {'MultiFileField', 'FileField'}
   }
   early_stopping = False
   for file_field in file_fields:
     field_examples = field_args[file_field].get('examples', {})
-    default_file = default_args[file_field]
-    if default_file:
-      if default_file in field_examples:
-        if os.path.exists(os.path.join('appyters', appyter, field_examples[default_file])):
-          logger.info(f"Copying example file {default_file} from {field_examples[default_file]}...")
-          shutil.copyfile(os.path.join('appyters', appyter, field_examples[default_file]), os.path.join(tmp_directory, default_file))
-        else:
-          logger.info(f"Using example file {default_file} from {field_examples[default_file]}...")
-          try:
-            fs, fs_path = url_to_fs(field_examples[default_file])
-            assert fs.exists(fs_path), "file does not exist"
-          except AssertionError as e:
-            logger.warning(f"example file {default_file} from {field_examples[default_file]} resulted in error {str(e)}.")
-            early_stopping = True
+    default_files = ensure_list(default_args[file_field])
+    if default_files:
+      for default_file in default_files:
+        if default_file in field_examples:
+          default_file_path = field_examples[default_file].lstrip('/')
+          if os.path.exists(os.path.join('appyters', appyter, default_file_path)):
+            logger.info(f"Copying example file {default_file} from {default_file_path}...")
+            shutil.copyfile(os.path.join('appyters', appyter, default_file_path), os.path.join(tmp_directory, default_file))
           else:
-            uri_parsed = URI(field_examples[default_file])
-            default_args[file_field] = str(uri_parsed.with_fragment(default_file))
-      else:
-        logger.warning(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
+            logger.info(f"Using example file {default_file} from {default_file_path}...")
+            try:
+              fs, fs_path = url_to_fs(default_file_path)
+              assert fs.exists(fs_path), "file does not exist"
+            except AssertionError as e:
+              logger.warning(f"example file {default_file} from {default_file_path} resulted in error {str(e)}.")
+              early_stopping = True
+            else:
+              uri_parsed = URI(default_file_path)
+              default_args[file_field] = str(uri_parsed.with_fragment(default_file))
+        else:
+          logger.warning(f"default file isn't in examples, we won't know how to get it if it isn't available in the image")
     else:
       logger.warning(f"no default file is provided")
   #
