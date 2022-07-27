@@ -9,8 +9,6 @@ The Genotype-Tissue Expression (GTEx) Project was supported by the Common Fund o
 Proteomics data were obtained from the Human Protein Atlas [4] with IHC-based expression profiling, the Human Proteome Map [5] with MS-based expression quantification, and a GTEx proteome project [6] using TMT MS. 
 
 
-%%appyter markdown
-
 # References
 
 [1] Lonsdale, John, et al. "The genotype-tissue expression (GTEx) project." Nature genetics 45.6 (2013): 580-585. https://doi.org/10.1038/ng.265
