@@ -17,7 +17,7 @@
       "Expression Analysis"
     ],
     "license": "CC-BY-NC-SA-4.0",
-    "public": false,
+    "public": true,
     "appyter": {
       "file": "Gene_Expression_by_Tissue.ipynb",
       "profile": "biojupies",
