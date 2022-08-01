@@ -6,6 +6,7 @@ BiocManager::install("org.Mm.eg.db")
 
 BiocManager::install("ChIPseeker")
 
+BiocManager::install("TxDb.Hsapiens.UCSC.hg18.knownGene")
 BiocManager::install("TxDb.Hsapiens.UCSC.hg19.knownGene")
 BiocManager::install("TxDb.Hsapiens.UCSC.hg38.knownGene")
 BiocManager::install("TxDb.Mmusculus.UCSC.mm9.knownGene")
