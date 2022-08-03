@@ -2,7 +2,7 @@
 
 This Appyter is inspired by the work of Bosse, Kristopher R et al [1] which compared neurobastomas vs normal tissue in GTEx [2] to identify a promising candidate immunotherapeutic target.
 
-The goal is to allow rapid screening of targets with the help of normal tissue data from GTEx and GEO data through ARCHS4 [3], as well as single-cell data from Tabula Sapiens and the Human Cell Atlas. The Appyter takes input expression data (such as from a tumor) and attempts to rank significantly differentially expressed genes when compared with with either bulk RNA-seq data from GTEx or ARCHS4, or single-cell RNA-seq data from Tabula Sapiens or Human Cell Atlas, across all tissues.
+The goal is to allow rapid screening of targets with the help of normal tissue data from GTEx and GEO data through ARCHS4 [3], as well as single-cell data from Tabula Sapiens and the Human Cell Atlas. The Appyter takes tumor expression data and attempts to rank significantly differentially expressed genes when compared with with either bulk RNA-seq data from GTEx or ARCHS4, or single-cell RNA-seq data from Tabula Sapiens or Human Cell Atlas, across all tissues.
 
 The Genotype-Tissue Expression (GTEx) Project was supported by the Common Fund of the Office of the Director of the National Institutes of Health, and by NCI, NHGRI, NHLBI, NIDA, NIMH, and NINDS. [2] GTEx Version 8 gene counts was processed to produce gene summary statistics.
 
