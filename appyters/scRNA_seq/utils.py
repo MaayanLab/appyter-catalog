@@ -70,7 +70,7 @@ pd.set_option('display.max_rows', 1000)
 
 
 def check_files(fname):
-    if fname == "":
+    if not fname:
         raise IOError
     if fname.endswith(".txt") == False and fname.endswith(".csv") ==False and fname.endswith(".tsv")==False:
         raise IOError
@@ -102,12 +102,12 @@ def load_seurat_files(mtx_filename, gene_filename, barcodes_filename):
     return adata
 
 def load_metadata(adata, meta_data_filename, meta_class_column_name):
-    if meta_data_filename != "":
+    if meta_data_filename:
         if meta_data_filename.endswith(".csv"):
             meta_df = pd.read_csv(meta_data_filename, index_col=0)
         else:
             meta_df = pd.read_csv(meta_data_filename, sep="\t", index_col=0)
-        if meta_class_column_name == "":
+        if not meta_class_column_name:
             raise Exception ("Run time error: Please provide a proper column name for sample classes in metadata")
         try:
             check_df(meta_df, meta_class_column_name)
@@ -125,7 +125,7 @@ def load_metadata(adata, meta_data_filename, meta_class_column_name):
 
 def load_data(dataset_name, rnaseq_data_filename, mtx_data_filename, gene_data_filename, barcode_data_filename, meta_data_filename=None, meta_class_column_name=None, table_counter=1):
     adata = None
-    if rnaseq_data_filename != "":
+    if rnaseq_data_filename:
         check_files(rnaseq_data_filename)
         try:
             if rnaseq_data_filename.endswith(".csv"):
@@ -144,14 +144,14 @@ def load_data(dataset_name, rnaseq_data_filename, mtx_data_filename, gene_data_f
             Sample IDs in the expression data and the metadata should be matched")
 
         del expr_df
-    elif mtx_data_filename != "":
+    elif mtx_data_filename:
         adata = load_seurat_files(mtx_data_filename, gene_data_filename, barcode_data_filename)
     if adata is not None:
         # load meta data
         adata, meta_class_column_name = load_metadata(adata, meta_data_filename, meta_class_column_name)    
     
         # add batch info
-        if meta_class_column_name == "":
+        if not meta_class_column_name:
             meta_class_column_name = "batch"
         else:
             adata.obs = adata.obs.rename(columns={meta_class_column_name: 'class'})
@@ -1249,7 +1249,7 @@ def get_color_map(library_filenames, tmp_adata):
         for pred in prediction:
             pred = str(pred)
             cl_id_in_pred = pred.split(":")[-1]
-            if cl_id_in_pred == "": #if CL ID is None, use cell ontology name
+            if not cl_id_in_pred: #if CL ID is None, use cell ontology name
                 cl_id_in_pred = pred
 
             if cl_id_in_pred not in color_map_id_dict:
