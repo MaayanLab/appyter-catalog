@@ -15,9 +15,9 @@ export default function (_env, argv) {
     entry: './src/index.js',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'assets/js/[name].js',
-      chunkFilename: 'assets/js/[name].[contenthash:8].chunk.js',
-      assetModuleFilename: 'assets/media/[name].[hash:8].[ext]',
+      filename: 'assets/js/[name].[chunkhash:8].js',
+      chunkFilename: 'assets/js/[name].[chunkhash:8].chunk.js',
+      assetModuleFilename: 'assets/media/[name].[hash:8][ext]',
       publicPath: '/',
       library: {
         name: 'appyters',
