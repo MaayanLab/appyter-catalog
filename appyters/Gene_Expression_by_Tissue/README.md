@@ -2,7 +2,7 @@
 
 The Gene Expression across Cells and Tissues Appyter takes as input a human gene symbol to produce box plots that display its expression across human cell types and tissues at the mRNA and protein levels.
 
-This appyter utilizes normal tissue gene and protien expression from [GTEx](https://gtexportal.org/home/) [1], [ARCHS4](https://maayanlab.cloud/archs4/) [2], and the [Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/) [3], the [Human Protein Atlas](https://www.proteinatlas.org/about/download) [4], the [Human Proteome Map](https://www.humanproteomemap.org/download.php) [5], and the [GTEx proteome project](https://doi.org/10.1016/j.cell.2020.08.036) [6].
+This appyter utilizes normal tissue gene and protein expression from [GTEx](https://gtexportal.org/home/) [1], [ARCHS4](https://maayanlab.cloud/archs4/) [2], and the [Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/) [3], the [Human Protein Atlas](https://www.proteinatlas.org/about/download) [4], the [Human Proteome Map](https://www.humanproteomemap.org/download.php) [5], and the [GTEx proteome project](https://doi.org/10.1016/j.cell.2020.08.036) [6].
 
 GTEx Version 8 [1] and the ARCHS4 Version 11 [2] gene counts were processed to produce gene summary statistics for cell types and tissues. The Tabula Sapiens dataset [3] was processed to produce expression values for all human genes in 469 cell types from 456,101 single cells collected from 14 donors.
 
