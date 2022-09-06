@@ -4,3 +4,5 @@ matplotlib
 numpy
 pandas
 plotly
+s3fs
+h5py

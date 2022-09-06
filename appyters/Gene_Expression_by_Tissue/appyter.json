@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
     "name": "Gene_Expression_by_Tissue",
     "title": "Gene Expression across Cells and Tissues",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "An appyter for viewing a gene's expression in humans across cells and tissues",
     "authors": [
       {
