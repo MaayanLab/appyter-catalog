@@ -1,25 +1,28 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
-  "name": "Reactome_Harmonizome_ETL",
-  "title": "Harmonizome ETL: Reactome",
-  "version": "0.1.3",
-  "description": "An appyter to process data from Reactome for the Harmonizome.",
-  "image": "ETL_Logo.png",
-  "authors": [
-    {
-      "name": "Charles R. Dai",
-      "email": "charles.r.dai@gmail.com"
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+    "name": "Reactome_Harmonizome_ETL",
+    "title": "Harmonizome ETL: Reactome",
+    "version": "0.1.4",
+    "description": "An appyter to process data from Reactome for the Harmonizome.",
+    "image": "ETL_Logo.png",
+    "authors": [
+      {
+        "name": "Charles R. Dai",
+        "email": "charles.r.dai@gmail.com"
+      }, {
+        "name": "Ido Diamant",
+        "email": "ido.diamant@mssm.edu"
+      }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog/appyters/Reactome_Harmonizome_ETL",
+    "tags": [
+      "Harmonizome",
+      "ETL Script",
+      "Reactome"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "appyter": {
+      "file": "Reactome.ipynb",
+      "profile": "biojupies"
     }
-  ],
-  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
-  "tags": [
-    "Harmonizome",
-    "ETL Script",
-    "Reactome"
-  ],
-  "license": "CC-BY-NC-SA-4.0",
-  "appyter": {
-    "file": "Reactome.ipynb",
-    "profile": "biojupies"
-  }
 }
