@@ -15,6 +15,41 @@ from appyter.ext.urllib import URI
 from PIL import Image
 from subprocess import Popen, PIPE
 
+class BufferedLog:
+  ''' A logger wrapper which saves a buffer and dumps debugging messages in the buffer when necessary
+  (after an exception, we get more detailed information leading up to the exception)
+  '''
+  def __init__(self, logger=logging.getLogger(), buffer_size=25):
+    self.logger = logger
+    self.buffer = []
+    self.buffer_size = buffer_size
+  
+  def log(self, level, msg):
+    self.logger.log(level, msg)
+    self.buffer.append((level, msg))
+    while len(self.buffer) >= self.buffer_size:
+      self.buffer.pop(0)
+
+  def debug(self, msg):
+    self.log(logging.DEBUG, msg)
+  def info(self, msg):
+    self.log(logging.INFO, msg)
+  def warning(self, msg):
+    self.log(logging.WARNING, msg)
+  def error(self, msg):
+    self.log(logging.ERROR, msg)
+
+  def getChild(self, child):
+    return BufferedLog(logger=self.logger.getChild(child), buffer_size=self.buffer_size)
+
+  def replay_buffer(self, replay_level=logging.DEBUG):
+    current_level = self.logger.getEffectiveLevel()
+    self.logger.setLevel(replay_level)
+    for level, msg in self.buffer:
+      if level < current_level and level >= replay_level:
+        self.logger.log(level, msg)
+    self.logger.setLevel(current_level)
+
 def try_json_loads(s):
   import json
   try:
@@ -88,9 +123,7 @@ def get_changed_appyters(github_action):
     assert appyterJson, f"Expected appyter.json modification for {appyter}"
     yield appyter
 
-def validate_appyter(appyter, library_version=appyter_library_version):
-  logger = logging.getLogger(appyter)
-  #
+def validate_appyter(appyter, library_version=appyter_library_version, logger=logging.getLogger()):
   logger.info("Preparing temporary directory...")
   tmp_directory = os.path.realpath('.tmp')
   os.makedirs(tmp_directory, exist_ok=True)
@@ -279,7 +312,7 @@ def validate_merge(github_action=False, verbose=0, library_version=appyter_libra
   logging.basicConfig(level=30 - (verbose*10))
   valid = True
   for appyter in get_changed_appyters(github_action):
-    logger = logging.getLogger(appyter)
+    logger = BufferedLog(logging.getLogger(appyter))
     if not os.path.exists(os.path.join('appyters', appyter)):
       logger.info(f"{appyter} directory no longer exists, ignoring")
       continue
@@ -288,8 +321,9 @@ def validate_merge(github_action=False, verbose=0, library_version=appyter_libra
       continue
     #
     try:
-      validate_appyter(appyter, library_version=library_version)
+      validate_appyter(appyter, library_version=library_version, logger=logger)
     except Exception as e:
+      logger.replay_buffer()
       logger.error(str(e))
       logger.error(traceback.format_exc())
       valid = False
