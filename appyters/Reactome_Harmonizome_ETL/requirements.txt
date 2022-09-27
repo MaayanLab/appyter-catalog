@@ -1,14 +1,14 @@
 anndata
 appyter @ git+https://github.com/MaayanLab/appyter
 bokeh
-harmonizome-helper @ git+https://github.com/MaayanLab/ETL-appyter-utilities
+harmonizome-helper @ git+https://github.com/MaayanLab/ETL-appyter-utilities@v0.2.2
 IPython
 leidenalg
 matplotlib
 numpy
 pandas
 scanpy
-sklearn
+scikit-learn
 statsmodels
 tqdm
 xlrd
