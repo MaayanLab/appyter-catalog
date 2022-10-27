@@ -2,13 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "lncHUB2",
   "title": "lncHUB2",
-  "version": "0.1.2",
-  "description": "An appyter that facilitates the discovery of biological functions for 15,862 lncRNAs.",
+  "version": "0.2.0",
+  "description": "An appyter that facilitates the discovery of biological functions for 18,705 human and 11,274 mouse lncRNAs.",
   "image": "lncRNA_appyter_logo.png",
   "authors": [
     {
       "name": "Megan L. Wojciechowicz",
       "email": "megan.wojciechowicz@icahn.mssm.edu"
+    },
+    {
+      "name": "Giacomo B. Marino",
+      "email": "giacomo.marino@mssm.edu"
     }
   ],
   "url": "https://github.com/MaayanLab/appyter-catalog",
