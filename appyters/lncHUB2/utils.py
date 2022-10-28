@@ -11,7 +11,7 @@ import plotly.graph_objs as go
 from bokeh.plotting import figure, show
 from bokeh.models import HoverTool, CustomJS, ColumnDataSource, Select, Legend, Paragraph, LinearColorMapper, ColorBar, CategoricalColorMapper
 from bokeh.layouts import row, column
-from bokeh.palettes import Pastel2, Set2, Set1, Colorblind
+from bokeh.palettes import Pastel2, Set2, Set1, Colorblind, Reds256
 from bokeh.models import Arrow, NormalHead
 import hashlib
 import colorcet as cc
@@ -267,9 +267,9 @@ def str_to_int(string, mod):
 
 def plot_scatter(x,y,values,query,title,min_val,max_val,arrow_loc,rank,filename):
     fig = plt.figure(figsize=(20,15))
-    plt.scatter(x, y, s=6, c=values, cmap=plt.cm.get_cmap('seismic'), vmin = min_val, vmax = max_val)
+    plt.scatter(x, y, s=6, c=values, cmap=plt.cm.get_cmap('Reds'), vmin = min_val, vmax = max_val)
     cb = plt.colorbar()
-    cb.set_label(label='Z-score',fontsize=20)
+    cb.set_label(label='Median Expression',fontsize=20)
     cb.ax.tick_params(labelsize=15) 
     plt.xlabel('UMAP 1',fontsize=30)
     plt.ylabel('UMAP 2',fontsize=30)
@@ -293,7 +293,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     min_val = np.min([np.min(values_dict[option]) for option in values_dict.keys()])
     max_val_round = np.ceil(np.max([np.abs(max_val),np.abs(min_val)]))
     max_val = max_val_round
-    min_val = np.negative(max_val_round)
+    min_val = 0
 
     # init plot 
     source = ColumnDataSource(data=dict(x=umap_df["x"], y=umap_df["y"], values=values_dict[first_selection], names=sample_names))
@@ -308,7 +308,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     if category == True:
         unique_category_dict = dict()
         for option in option_list:
-            unique_category_dict[option] = sorted(list(set(values_dict[option])))
+            unique_category_dict[option] = sorted(values_dict[option])
         
         # map category to color
         # color is mapped by its category name 
@@ -357,17 +357,18 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     else:
         unique_category_dict = dict()
         for option in option_list:
-            unique_category_dict[option] = sorted(list(set(values_dict[option])))
+            unique_category_dict[option] = sorted(values_dict[option])
         
         # map category to color
         # color is mapped by its category name 
         # if a color is used by other categories, use another color
         colors_dict = dict()
         for key in values_dict.keys():
-            colors_dict[key]= cc.CET_D1A
-
+            colors_dict[key]= list(Reds256)[::-1]
+        
         color_mapper = LinearColorMapper(palette=colors_dict[first_selection] , low=min_val, high=max_val)
         #color_mapper = LinearColorMapper(palette=colors_dict[first_selection] , low=min(values_dict[first_selection]), high=max(values_dict[first_selection]))
+
         color_bar = ColorBar(color_mapper=color_mapper)
         plot.add_layout(color_bar, 'right')
         scatter = plot.scatter('x', 'y', size=node_size,  source=source, color={'field': 'values', 'transform': color_mapper})
@@ -381,7 +382,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     else:
         tooltips = [
             ("lncRNA", "@names"),
-            ("Z-score", "@values"),
+            ("Median Expression", "@values"),
         ]
     
     if highlight_query!=None:
@@ -404,7 +405,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     plot.xaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
     plot.yaxis.major_label_text_font_size = '0pt'  # preferred method for removing tick labels
 
-    plot.add_layout(Title(text="Z-score", align="left",standoff=0,offset=110), "right")
+    plot.add_layout(Title(text="Median Expression", align="left",standoff=0,offset=110), "right")
 
     # Save static images 
     for static_image_i,static_image in enumerate(static_images_save):
@@ -443,7 +444,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
             """)
             #plot.height = 1000+10*(category_list_dict[val].length)
         else:
-            if len(option_list) >0:
+            if len(option_list) > 0:
                 callback_adt = CustomJS(args=dict(source=source, \
                                                 pre=pre, \
                                                 values_dict=values_dict, \
@@ -493,19 +494,25 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
     # output_file(filename=file_path+highlight_query+'_dynamic_umap.html', title=highlight_query)
     # save(col)
 
+def check_chrom(chr):
+    if len(chr) > 3:
+        return 'NA'
+    return chr
+
 # Interactive network visualization
-def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
-    
+def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES, path):
+
     s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
-    edge_matrix = load_npz(s3.open('storage/lncRNA_Appyter/v0.0.6/network_edges.npz', 'rb'))
+    edge_matrix = load_npz(s3.open(f'storage/lncRNA_Appyter/{path}network_edges.npz', 'rb'))
 
     # Import chromosome location metadata
-    chr_loc = pd.read_csv(s3.open('storage/lncRNA_Appyter/v0.0.6/mart_export.txt','rb'),sep='\t')
+    chr_loc = pd.read_csv(s3.open(f'storage/lncRNA_Appyter/{path}mart_export.txt','rb'),sep='\t')
     chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].astype(str)
+    chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].map(check_chrom)
     ensembl_2_chromsome = dict(zip(chr_loc['Gene stable ID'],chr_loc['Chromosome/scaffold name']))
 
     # Find chromosome locations for each node
-    ensembl_network = [GENES_2_ENSEMBL[x] for x in LNCRNA_COEXP[0:100].index]
+    ensembl_network = [GENES_2_ENSEMBL[x] for x in LNCRNA_COEXP[1:101].index]
     ensembl_network_loc = []
     for x in ensembl_network:
         try:
@@ -514,7 +521,8 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
             ensembl_network_loc.append('NA')
     
     # Node metadata
-    network = LNCRNA_COEXP[0:100]
+    network = LNCRNA_COEXP[1:101]
+
     #network.insert(1, 'Ensembl', ensembl_network, False)
     network.insert(1, 'Chromosome', ensembl_network_loc,False)
 
@@ -538,6 +546,8 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
         idx1 = idx_dict[symbol1]
         for symbol2 in network_genes_done:
             idx2 = idx_dict[symbol2]
+            if idx1==idx2:
+                continue
             c = edge_matrix[idx1,idx2]
             node1.append(symbol1)
             node2.append(symbol2)
@@ -554,7 +564,8 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
     all_edges_df = pd.DataFrame({"Node1":node1,'Node2':node2,'Correlation':edge_values})
     all_edges_df = all_edges_df[all_edges_df['Correlation']!=1].reset_index(drop=True) # remove self-correlations
     all_edges_df = all_edges_df[all_edges_df['Correlation']!=0].reset_index(drop=True) # remove correlations of 0
-    
+
+
     # Only keep the top n edges per node to start 
     idx_keep = []
     for symbol in list(network_genes)+list([QUERY]):
@@ -562,7 +573,7 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
         for idx in top_idx:
             idx_keep.append(idx)
     all_edges_df = all_edges_df.loc[sorted(np.unique(idx_keep))]
-    
+
     
     # Calculate the average edges per node in the network 
     average = []
@@ -570,6 +581,8 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
         sub_df = all_edges_df[(all_edges_df['Node1']==node) | (all_edges_df['Node2']==node)]
         average.append(len(sub_df))
     average = np.mean(average)
+
+
 
     # Prune the network
     # Remove edges from hub node one by one until the network has an average <3 edges per node
@@ -594,22 +607,24 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
             sub_df = all_edges_df[(all_edges_df['Node1']==node) | (all_edges_df['Node2']==node)]
             average_new.append(len(sub_df))
         average = np.mean(average_new)
+
         if n_hubs == 0:
             hub_node_n = hub_node_n-1
     all_edges_df= all_edges_df.reset_index(drop=True)
     
     # After pruning, add the top 5 edges for the lncRNA of interest regardless of the pruning step
     lncRNA_connections = all_edges_df[(all_edges_df['Node1']==QUERY)|(all_edges_df['Node2']==QUERY)]
-    for i,node in enumerate(LNCRNA_COEXP[0:5].index):
+    for i,node in enumerate(LNCRNA_COEXP[1:6].index):
         if node not in list(lncRNA_connections['Node1']):
             if node not in list(lncRNA_connections['Node2']):
-                    df_add = {'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i]}
-                    all_edges_df = all_edges_df.append(df_add, ignore_index=True)
+                    df_add = pd.DataFrame({'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i+1]}, index=[0])
+                    all_edges_df = pd.concat([all_edges_df, df_add])
 
 
     # If a node has no edges after pruning, remove it
     nodes_keep = np.unique(list(all_edges_df['Node1'])+list(all_edges_df['Node2']))
     nodes_keep = [x for x in nodes_keep if x!=QUERY]
+
     network = network.loc[nodes_keep]
     
     # Get hover titles for nodes
@@ -681,7 +696,6 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES):
 def get_bf_pvalues(bf_file, pval_file, query):
     
     s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
-
     f = h5.File(s3.open(bf_file, 'rb'), 'r') 
     data = f['data/mean_pearson_corr']
     cols = [x.decode('UTF-8') for x in f["meta/columns/terms"]]
