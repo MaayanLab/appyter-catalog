@@ -1,4 +1,3 @@
-from contextlib import redirect_stderr
 import requests
 import os,json
 import urllib.request
@@ -619,7 +618,7 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES, path):
         if node not in list(lncRNA_connections['Node1']):
             if node not in list(lncRNA_connections['Node2']):
                     df_add = {'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i+1]}
-                    all_edges_df = all_edges_df.append(df_add, ignore_index=True)
+                    all_edges_df = all_edges_df.concat(df_add, ignore_index=True)
 
 
     # If a node has no edges after pruning, remove it

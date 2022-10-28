@@ -1,4 +1,4 @@
-appyter @ git+https://github.com/Maayanlab/appyter
+appyter
 pandas
 numpy
 requests
@@ -9,7 +9,6 @@ plotly
 ipython
 s3fs
 bokeh
-jinja2>=3.0,<3.1
 colorcet
 pyvis
 kaleido
