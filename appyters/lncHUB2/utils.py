@@ -617,8 +617,8 @@ def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES, path):
     for i,node in enumerate(LNCRNA_COEXP[1:6].index):
         if node not in list(lncRNA_connections['Node1']):
             if node not in list(lncRNA_connections['Node2']):
-                    df_add = {'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i+1]}
-                    all_edges_df = all_edges_df.concat(df_add, ignore_index=True)
+                    df_add = pd.DataFrame({'Node1':node,'Node2':QUERY,'Correlation':LNCRNA_COEXP["Pearson's Correlation Coefficient"][i+1]}, index=[0])
+                    all_edges_df = pd.concat([all_edges_df, df_add])
 
 
     # If a node has no edges after pruning, remove it
