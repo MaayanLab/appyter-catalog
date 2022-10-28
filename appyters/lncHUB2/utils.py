@@ -503,10 +503,10 @@ def check_chrom(chr):
 def network_vis(QUERY,LNCRNA_COEXP,GENES_2_ENSEMBL,ROW_GENES, path):
 
     s3 = s3fs.S3FileSystem(anon=True, client_kwargs=dict(endpoint_url='https://s3.appyters.maayanlab.cloud'))
-    edge_matrix = load_npz(s3.open(f'storage/lncRNA_Appyter/v0.1.3/{path}network_edges.npz', 'rb'))
+    edge_matrix = load_npz(s3.open(f'storage/lncRNA_Appyter/{path}network_edges.npz', 'rb'))
 
     # Import chromosome location metadata
-    chr_loc = pd.read_csv(s3.open(f'storage/lncRNA_Appyter/v0.1.3/{path}mart_export.txt','rb'),sep='\t')
+    chr_loc = pd.read_csv(s3.open(f'storage/lncRNA_Appyter/{path}mart_export.txt','rb'),sep='\t')
     chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].astype(str)
     chr_loc['Chromosome/scaffold name'] = chr_loc['Chromosome/scaffold name'].map(check_chrom)
     ensembl_2_chromsome = dict(zip(chr_loc['Gene stable ID'],chr_loc['Chromosome/scaffold name']))
