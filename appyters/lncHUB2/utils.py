@@ -303,7 +303,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
         node_size = 4
     else:
         node_size = 6
-    plot = figure(plot_width=1000, plot_height=800,sizing_mode='scale_both')      
+    plot = figure(width=1000, height=800, sizing_mode='scale_both')      
  
     if category == True:
         unique_category_dict = dict()
