@@ -413,7 +413,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
  
 
     default_text = "Figure {}. {}{}"
-    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=10, style={"font-family":'Helvetica', "font-style": "italic"})
+    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=10, styles={"font-family":'Helvetica', "font-style": "italic"})
     figure_counter += 1
     if dropdown == True:
         if category == True:
