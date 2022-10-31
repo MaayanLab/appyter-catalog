@@ -83,7 +83,7 @@ def autorif_plot(df,query,path,show_cumulative_pubs=False):
     plt.ylabel('Publications',fontsize=20)
     plt.xticks(list(range(1992,2022)),fontsize=12, rotation=90)
     plt.yticks(fontsize=12)
-    plt.title(query,fontsize=25)
+    plt.title(query + ' mentions in publications over time',fontsize=20)
     plt.tight_layout()
     plt.savefig(path + '.png',facecolor='white',bbox_inches='tight', dpi = 300)
     plt.savefig(path + '.svg',facecolor='white',bbox_inches='tight')
