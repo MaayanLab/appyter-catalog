@@ -8,7 +8,7 @@ h5py
 plotly
 ipython
 s3fs
-bokeh
+bokeh==3.0.0
 colorcet
 pyvis
 kaleido
