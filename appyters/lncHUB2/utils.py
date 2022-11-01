@@ -83,7 +83,7 @@ def autorif_plot(df,query,path,show_cumulative_pubs=False):
     plt.ylabel('Publications',fontsize=20)
     plt.xticks(list(range(1992,2022)),fontsize=12, rotation=90)
     plt.yticks(fontsize=12)
-    plt.title(query,fontsize=25)
+    plt.title(query + ' mentions in publications over time',fontsize=20)
     plt.tight_layout()
     plt.savefig(path + '.png',facecolor='white',bbox_inches='tight', dpi = 300)
     plt.savefig(path + '.svg',facecolor='white',bbox_inches='tight')
@@ -303,7 +303,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
         node_size = 4
     else:
         node_size = 6
-    plot = figure(plot_width=1000, plot_height=800,sizing_mode='scale_both')      
+    plot = figure(width=1000, height=800, sizing_mode='scale_both')      
  
     if category == True:
         unique_category_dict = dict()
@@ -413,7 +413,7 @@ def plot_dynamic_scatter(umap_df, values_dict, option_list, sample_names, captio
  
 
     default_text = "Figure {}. {}{}"
-    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=10, style={"font-family":'Helvetica', "font-style": "italic"})
+    pre = Paragraph(text = default_text.format(figure_counter, caption_text, first_selection), width=1000, height=10, styles={"font-family":'Helvetica', "font-style": "italic"})
     figure_counter += 1
     if dropdown == True:
         if category == True:
