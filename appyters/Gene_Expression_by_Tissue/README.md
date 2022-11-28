@@ -22,5 +22,9 @@ Proteomics data were obtained from the Human Protein Atlas [4] with IHC-based ex
 [5] Kim, Min-Sik et al. “A draft map of the human proteome.” Nature vol. 509,7502 (2014): 575-81. https://doi.org/10.1038/nature13302
 
 [6] Jiang, Lihua et al. “A Quantitative Proteome Map of the Human Body.” Cell vol. 183,1 (2020): 269-283.e19. https://doi.org/10.1016/j.cell.2020.08.036
+
+[7] Tabula Muris Consortium et al. “Single-cell transcriptomics of 20 mouse organs creates a Tabula Muris.” Nature vol. 562,7727 (2018): 367-372. doi:10.1038/s41586-018-0590-4
+
+[8] Ghandi, Mahmoud et al. “Next-generation characterization of the Cancer Cell Line Encyclopedia.” Nature vol. 569,7757 (2019): 503-508. doi:10.1038/s41586-019-1186-3
         
     
