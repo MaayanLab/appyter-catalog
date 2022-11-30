@@ -5,9 +5,8 @@ appyter
 numpy
 pandas
 matplotlib
-sklearn
 seaborn
-scanpy[leiden]
+scanpy>=1.5.0[leiden]
 IPython
 bokeh
 jinja2>=3.0,<3.1
@@ -16,4 +15,3 @@ scipy
 qnorm
 MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE
 react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
