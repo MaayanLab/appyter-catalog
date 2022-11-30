@@ -6,7 +6,7 @@ numpy
 pandas
 matplotlib
 seaborn
-scanpy>=1.5.0[leiden]
+scanpy[leiden]
 IPython
 bokeh
 jinja2>=3.0,<3.1
