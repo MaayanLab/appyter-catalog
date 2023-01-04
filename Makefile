@@ -38,7 +38,7 @@ docker-compose.yml: compose/.build $(DOCKERFILES)
 app/public/appyters.json: compose/.build .env $(APPYTER_FILES)
 	$(PYTHON) compose/build_appyters.py > $@
 
-app/.build: app/package.json $$(call +s,$$(shell find app/public app/src -type f | sed 's/ /+/g'))
+app/.build: app/public/appyters.json docker-compose.yml app/package.json $$(call +s,$$(shell find app/public app/src -type f | sed 's/ /+/g'))
 	cd app && npm i && npm run build && cd .. && docker-compose build appyters-catalog && touch $@
 
 app/.publish: app/.build
