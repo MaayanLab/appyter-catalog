@@ -11,3 +11,4 @@ h5py
 tqdm
 pickle-mixin
 requests
+lightgbm==3.3.4
