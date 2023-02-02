@@ -7,3 +7,4 @@ pandas
 plotly
 qnorm
 rpy2
+scikit-learn
