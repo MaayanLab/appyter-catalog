@@ -1,7 +1,7 @@
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
-BiocManager::install(version = '3.9', ask = FALSE)
+BiocManager::install(version = '3.14', ask = FALSE)
 
 BiocManager::install("limma")
 
