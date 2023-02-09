@@ -1,13 +1,11 @@
 # Dataset Pair Attribute Similarity
 
-by Ido Diamant
-
 This appyter compares the similarity between two gene set libraries.
 
 The appyter creates two attribute similarity matrices from these libraries using two set similarity measures:
 
 * The [Jaccard Index](https://en.wikipedia.org/wiki/Jaccard_index) measures the degree of similarity between each gene set by comparing the sets' intersection over their union.
-* The [Fisher&#39;s Exact Test](https://en.wikipedia.org/wiki/Fisher%27s_exact_test) is a proportions test that measures the probability that two sets have a statistically significant overlap.
+* The Fisher's Exact Test is a proportions test that measures the probability that two sets have a statistically significant overlap.
 
 The appyter then creates: a gene set length histogram, a clustered heatmap of the Jaccard distance matrix, and a clustered heatmap of the Fisher's exact test distance matrix.
 
