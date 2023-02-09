@@ -1,0 +1,7 @@
+appyter @ git+https://github.com/MaayanLab/appyter
+fisher
+matplotlib
+numpy
+pandas
+scipy
+seaborn
