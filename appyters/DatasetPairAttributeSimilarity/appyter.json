@@ -1,0 +1,25 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+    "name": "DatasetPairAttributeSimilarity",
+    "title": "Dataset Pair Attribute Similarity",
+    "version": "0.0.1",
+    "description": "An appyter to compare similarity of attributes from two datasets.",
+    "image": "clustermap-icon.png",
+    "authors": [
+        {
+            "name": "Ido Diamant",
+            "email": "diamantido@gmail.com"
+        }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/DatasetPairAttributeSimilarity",
+    "tags": [
+        "Visualization",
+        "Gene Set Library",
+        "Compare Sets"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "appyter": {
+        "file": "DatasetPairAttributeSimilarity.ipynb",
+        "profile": "biojupies"
+    }
+}
