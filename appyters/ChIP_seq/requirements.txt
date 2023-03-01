@@ -1,5 +1,5 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 ipykernel
 rpy2
 pandas
@@ -8,7 +8,7 @@ plotly
 matplotlib
 scipy
 stats
-sklearn
+scikit-learn
 numpy
 chart_studio
 pybase64

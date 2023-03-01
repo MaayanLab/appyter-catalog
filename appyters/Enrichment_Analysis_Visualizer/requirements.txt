@@ -1,5 +1,5 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 pandas==1.3.2
 numpy==1.21.5
 seaborn==0.11.2

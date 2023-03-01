@@ -1,5 +1,5 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 
 pandas
 numpy
@@ -10,6 +10,6 @@ bokeh==2.3.2
 jinja2>=3.0,<3.1
 fastcluster
 scipy
-sklearn
+scikit-learn
 umap-learn
 seaborn

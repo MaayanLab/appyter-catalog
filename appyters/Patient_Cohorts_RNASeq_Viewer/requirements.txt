@@ -2,14 +2,14 @@ appyter @ git+https://github.com/Maayanlab/appyter
 requests
 pandas
 numpy
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.4.3
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 
 seaborn
 matplotlib
 umap-learn
 scipy
 qnorm
-sklearn
+scikit-learn
 plotly
 plotly_express
 jupyter-d3 @ git+https://github.com/nicolemoiseyev/jupyter-d3@v0.0.4

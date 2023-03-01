@@ -6,5 +6,5 @@ numpy
 pandas
 plotly
 scipy
-sklearn
+scikit-learn
 umap-learn
