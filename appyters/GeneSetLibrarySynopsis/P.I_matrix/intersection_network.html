@@ -2,10 +2,204 @@
     <head>
         <meta charset="utf-8">
         
-            <script src="lib/bindings/utils.js"></script>
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
             <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             
+            
+            
+            
+            
+            
+
         
 <center>
 <h1></h1>
@@ -88,8 +282,8 @@
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "NFATC1 human tf ARCHS4 coexpression", "label": "NFATC1 human tf ARCHS4 coexpression", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 7"}, {"color": "#97c2fc", "id": "NFATC1 human", "label": "NFATC1 human", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 11"}, {"color": "#97c2fc", "id": "NFATC1 mouse", "label": "NFATC1 mouse", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 11"}, {"color": "#97c2fc", "id": "NFATC1", "label": "NFATC1", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 6"}, {"color": "#97c2fc", "id": "CD2 -\u003e NFATC1 Signaling", "label": "CD2 -\u003e NFATC1 Signaling", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 9"}, {"color": "#97c2fc", "id": "FcIgER -\u003e NFATC1 Signaling", "label": "FcIgER -\u003e NFATC1 Signaling", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 9"}, {"color": "#97c2fc", "id": "TNFRSF5/13B -\u003e NFATC1 Signaling", "label": "TNFRSF5/13B -\u003e NFATC1 Signaling", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 9"}, {"color": "#97c2fc", "id": "NFATC1 GM12878", "label": "NFATC1 GM12878", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 3"}, {"color": "#97c2fc", "id": "NFATC1 GM12878 hg19", "label": "NFATC1 GM12878 hg19", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 6"}, {"color": "#97c2fc", "id": "NFATC1 Up", "label": "NFATC1 Up", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 7"}, {"color": "#97c2fc", "id": "NFATC1 Down", "label": "NFATC1 Down", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 4"}, {"color": "#97c2fc", "id": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "label": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 5"}, {"color": "#97c2fc", "id": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "label": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "shape": "dot", "size": 10, "title": "Number of Significant Pairwise Intersections: 7"}]);
-                  edges = new vis.DataSet([{"from": "NFATC1 human tf ARCHS4 coexpression", "to": "NFATC1 human", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "NFATC1 mouse", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "NFATC1", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "CD2 -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "FcIgER -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "TNFRSF5/13B -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human tf ARCHS4 coexpression", "to": "NFATC1 GM12878", "width": 1}, {"from": "NFATC1 human", "to": "NFATC1 mouse", "width": 1}, {"from": "NFATC1 human", "to": "NFATC1", "width": 1}, {"from": "NFATC1 human", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "NFATC1 human", "to": "CD2 -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human", "to": "FcIgER -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human", "to": "TNFRSF5/13B -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 human", "to": "NFATC1 Up", "width": 1}, {"from": "NFATC1 human", "to": "NFATC1 Down", "width": 1}, {"from": "NFATC1 human", "to": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "width": 1}, {"from": "NFATC1 human", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "NFATC1 mouse", "to": "NFATC1", "width": 1}, {"from": "NFATC1 mouse", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "NFATC1 mouse", "to": "CD2 -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 mouse", "to": "FcIgER -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 mouse", "to": "TNFRSF5/13B -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1 mouse", "to": "NFATC1 Down", "width": 1}, {"from": "NFATC1 mouse", "to": "NFATC1 GM12878", "width": 1}, {"from": "NFATC1 mouse", "to": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "width": 1}, {"from": "NFATC1 mouse", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "NFATC1", "to": "FcIgER -\u003e NFATC1 Signaling", "width": 1}, {"from": "NFATC1", "to": "NFATC1 Up", "width": 1}, {"from": "NFATC1", "to": "NFATC1 Down", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "FcIgER -\u003e NFATC1 Signaling", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "TNFRSF5/13B -\u003e NFATC1 Signaling", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "NFATC1 Up", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "width": 1}, {"from": "CD2 -\u003e NFATC1 Signaling", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "FcIgER -\u003e NFATC1 Signaling", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "FcIgER -\u003e NFATC1 Signaling", "to": "TNFRSF5/13B -\u003e NFATC1 Signaling", "width": 1}, {"from": "FcIgER -\u003e NFATC1 Signaling", "to": "NFATC1 Up", "width": 1}, {"from": "FcIgER -\u003e NFATC1 Signaling", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "TNFRSF5/13B -\u003e NFATC1 Signaling", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "TNFRSF5/13B -\u003e NFATC1 Signaling", "to": "NFATC1 Up", "width": 1}, {"from": "TNFRSF5/13B -\u003e NFATC1 Signaling", "to": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "width": 1}, {"from": "TNFRSF5/13B -\u003e NFATC1 Signaling", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "NFATC1 GM12878", "to": "NFATC1 GM12878 hg19", "width": 1}, {"from": "NFATC1 Up", "to": "NFATC1 Down", "width": 1}, {"from": "NFATC1 Up", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}, {"from": "Nfatc1 Sumoylation Autoimmunity Alloreactivity GSE148087 1", "to": "Lack Nfatc1 Sumoylation Diseases GSE119313 1", "width": 1}]);
+                  nodes = new vis.DataSet([{"color": "#995530", "id": "NFATC2 human tf ARCHS4 coexpression", "label": "NFATC2 human tf ARCHS4 coexpression", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 2"}, {"color": "#c25740", "id": "NFATC2 human", "label": "NFATC2 human", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 4"}, {"color": "#c25740", "id": "NFATC2 mouse", "label": "NFATC2 mouse", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 3"}, {"color": "#aaf8af", "id": "NFATC2", "label": "NFATC2", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 3"}, {"color": "#de8c0f", "id": "NFATC2 (human)", "label": "NFATC2 (human)", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 1"}, {"color": "#826bd7", "id": "NFATC2 Up", "label": "NFATC2 Up", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 3"}, {"color": "#826bd7", "id": "NFATC2 Down", "label": "NFATC2 Down", "shape": "dot", "title": "Number of Significant Pairwise Intersections: 4"}]);
+                  edges = new vis.DataSet([{"from": "NFATC2 human tf ARCHS4 coexpression", "to": "NFATC2 human", "value": 12.545926702572473}, {"from": "NFATC2 human tf ARCHS4 coexpression", "to": "NFATC2", "value": 1.2192051724553445}, {"from": "NFATC2 human", "to": "NFATC2 mouse", "value": 12.545926702572473}, {"from": "NFATC2 human", "to": "NFATC2 Up", "value": 0.2592801400694227}, {"from": "NFATC2 human", "to": "NFATC2 Down", "value": 0.658671324784676}, {"from": "NFATC2 mouse", "to": "NFATC2 (human)", "value": 0.152259557822769}, {"from": "NFATC2 mouse", "to": "NFATC2 Down", "value": 4.289968629880881}, {"from": "NFATC2", "to": "NFATC2 Up", "value": 0.8534986035427776}, {"from": "NFATC2", "to": "NFATC2 Down", "value": 1.2192051724553445}, {"from": "NFATC2 Up", "to": "NFATC2 Down", "value": 12.545926702572473}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
@@ -100,35 +294,7 @@
                   // adding nodes and edges to the graph
                   data = {nodes: nodes, edges: edges};
 
-                  var options = {
-    "configure": {
-        "enabled": false
-    },
-    "edges": {
-        "color": {
-            "inherit": true
-        },
-        "smooth": {
-            "enabled": true,
-            "type": "dynamic"
-        }
-    },
-    "interaction": {
-        "dragNodes": true,
-        "hideEdgesOnDrag": false,
-        "hideNodesOnDrag": false
-    },
-    "physics": {
-        "enabled": true,
-        "stabilization": {
-            "enabled": true,
-            "fit": true,
-            "iterations": 1000,
-            "onlyDynamicEdges": false,
-            "updateInterval": 50
-        }
-    }
-};
+                  var options = {"edges": {"color": {"color": "lightgrey", "highlight": "orange"}}};
 
                   
 
