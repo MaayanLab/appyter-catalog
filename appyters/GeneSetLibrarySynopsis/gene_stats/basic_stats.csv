@@ -1,4 +1,4 @@
 ,Statistic,Average,Median,Standard Deviation,Maximum,Minimum
-0,Gene Occurence,2.1056224178192924,1.0,1.9679380317266548,26,1
-1,Gene Set Size,202.10344827586206,250.0,131.83012589375747,449,9
-2,Significant Pairwise Intersections,20.526315789473685,22.0,7.810490343025606,34,1
+0,Gene Occurence,2.106,1.0,1.968,26,1
+1,Gene Set Size,202.103,250.0,131.83,449,9
+2,Significant Pairwise Intersections,20.526,22.0,7.81,34,1
