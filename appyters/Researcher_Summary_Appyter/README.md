@@ -1,0 +1,5 @@
+# Researcher Summary Report
+
+by Nasheath Ahmed
+
+This appyter takes as input a researcher name and an optional ORCID ID and outputs information about the researcher from various sources including PubMed, RePORTER, Google Scholar, Geneshot, and Drugshot. The information that is currently included in the report is publications, grants, citations, collaborations, associated genes and drugs, and additional information related to the researcher's affiliation and topics of research interests. The report provides graphs and tables. 

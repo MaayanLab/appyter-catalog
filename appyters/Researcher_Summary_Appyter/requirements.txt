@@ -1,0 +1,17 @@
+requests
+biopython
+numpy
+pandas
+matplotlib
+appyter
+plotly
+wordcloud
+scholarly
+kaleido
+beautifulsoup4
+tqdm
+ipycytoscape
+py2neo
+python-dotenv
+rdflib
+seaborn
