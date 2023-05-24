@@ -9,9 +9,3 @@ wordcloud
 scholarly
 kaleido
 beautifulsoup4
-tqdm
-ipycytoscape
-py2neo
-python-dotenv
-rdflib
-seaborn
