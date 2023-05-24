@@ -1,0 +1,11 @@
+requests
+biopython
+numpy
+pandas
+matplotlib
+appyter
+plotly
+wordcloud
+scholarly
+kaleido
+beautifulsoup4

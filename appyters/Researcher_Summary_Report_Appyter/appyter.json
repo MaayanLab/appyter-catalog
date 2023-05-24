@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+    "name": "Researcher_Summary_Report_Appyter",
+    "title": "Researcher Summary Report",
+    "version": "0.0.1",
+    "description": "An appyter to summarize various research information output pertaining to the work of a given researcher.",
+    "image": "thumbnail.png",
+    "authors": [
+        {
+            "name": "Nasheath Ahmed",
+            "email": "nasheathahmed00@gmail.com"
+        }
+    ],
+    "url": "https://github.com/MaayanLab/appyter-catalog",
+    "tags": [
+        "Researcher"
+    ],
+    "license": "CC-BY-NC-SA-4.0",
+    "appyter": {
+        "file": "researcher_summary_appyter.ipynb",
+        "profile": "biojupies", 
+        "extras":["toc","toggle-code"]
+    }
+}
