@@ -11,7 +11,18 @@ import math
 from bs4 import BeautifulSoup
 plotly.offline.init_notebook_mode()
 
-
+# Class definition to define HTML object for the text display cards within the appyter.
+class MyHTML:
+  def __init__(self, html):
+    self._html = html
+  def _repr_html_(self):
+    return self._html
+class MyMarkdown:
+  def __init__(self, markdown):
+    self._markdown = markdown
+  def _repr_markdown_(self):
+    return self._markdown
+    
 def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, source_title=''):
     dict_for_graph = defaultdict(list)
     for key, value in input_data_dict.items():
@@ -120,7 +131,7 @@ def calculate_ar_index(citations):
 
 #Displaying the figure number and if a title is given, then displaying the download link. 
 def display_figure_labels(counter, caption, title = None):
-    display(Markdown("*Figure {}. {}*".format(counter, caption)))
+    display(MyMarkdown("*Figure {}. {}*".format(counter, caption)))
     if title != None:
         display(FileLink("output_images/"+title+'.png' , result_html_prefix=str('Download Figure {} (PNG): '.format(counter))))
     counter += 1
@@ -131,7 +142,7 @@ def display_summary_text_from_google_scholar(affiliation_from_google_scholar = N
 
     # <h3 style="color: #333;">Organization Affiliation from RePORTER</h3>
     # <p style="color: #333;">{organization_from_reporter}</p>
-    display(Markdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
+    display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
     html_for_text_display = ""
     html_for_text_display += "<div style=\"display: grid; grid-template-columns: 200px 200px 200px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
     if affiliation_from_google_scholar != None:
@@ -160,13 +171,13 @@ def display_summary_text_from_google_scholar(affiliation_from_google_scholar = N
         html_for_text_display += "</ul>\n"
         html_for_text_display += "</div\n"
     html_for_text_display += "</div>"
-    display(HTML(html_for_text_display))
+    display(MyHTML(html_for_text_display))
 
 def query_google_citation(name_of_researcher):
     search_query = scholarly.search_author(name_of_researcher)
     try:
         author  = next(search_query)
-        display(Markdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
+        display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
         summary_info = scholarly.fill(author, sections=['counts', 'indices'])
         # print(summary_info)
         # Print the titles of the author's publications
@@ -219,7 +230,7 @@ def query_semantic_scholar_citation(name_of_researcher):
             url_for_papers_final = f"https://api.semanticscholar.org/graph/v1/author/{id_of_researcher}?fields=name,citationCount,paperCount,hIndex,aliases,papers.year,papers.citationCount"
             citation_response = requests.get(url_for_papers_final)
             if citation_response.status_code == 200:
-                display(Markdown("### Link to [Semantic Scholar Page](https://www.semanticscholar.org/author/{}/{}) for {}".format(final_name, id_of_researcher, name_of_researcher)))
+                display(MyMarkdown("### Link to [Semantic Scholar Page](https://www.semanticscholar.org/author/{}/{}) for {}".format(final_name, id_of_researcher, name_of_researcher)))
                 data = citation_response.json()
                 if data['paperCount'] > 500:
                     dict_for_holding_ids = {}
@@ -273,7 +284,7 @@ def query_semantic_scholar_citation(name_of_researcher):
 
 def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
 
-    display(Markdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
+    display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
     html_for_text_display = ""
     html_for_text_display += "<div style=\"display: grid; grid-template-columns: 150px 150px 150px 150px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
     if wiki_institution != '':
@@ -310,11 +321,11 @@ def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = 
         html_for_text_display += "</ul>\n"
         html_for_text_display += "</div>\n"
     html_for_text_display += "</div>"
-    display(HTML(html_for_text_display))
+    display(MyHTML(html_for_text_display))
 
 def display_summary_text_from_openalex(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
 
-    display(Markdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
+    display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     html_for_text_display = ""
     html_for_text_display += "<div style=\"display: grid; grid-template-columns: 200px 200px 200px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
     if institution != '':
@@ -344,7 +355,7 @@ def display_summary_text_from_openalex(institution = '', interests = [], h_index
         html_for_text_display += "</div>\n"
 
     html_for_text_display += "</div>"
-    display(HTML(html_for_text_display))
+    display(MyHTML(html_for_text_display))
 
 
 def getting_information_from_openalex(name_of_researcher):
@@ -376,6 +387,7 @@ def getting_information_from_openalex(name_of_researcher):
             print("No matching information for this researcher from OpenAlex")
     else:
         print("Error in querying from OpenAlex API.")
+
 def getting_information_from_wiki(name_of_researcher):
     wiki_institution = ''
     wiki_known_for = []
@@ -394,7 +406,7 @@ def getting_information_from_wiki(name_of_researcher):
                     page_id = page_query['pageid']
                     break
             if title_to_get_content_from != None:
-                display(Markdown("### Link to [Wiki Page](https://en.wikipedia.org/wiki/{}) for {}".format(title_to_get_content_from.replace(" ","_"), name_of_researcher)))
+                display(MyMarkdown("### Link to [Wiki Page](https://en.wikipedia.org/wiki/{}) for {}".format(title_to_get_content_from.replace(" ","_"), name_of_researcher)))
                 url_to_get_page_content = f"https://en.wikipedia.org/w/api.php?action=parse&page={title_to_get_content_from}&props=text&format=json"
                 response = requests.get(url_to_get_page_content)
                 data  = response.json()
