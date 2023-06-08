@@ -7,4 +7,5 @@ pandas
 plotly
 qnorm
 rpy2
+s3fs
 scikit-learn
