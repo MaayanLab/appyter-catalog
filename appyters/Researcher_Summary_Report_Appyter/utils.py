@@ -560,7 +560,6 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
 
 def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
     display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
-
     # Create a blank image
     display_list = []
     title_font_size = 18
@@ -577,11 +576,11 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         y = 0
         for line in text_1:
             draw.text((5, y), line, font=title_font, fill='black')
-            y += content_font_size
+            y += title_font_size
 
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
-            y += content_font
+            y += content_font_size
         inst_image.save("googlescholar_image_1.png")
         display_list.append(inst_image)
         display(inst_image)
@@ -594,7 +593,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         ar_index = textwrap.wrap(f'Age Related Index: {int(ar_index)}', width=25)
         times_cited = textwrap.wrap('Total Citations: '+str(total_times_cited), width=25)
         y = 0
-        draw.text((5, y), line, font=title_font, fill='black')
+        draw.text((5, y), title, font=title_font, fill='black')
         y += title_font_size + 10
         for line in h_index:
             draw.text((5, y), line, font=content_font, fill='black')
@@ -651,6 +650,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     image_height = 200
     title_font = ImageFont.truetype("Arial.ttf", title_font_size)
     content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     if institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(inst_image)
