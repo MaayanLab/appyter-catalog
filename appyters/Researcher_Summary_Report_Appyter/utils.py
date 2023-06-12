@@ -482,7 +482,6 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         draw = ImageDraw.Draw(inst_image)
         text_1 = textwrap.wrap("Institution Affiliation", width = 25)
         text_2 = textwrap.wrap(wiki_institution, width = 20)
-        height_of_title = title_font_size * len(text_1)
         y = 0
         for line in text_1:
             draw.text((5, y), line, font=title_font, fill='black')
@@ -555,6 +554,8 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         fig.add_subplot(rows, columns, idx + 1)
         plt.imshow(img)
         plt.axis('off')
+    
+    plt.show()
 
 
 
@@ -639,6 +640,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         fig.add_subplot(rows, columns, idx + 1)
         plt.imshow(img)
         plt.axis('off')
+    plt.show()
 
 
 
@@ -717,3 +719,4 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         fig.add_subplot(rows, columns, idx + 1)
         plt.imshow(img)
         plt.axis('off')
+    plt.show()
