@@ -9,6 +9,9 @@ from scholarly import scholarly
 import datetime
 import math
 from bs4 import BeautifulSoup
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
+import matplotlib.pyplot as plt
 plotly.offline.init_notebook_mode()
 
 # Class definition to define HTML object for the text display cards within the appyter.
@@ -138,6 +141,39 @@ def display_figure_labels(counter, caption, title = None):
     return counter
 
 
+def query_google_citation(name_of_researcher):
+    search_query = scholarly.search_author(name_of_researcher)
+    try:
+        author  = next(search_query)
+        display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
+        summary_info = scholarly.fill(author, sections=['counts', 'indices'])
+        # print(summary_info)
+        # Print the titles of the author's publications
+        author = scholarly.fill(author)
+        # print(len([pub['bib']['title'] for pub in author['publications']]))
+        list_storing_citations_and_years = []
+        for pub in author['publications']:
+            # print(pub)
+            if 'pub_year'in pub['bib']:
+                list_storing_citations_and_years.append([pub['bib']['title'], int(pub['bib']['pub_year']), int(pub['num_citations'])])
+        # print(len(list_storing_citations_and_years))
+        citation_dict = summary_info['cites_per_year']
+        affiliation_from_google_scholar = summary_info['affiliation']
+        interests_from_google_scholar = summary_info['interests']
+        total_times_cited = summary_info['citedby']
+        h_index_from_google_scholar = summary_info['hindex']
+        h_index_from_google_scholar_last_5 = summary_info['hindex5y']
+
+        list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
+        ar_index = calculate_ar_index(list_storing_citations_and_years)
+        display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
+        display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
+        return citation_dict
+    except:
+        print("No Google Scholar information for {}".format(name_of_researcher))
+        return None
+
+
 def display_summary_text_from_google_scholar(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
 
     # <h3 style="color: #333;">Organization Affiliation from RePORTER</h3>
@@ -173,36 +209,6 @@ def display_summary_text_from_google_scholar(affiliation_from_google_scholar = N
     html_for_text_display += "</div>"
     display(MyHTML(html_for_text_display))
 
-def query_google_citation(name_of_researcher):
-    search_query = scholarly.search_author(name_of_researcher)
-    try:
-        author  = next(search_query)
-        display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
-        summary_info = scholarly.fill(author, sections=['counts', 'indices'])
-        # print(summary_info)
-        # Print the titles of the author's publications
-        author = scholarly.fill(author)
-        # print(len([pub['bib']['title'] for pub in author['publications']]))
-        list_storing_citations_and_years = []
-        for pub in author['publications']:
-            # print(pub)
-            if 'pub_year'in pub['bib']:
-                list_storing_citations_and_years.append([pub['bib']['title'], int(pub['bib']['pub_year']), int(pub['num_citations'])])
-        # print(len(list_storing_citations_and_years))
-        citation_dict = summary_info['cites_per_year']
-        affiliation_from_google_scholar = summary_info['affiliation']
-        interests_from_google_scholar = summary_info['interests']
-        total_times_cited = summary_info['citedby']
-        h_index_from_google_scholar = summary_info['hindex']
-        h_index_from_google_scholar_last_5 = summary_info['hindex5y']
-
-        list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
-        ar_index = calculate_ar_index(list_storing_citations_and_years)
-        display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
-        return citation_dict
-    except:
-        print("No Google Scholar information for {}".format(name_of_researcher))
-        return None
 
 def query_semantic_scholar_citation(name_of_researcher):
     citation_dict = defaultdict(int)
@@ -282,46 +288,38 @@ def query_semantic_scholar_citation(name_of_researcher):
         print('Error in querying this researcher from Semantic Scholar. Their information may not be here. A manual search may help. ')
         return citation_dict
 
-def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
 
-    display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
-    html_for_text_display = ""
-    html_for_text_display += "<div style=\"display: grid; grid-template-columns: 150px 150px 150px 150px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
-    if wiki_institution != '':
-        html_for_text_display += f"""
-    <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;">
-        <h3 style="color: #333;">Institution Affiliation</h3>
-        <p style="color: #333;">{wiki_institution}</p>
-    </div>
-    """
-    if len(wiki_awards) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Awards</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for award in wiki_awards:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{award}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
+def getting_information_from_openalex(name_of_researcher):
+    url_link = "https://api.openalex.org/authors?search={}".format(name_of_researcher)
+    response  = requests.get(url_link)
+    if response.status_code == 200:
+        interests = []
+        h_index = None
+        i10_index = None
+        total_times_cited = None
+        institution = ''
 
-    if len(wiki_known_for) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Known For</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for known in wiki_known_for:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{known}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
+        data = response.json()
+        if data['meta']['count'] > 0:
+            first_result = data['results'][0]
+            if name_of_researcher.split()[0] in first_result['display_name'] and name_of_researcher.split()[-1] in first_result['display_name']:
+                total_times_cited = first_result['cited_by_count']
+                if 'h_index' in first_result['summary_stats']:
+                    h_index = first_result['summary_stats']['h_index']
+                if 'i10_index' in first_result['summary_stats']:
+                    i10_index = first_result['summary_stats']['i10_index']
+                if 'last_known_institution' in first_result:
+                    institution = first_result['last_known_institution']['display_name']
+                for concept in first_result['x_concepts'][:5]:
+                    interests.append(concept['display_name'])
+            
+            display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
+            display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
 
-    if len(wiki_field_interests) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Research Fields</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for interest in wiki_field_interests:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
-    html_for_text_display += "</div>"
-    display(MyHTML(html_for_text_display))
+        else:
+            print("No matching information for this researcher from OpenAlex")
+    else:
+        print("Error in querying from OpenAlex API.")
 
 def display_summary_text_from_openalex(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
 
@@ -347,7 +345,7 @@ def display_summary_text_from_openalex(institution = '', interests = [], h_index
     """
     if len(interests) > 0:
         html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Awards</h3>\n"
+        html_for_text_display += "<h3 style=\"color: #333;\">Interests</h3>\n"
         html_for_text_display += "<ul>\n"
         for interest in interests:
             html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
@@ -358,35 +356,9 @@ def display_summary_text_from_openalex(institution = '', interests = [], h_index
     display(MyHTML(html_for_text_display))
 
 
-def getting_information_from_openalex(name_of_researcher):
-    url_link = "https://api.openalex.org/authors?search={}".format(name_of_researcher)
-    response  = requests.get(url_link)
-    if response.status_code == 200:
-        interests = []
-        h_index = None
-        i10_index = None
-        total_times_cited = None
-        institution = ''
 
-        data = response.json()
-        if data['meta']['count'] > 0:
-            first_result = data['results'][0]
-            if name_of_researcher.split()[0] in first_result['display_name'] and name_of_researcher.split()[-1] in first_result['display_name']:
-                total_times_cited = first_result['cited_by_count']
-                if 'h_index' in first_result['summary_stats']:
-                    h_index = first_result['summary_stats']['h_index']
-                if 'i10_index' in first_result['summary_stats']:
-                    i10_index = first_result['summary_stats']['i10_index']
-                if 'last_known_institution' in first_result:
-                    institution = first_result['last_known_institution']['display_name']
-                for concept in first_result['x_concepts'][:6]:
-                    interests.append(concept['display_name'])
-            
-            display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
-        else:
-            print("No matching information for this researcher from OpenAlex")
-    else:
-        print("Error in querying from OpenAlex API.")
+
+
 
 def getting_information_from_wiki(name_of_researcher):
     wiki_institution = ''
@@ -433,7 +405,7 @@ def getting_information_from_wiki(name_of_researcher):
                                     for index, content in enumerate(td.contents):
                                         if type(content) == type(BeautifulSoup("", "html.parser").new_tag("tag")) and len(content.text) > 0:
                                             # print(content.text)
-                                            if index != len(td.contents):
+                                            if index != len(td.contents) - 1:
                                                 wiki_institution += content.text + " and "
                                             else:
                                                 wiki_institution += content.text
@@ -443,6 +415,7 @@ def getting_information_from_wiki(name_of_researcher):
                                             wiki_awards.append(content.text)
                                             # print(content.text)
                         display_summary_text_from_wikipedia(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
+                        display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
                     else:
                         print("No data to show")
                 except:
@@ -453,3 +426,294 @@ def getting_information_from_wiki(name_of_researcher):
             print("No matching Wikipedia Page for this researcher")
     else:
         print("Error in querying Wikipedia for the name of researcher")         
+
+def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
+
+    display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
+    html_for_text_display = ""
+    html_for_text_display += "<div style=\"display: grid; grid-template-columns: 150px 150px 150px 150px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
+    if wiki_institution != '':
+        html_for_text_display += f"""
+    <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;">
+        <h3 style="color: #333;">Institution Affiliation</h3>
+        <p style="color: #333;">{wiki_institution}</p>
+    </div>
+    """
+    if len(wiki_awards) > 0:
+        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
+        html_for_text_display += "<h3 style=\"color: #333;\">Awards</h3>\n"
+        html_for_text_display += "<ul>\n"
+        for award in wiki_awards:
+            html_for_text_display += f"<li><p style=\"color: #333;\">{award}</p> </li>\n"
+        html_for_text_display += "</ul>\n"
+        html_for_text_display += "</div>\n"
+
+    if len(wiki_known_for) > 0:
+        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
+        html_for_text_display += "<h3 style=\"color: #333;\">Known For</h3>\n"
+        html_for_text_display += "<ul>\n"
+        for known in wiki_known_for:
+            html_for_text_display += f"<li><p style=\"color: #333;\">{known}</p> </li>\n"
+        html_for_text_display += "</ul>\n"
+        html_for_text_display += "</div>\n"
+
+    if len(wiki_field_interests) > 0:
+        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
+        html_for_text_display += "<h3 style=\"color: #333;\">Research Fields</h3>\n"
+        html_for_text_display += "<ul>\n"
+        for interest in wiki_field_interests:
+            html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
+        html_for_text_display += "</ul>\n"
+        html_for_text_display += "</div>\n"
+    html_for_text_display += "</div>"
+    display(MyHTML(html_for_text_display))
+
+def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
+    display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
+    display_list = []
+    title_font_size = 18
+    content_font_size = 16
+    image_width = 200
+    image_height = 200
+    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
+    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    if wiki_institution != '':
+        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(inst_image)
+        text_1 = textwrap.wrap("Institution Affiliation", width = 25)
+        text_2 = textwrap.wrap(wiki_institution, width = 20)
+        height_of_title = title_font_size * len(text_1)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += title_font_size
+
+        for line in text_2:
+            draw.text((5, y+10), line, font=content_font, fill='black')
+            y += content_font_size
+        inst_image.save("wiki_image_1.png")
+        display_list.append(inst_image)
+        display(inst_image)
+    if len(wiki_awards) > 0: 
+        awards = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(awards)
+        text_1 = textwrap.wrap("Awards", width = 20)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font= title_font, fill='black')
+            y += content_font_size
+        for award in wiki_awards:
+            text_2 = textwrap.wrap(award, width = 20)
+            for line in text_2:
+                draw.text((5, y+10), line, font= content_font, fill='black')
+                y += content_font_size
+            y += 10
+        awards.save("wiki_image_2.png")
+        display_list.append(awards)
+        display(awards)
+
+    if len(wiki_known_for) > 0:
+        known_for = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(known_for)
+        text_1 = textwrap.wrap("Known For", width = 20)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += content_font_size
+        for known in wiki_known_for:
+            text_2 = textwrap.wrap(known, width = 20)
+            for line in text_2:
+                draw.text((5, y+10), line, font=content_font, fill='black')
+                y += content_font_size
+            y += 10
+        known_for.save("wiki_image_3.png")
+        display_list.append(known_for)
+        display(known_for)
+
+    if len(wiki_field_interests) > 0:
+        interests = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(interests)
+        text_1 = textwrap.wrap("Research Fields", width = 20)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += content_font_size
+        for interest in wiki_field_interests:
+            text_2 = textwrap.wrap(interest, width = 20)
+            for line in text_2:
+                draw.text((5, y+10), line, font=content_font, fill='black')
+                y += content_font_size
+            y += 10
+        interests.save("wiki_image_4.png")
+        display_list.append(interests)
+        display(interests)
+
+    fig = plt.figure(figsize=(10, 10))
+    rows = 1
+    columns = len(display_list)
+    for idx, img in enumerate(display_list):
+        fig.add_subplot(rows, columns, idx + 1)
+        plt.imshow(img)
+        plt.axis('off')
+
+
+
+def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
+    display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
+
+    # Create a blank image
+    display_list = []
+    title_font_size = 18
+    content_font_size = 16
+    image_width = 200
+    image_height = 200
+    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
+    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    if affiliation_from_google_scholar != '':
+        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(inst_image)
+        text_1 = textwrap.wrap("Institution Affiliation", width = 25)
+        text_2 = textwrap.wrap(affiliation_from_google_scholar, width = 20)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += content_font_size
+
+        for line in text_2:
+            draw.text((5, y+10), line, font=content_font, fill='black')
+            y += content_font
+        inst_image.save("googlescholar_image_1.png")
+        display_list.append(inst_image)
+        display(inst_image)
+    if h_index_from_google_scholar != None:
+        h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(h_image)
+        title = 'Metrics'
+        h_index = textwrap.wrap(f'H-index: {h_index_from_google_scholar}', width = 25)
+        h_index_5 = textwrap.wrap(f'H-index over last 5 years: {h_index_from_google_scholar_last_5}', width = 25)
+        ar_index = textwrap.wrap(f'Age Related Index: {int(ar_index)}', width=25)
+        times_cited = textwrap.wrap('Total Citations: '+str(total_times_cited), width=25)
+        y = 0
+        draw.text((5, y), line, font=title_font, fill='black')
+        y += title_font_size + 10
+        for line in h_index:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        y += 10
+        for line in h_index_5:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        y += 10
+        for line in ar_index:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        y += 10
+        for line in times_cited:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        h_image.save("googlescholar_image_2.png")
+        display_list.append(h_image)
+        display(h_image)
+    if len(interests_from_google_scholar) > 0:
+        interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(interests_image)
+        title = textwrap.wrap('Research Interests', width = 25)
+        y = 0
+        for line in title:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += title_font_size
+        y += 15
+        for interest in interests_from_google_scholar:
+            interest_text = textwrap.wrap(interest, width=25)
+            for line in interest_text:
+                draw.text((5, y), line, font=content_font, fill='black')
+                y += content_font_size
+            y += 10
+        interests_image.save("googlescholar_image_2.png")
+        display_list.append(interests_image)
+        display(interests_image)
+
+    fig = plt.figure(figsize=(10, 10))
+    rows = 1
+    columns = len(display_list)
+    for idx, img in enumerate(display_list):
+        fig.add_subplot(rows, columns, idx + 1)
+        plt.imshow(img)
+        plt.axis('off')
+
+
+
+def display_summary_text_from_openalex_png(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
+    display_list = []
+    title_font_size = 18
+    content_font_size = 16
+    image_width = 200
+    image_height = 200
+    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
+    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    if institution != '':
+        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(inst_image)
+        text_1 = textwrap.wrap("Institution Affiliation", width = 25)
+        text_2 = textwrap.wrap(institution, width = 20)
+        y = 0
+        for line in text_1:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += title_font_size
+
+        for line in text_2:
+            draw.text((5, y+10), line, font=content_font, fill='black')
+            y += content_font_size
+        inst_image.save("openalex_image_1.png")
+        display_list.append(inst_image)
+        display(inst_image)
+    if h_index != None:
+        h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(h_image)
+        title = 'Metrics'
+        h_index = textwrap.wrap(f'H-index: {h_index}', width = 25)
+        i10_index = textwrap.wrap(f'I10-index : {i10_index}', width = 25)
+        times_cited = textwrap.wrap('Total Citations: '+str(total_times_cited), width=25)
+        y = 0
+        draw.text((5, y), title, font=title_font, fill='black')
+        y += title_font_size + 10
+        for line in h_index:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        y += 10
+        for line in i10_index:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        y += 10
+        for line in times_cited:
+            draw.text((5, y), line, font=content_font, fill='black')
+            y += content_font_size
+        h_image.save("openalex_image_2.png")
+        display_list.append(h_image)
+        display(h_image)
+    if len(interests) > 0:
+        interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        draw = ImageDraw.Draw(interests_image)
+        title = textwrap.wrap('Research Interests', width = 25)
+        y = 0
+        for line in title:
+            draw.text((5, y), line, font=title_font, fill='black')
+            y += title_font_size
+        y += 15
+        for interest in interests:
+            interest_text = textwrap.wrap(interest, width=25)
+            for line in interest_text:
+                draw.text((5, y), line, font=content_font, fill='black')
+                y += content_font_size
+            y += 10
+        interests_image.save("openalex_image_3.png")
+        display_list.append(interests_image)
+        display(interests_image)
+    
+    fig = plt.figure(figsize=(10, 10))
+    rows = 1
+    columns = len(display_list)
+    for idx, img in enumerate(display_list):
+        fig.add_subplot(rows, columns, idx + 1)
+        plt.imshow(img)
+        plt.axis('off')
