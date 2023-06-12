@@ -166,7 +166,7 @@ def query_google_citation(name_of_researcher):
 
         list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
         ar_index = calculate_ar_index(list_storing_citations_and_years)
-        display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
+        # display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
         display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
         return citation_dict
     except:
@@ -313,7 +313,7 @@ def getting_information_from_openalex(name_of_researcher):
                 for concept in first_result['x_concepts'][:5]:
                     interests.append(concept['display_name'])
             
-            display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
+            # display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
             display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
 
         else:
@@ -414,7 +414,7 @@ def getting_information_from_wiki(name_of_researcher):
                                         if type(content) == type(BeautifulSoup("", "html.parser").new_tag("tag")) and len(content.text) > 0:
                                             wiki_awards.append(content.text)
                                             # print(content.text)
-                        display_summary_text_from_wikipedia(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
+                        # display_summary_text_from_wikipedia(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
                         display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
                     else:
                         print("No data to show")
