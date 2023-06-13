@@ -167,8 +167,8 @@ def query_google_citation(name_of_researcher):
         list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
         ar_index = calculate_ar_index(list_storing_citations_and_years)
         # display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
-        display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
-        return citation_dict
+        display_list = display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
+        return (citation_dict, display_list)
     except:
         print("No Google Scholar information for {}".format(name_of_researcher))
         return None
@@ -314,12 +314,13 @@ def getting_information_from_openalex(name_of_researcher):
                     interests.append(concept['display_name'])
             
             # display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
-            display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
+            return display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
 
         else:
             print("No matching information for this researcher from OpenAlex")
     else:
         print("Error in querying from OpenAlex API.")
+    return None
 
 def display_summary_text_from_openalex(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
 
@@ -415,17 +416,19 @@ def getting_information_from_wiki(name_of_researcher):
                                             wiki_awards.append(content.text)
                                             # print(content.text)
                         # display_summary_text_from_wikipedia(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
-                        display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
+                        return display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
                     else:
                         print("No data to show")
                 except:
                     print("Error in reading the content from Wikipedia page")
+                    return None
             else:
                 print("No matching Wikipedia Page for this researcher")
         else:
             print("No matching Wikipedia Page for this researcher")
     else:
-        print("Error in querying Wikipedia for the name of researcher")         
+        print("Error in querying Wikipedia for the name of researcher")   
+    return None      
 
 def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
 
@@ -490,9 +493,9 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("wiki_image_1.png")
+        inst_image.save("./output_images/wiki_image_1.png")
         display_list.append(inst_image)
-        display(inst_image)
+        # display(inst_image)
     if len(wiki_awards) > 0: 
         awards = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(awards)
@@ -507,9 +510,9 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font= content_font, fill='black')
                 y += content_font_size
             y += 10
-        awards.save("wiki_image_2.png")
+        awards.save("./output_images/wiki_image_2.png")
         display_list.append(awards)
-        display(awards)
+        # display(awards)
 
     if len(wiki_known_for) > 0:
         known_for = Image.new("RGB", (image_width, image_height), (221, 224, 237))
@@ -525,9 +528,9 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        known_for.save("wiki_image_3.png")
+        known_for.save("./output_images/wiki_image_3.png")
         display_list.append(known_for)
-        display(known_for)
+        # display(known_for)
 
     if len(wiki_field_interests) > 0:
         interests = Image.new("RGB", (image_width, image_height), (221, 224, 237))
@@ -543,9 +546,9 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests.save("wiki_image_4.png")
+        interests.save("./output_images/wiki_image_4.png")
         display_list.append(interests)
-        display(interests)
+        # display(interests)
 
     fig = plt.figure(figsize=(10, 10))
     rows = 1
@@ -556,6 +559,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         plt.axis('off')
     
     plt.show()
+    return display_list
 
 
 
@@ -582,9 +586,9 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("googlescholar_image_1.png")
+        inst_image.save("./output_images/googlescholar_image_1.png")
         display_list.append(inst_image)
-        display(inst_image)
+        # display(inst_image)
     if h_index_from_google_scholar != None:
         h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(h_image)
@@ -611,9 +615,9 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         for line in times_cited:
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
-        h_image.save("googlescholar_image_2.png")
+        h_image.save("./output_images/googlescholar_image_2.png")
         display_list.append(h_image)
-        display(h_image)
+        # display(h_image)
     if len(interests_from_google_scholar) > 0:
         interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(interests_image)
@@ -629,9 +633,9 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests_image.save("googlescholar_image_2.png")
+        interests_image.save("./output_images/googlescholar_image_3.png")
         display_list.append(interests_image)
-        display(interests_image)
+        # display(interests_image)
 
     fig = plt.figure(figsize=(10, 10))
     rows = 1
@@ -641,6 +645,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         plt.imshow(img)
         plt.axis('off')
     plt.show()
+    return display_list
 
 
 
@@ -666,9 +671,9 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("openalex_image_1.png")
+        inst_image.save("./output_images/openalex_image_1.png")
         display_list.append(inst_image)
-        display(inst_image)
+        # display(inst_image)
     if h_index != None:
         h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(h_image)
@@ -690,9 +695,9 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         for line in times_cited:
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
-        h_image.save("openalex_image_2.png")
+        h_image.save("./output_images/openalex_image_2.png")
         display_list.append(h_image)
-        display(h_image)
+        # display(h_image)
     if len(interests) > 0:
         interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(interests_image)
@@ -708,15 +713,39 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests_image.save("openalex_image_3.png")
+        interests_image.save("./output_images/openalex_image_3.png")
         display_list.append(interests_image)
-        display(interests_image)
+        # display(interests_image)
     
     fig = plt.figure(figsize=(10, 10))
     rows = 1
     columns = len(display_list)
     for idx, img in enumerate(display_list):
         fig.add_subplot(rows, columns, idx + 1)
+        plt.imshow(img)
+        plt.axis('off')
+    plt.show()
+    return display_list
+
+def display_matrix(google_scholar_info, wiki_info, open_alex_info):
+    wiki_info = wiki_info[:3]
+    fig = plt.figure(figsize=(10, 10))
+    rows = 3
+    columns = len(google_scholar_info)
+    count  =1
+    for idx, img in enumerate(google_scholar_info):
+        fig.add_subplot(rows, columns, count)
+        count += 1 
+        plt.imshow(img)
+        plt.axis('off')
+    for idx, img in enumerate(wiki_info):
+        fig.add_subplot(rows, columns, count)
+        count += 1 
+        plt.imshow(img)
+        plt.axis('off')
+    for idx, img in enumerate(open_alex_info):
+        fig.add_subplot(rows, columns, count)
+        count += 1 
         plt.imshow(img)
         plt.axis('off')
     plt.show()
