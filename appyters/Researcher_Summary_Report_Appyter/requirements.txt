@@ -9,3 +9,4 @@ wordcloud
 scholarly
 kaleido
 beautifulsoup4
+Pillow==9.5.0
