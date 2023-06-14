@@ -174,42 +174,6 @@ def query_google_citation(name_of_researcher):
         return None
 
 
-def display_summary_text_from_google_scholar(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
-
-    # <h3 style="color: #333;">Organization Affiliation from RePORTER</h3>
-    # <p style="color: #333;">{organization_from_reporter}</p>
-    display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
-    html_for_text_display = ""
-    html_for_text_display += "<div style=\"display: grid; grid-template-columns: 200px 200px 200px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
-    if affiliation_from_google_scholar != None:
-        html_for_text_display += f"""
-    <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;">
-        <h3 style="color: #333;">Institution Affiliation</h3>
-        <p style="color: #333;">{affiliation_from_google_scholar}</p>
-    </div>
-    """
-    if h_index_from_google_scholar != None:
-        html_for_text_display += f"""
-        <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;">
-        <h3 style="color: #333;">H-index: {h_index_from_google_scholar}</h3>
-        <h3 style="color: #333;">H-index over last 5 years: {h_index_from_google_scholar_last_5} </h3>
-        <h3 style="color: #333;">Age Related Index: {int(ar_index)}</h3>
-        <h3 style="color: #333;">Total Times Cited: {total_times_cited}</h3>
-        
-    </div>
-    """
-    if len(interests_from_google_scholar) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Research Interests</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for interest in interests_from_google_scholar:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div\n"
-    html_for_text_display += "</div>"
-    display(MyHTML(html_for_text_display))
-
-
 def query_semantic_scholar_citation(name_of_researcher):
     citation_dict = defaultdict(int)
     #Retrieving the most likely author id based off the name of the input passed in from the semantic Scholar API. 
@@ -322,44 +286,6 @@ def getting_information_from_openalex(name_of_researcher):
         print("Error in querying from OpenAlex API.")
     return None
 
-def display_summary_text_from_openalex(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
-
-    display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
-    html_for_text_display = ""
-    html_for_text_display += "<div style=\"display: grid; grid-template-columns: 200px 200px 200px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
-    if institution != '':
-        html_for_text_display += f"""
-    <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;">
-        <h3 style="color: #333;">Institution Affiliation</h3>
-        <p style="color: #333;">{institution}</p>
-    </div>
-    """
-
-    if h_index != None:
-        html_for_text_display += f"""
-        <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;">
-        <h3 style="color: #333;">H-index: {h_index}</h3>
-        <h3 style="color: #333;">I10-index : {i10_index} </h3>
-        <h3 style="color: #333;">Total Times Cited: {total_times_cited}</h3>
-        
-    </div>
-    """
-    if len(interests) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 200px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Interests</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for interest in interests:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
-
-    html_for_text_display += "</div>"
-    display(MyHTML(html_for_text_display))
-
-
-
-
-
 
 def getting_information_from_wiki(name_of_researcher):
     wiki_institution = ''
@@ -430,46 +356,6 @@ def getting_information_from_wiki(name_of_researcher):
         print("Error in querying Wikipedia for the name of researcher")   
     return None      
 
-def display_summary_text_from_wikipedia(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
-
-    display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
-    html_for_text_display = ""
-    html_for_text_display += "<div style=\"display: grid; grid-template-columns: 150px 150px 150px 150px; grid-gap: 20px; padding: 20px; width: 750px\">\n"
-    if wiki_institution != '':
-        html_for_text_display += f"""
-    <div style="background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;">
-        <h3 style="color: #333;">Institution Affiliation</h3>
-        <p style="color: #333;">{wiki_institution}</p>
-    </div>
-    """
-    if len(wiki_awards) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Awards</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for award in wiki_awards:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{award}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
-
-    if len(wiki_known_for) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Known For</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for known in wiki_known_for:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{known}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
-
-    if len(wiki_field_interests) > 0:
-        html_for_text_display += "<div style=\"background-color: #f1f1f1; padding: 5px; border-radius: 5px; width: 150px;\">\n"
-        html_for_text_display += "<h3 style=\"color: #333;\">Research Fields</h3>\n"
-        html_for_text_display += "<ul>\n"
-        for interest in wiki_field_interests:
-            html_for_text_display += f"<li><p style=\"color: #333;\">{interest}</p> </li>\n"
-        html_for_text_display += "</ul>\n"
-        html_for_text_display += "</div>\n"
-    html_for_text_display += "</div>"
-    display(MyHTML(html_for_text_display))
 
 def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
     display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
@@ -565,7 +451,6 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
 
 def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
     display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
-    # Create a blank image
     display_list = []
     title_font_size = 18
     content_font_size = 16
