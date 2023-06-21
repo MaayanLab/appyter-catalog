@@ -3,7 +3,7 @@
     "name": "Researcher_Summary_Report_Appyter",
     "title": "Researcher Summary Report",
     "version": "0.0.1",
-    "description": "An appyter to summarize various research information output pertaining to the work of a given researcher.",
+    "description": "An appyter to summarize and display various research information output pertaining to the work of a given researcher.",
     "image": "thumbnail.png",
     "authors": [
         {
