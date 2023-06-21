@@ -1,7 +1,7 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 ipython
 jupyter
-pandas==1.0.3
+pandas
 numpy
 scipy
 seaborn

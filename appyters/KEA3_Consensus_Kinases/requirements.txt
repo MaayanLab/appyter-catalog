@@ -3,8 +3,8 @@ maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinforma
 
 ipython
 jupyter
-pandas==1.0.3
-numpy==1.19.0
+pandas
+numpy
 scipy
 matplotlib
 seaborn

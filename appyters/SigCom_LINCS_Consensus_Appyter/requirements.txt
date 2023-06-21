@@ -1,10 +1,7 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
-
-ipython
-jupyter
-pandas==1.0.3
-numpy==1.19.0
+pandas
+numpy
 scipy
 matplotlib
 seaborn

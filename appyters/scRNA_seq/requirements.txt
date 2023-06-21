@@ -1,3 +1,4 @@
+MulticoreTSNE @ git+https://github.com/jorvis/Multicore-TSNE
 anndata==0.7.8
 appyter
 bbknn==1.5.1

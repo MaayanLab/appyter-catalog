@@ -1,0 +1,336 @@
+{%- macro create_deploy(spec) %}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ spec['name'] }}
+  labels:
+    app: {{ spec['name'] }}
+  namespace: {{ spec['namespace'] }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ spec['name'] }}
+  template:
+    metadata:
+      labels:
+        app: {{ spec['name'] }}
+    spec:
+      containers:
+      - name: {{ spec['name'] }}
+        image: {{ spec['image'] }}
+        imagePullPolicy: Always
+        {% if spec.get('command') %}
+        command: {{ spec['command']|tojson }}
+        {% endif %}
+        {% if spec.get('args') %}
+        args: {{ spec['args']|tojson }}
+        {% endif %}
+        {% if spec.get('env') %}
+        env:
+          {% for k, v in spec['env'].items() %}
+          - name: {{ k|tojson }}
+            value: {{ v|tojson }}
+          {% endfor %}
+        {% endif %}
+      restartPolicy: Always
+      {% if spec.get('serviceAccount') %}
+      serviceAccountName: {{ spec['serviceAccount'] }}
+      {% endif %}
+---
+{%- endmacro %}
+{%- macro create_service(spec) %}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ spec['name'] }}
+  labels:
+    app: {{ spec['name'] }}
+  namespace: {{ spec['namespace'] }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ spec['name'] }}
+  ports:
+  - port: {{ spec['port'] }}
+    protocol: TCP
+    targetPort: {{ spec['targetPort'] }}
+---
+{%- endmacro %}
+{%- macro create_ingress(spec) %}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ spec['name'] }}
+  namespace: {{ spec['namespace'] }}
+  {% if annotations %}
+  annotations: {{ spec['annotations']|tojson }}
+  {% endif %}
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ spec['host'] }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ spec['serviceName'] }}
+            port:
+              number: {{ spec['servicePort'] }}
+        path: {{ spec['path'] }}
+        pathType: ImplementationSpecific
+---
+{%- endmacro %}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appyter-catalog
+---
+{{ create_deploy({
+  'name': "appyters-catalog",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-catalog:{1}".format(os.environ['DOCKER_REGISTRY'], version)
+}) }}
+{{ create_service({
+  'name': "appyters-catalog",
+  'namespace': 'appyter-catalog',
+  'port': 80,
+  'targetPort': 80
+}) }}
+{{ create_ingress({
+  'name': "appyters-catalog",
+  'namespace': 'appyter-catalog',
+  'host': os.environ['SERVER_NAME'],
+  'path': "/",
+  'serviceName': "appyters-catalog",
+  'servicePort': 80
+}) }}
+
+{#
+{{ create_deploy({
+  'name': "appyters-orchestrator",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-orchestrator:{1}-{2}{3}".format(os.environ['DOCKER_REGISTRY'], version, os.environ['APPYTER_TAG'], os.environ['LIBRARY_VERSION']),
+  'env': { "APPYTER_HOST": "0.0.0.0",
+    "APPYTER_JOBS": "3",
+    "APPYTER_JOBS_PER_IMAGE": "1",
+    "APPYTER_DEBUG": "false" },
+  'command': ["appyter"],
+  'args': ["orchestration", "dispatcher"]
+}) }}
+{{ create_service("appyters-orchestrator", 80, 5000) }}
+#}
+
+{{ create_deploy({
+  'name': "appyters-postgrest",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-postgrest:{1}".format(os.environ['DOCKER_REGISTRY'], version),
+  'env': {
+    "PGRST_DB_URI": "postgres://appyters:{0}@appyters-postgres:5432/appyters".format(os.environ['POSTGRES_PASSWORD']),
+    "PGRST_DB_SCHEMA": "api",
+    "PGRST_DB_ANON_ROLE": "guest",
+    "PGRST_SERVER_PROXY_URI": "http://{0}/postgrest".format(os.environ['SERVER_NAME']),
+    "PGRST_JWT_SECRET": os.environ['PGRST_JWT_SECRET'],
+    "PGRST_ROLE_CLAIM_KEY": os.environ['PGRST_ROLE_CLAIM_KEY']
+  }
+}) }}
+{{ create_service({
+  'name': "appyters-postgrest",
+  'namespace': 'appyter-catalog',
+  'port': 80,
+  'targetPort': 3000
+}) }}
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: postgrest-stripprefix
+  namespace: appyter-catalog
+spec:
+  stripPrefix:
+    prefixes:
+    - /postgrest
+---
+{{ create_ingress({
+  'name': "appyters-postgrest",
+  'namespace': 'appyter-catalog',
+  'host': os.environ['SERVER_NAME'],
+  'path': "/postgrest",
+  'serviceName': "appyters-postgrest",
+  'servicePort': 80,
+  'annotations': {
+    "traefik.ingress.kubernetes.io/router.middlewares": "default-postgrest-stripprefix@kubernetescrd"
+  }
+}) }}
+
+{{ create_deploy({
+  'name': "appyters-postgres",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-postgres:{1}".format(os.environ['DOCKER_REGISTRY'], version),
+  'env': {
+    "POSTGRES_DB": "appyters",
+    "POSTGRES_USER": "appyters",
+    "POSTGRES_PASSWORD": os.environ['POSTGRES_PASSWORD']
+  }
+}) }}
+{{ create_service({
+  'name': "appyters-postgres",
+  'namespace': 'appyter-catalog',
+  'port': 5432,
+  'targetPort': 5432
+}) }}
+
+{%- if minio %}
+{{ create_deploy({
+  'name': "appyters-s3",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-s3:{1}".format(os.environ['DOCKER_REGISTRY'], version),
+  'env': {
+    "MINIO_BUCKET": os.environ['MINIO_BUCKET'],
+    "MINIO_ROOT_USER": os.environ['MINIO_ACCESS_KEY'],
+    "MINIO_ROOT_PASSWORD": os.environ['MINIO_SECRET_KEY'],
+    "MINIO_SERVER_URL": "http://s3.{0}".format(os.environ['SERVER_NAME']),
+    "MINIO_BROWSER_REDIRECT_URL": "http://minio.{0}".format(os.environ['SERVER_NAME'])
+  }
+}) }}
+{{ create_service({
+  'name': "appyters-s3",
+  'namespace': 'appyter-catalog',
+  'port': 80,
+  'targetPort': 9000
+}) }}
+{{ create_ingress({
+  'name': "appyters-s3",
+  'namespace': 'appyter-catalog',
+  'host': "{0}.{1}".format("s3", os.environ['SERVER_NAME']),
+  'path': "/",
+  'serviceName': "appyters-s3",
+  'servicePort': 80
+}) }}
+{%- endif %}
+
+{%- if auth %}
+{{ create_deploy({
+  'name': "appyters-auth",
+  'namespace': 'appyter-catalog',
+  'image': "{0}/appyters-auth:{1}".format(os.environ['DOCKER_REGISTRY'], version),
+  'env': {
+    "PROXY_ADDRESS_FORWARDING": "true",
+    "KEYCLOAK_USER": "admin",
+    "KEYCLOAK_PASSWORD": os.environ['KEYCLOAK_PASSWORD'],
+    "KEYCLOAK_FRONTEND_URL": os.environ['KEYCLOAK_URL'],
+    "DB_VENDOR": "postgres",
+    "DB_ADDR": "appyters-postgres",
+    "DB_DATABASE": "appyters",
+    "DB_SCHEMA": "keycloak",
+    "DB_USER": "appyters",
+    "DB_PASSWORD": os.environ['POSTGRES_PASSWORD']
+  }
+}) }}
+{{ create_service({
+  'name': "appyters-auth",
+  'namespace': 'appyter-catalog',
+  'port': 80,
+  'targetPort': 8080
+}) }}
+{{ create_ingress({
+  'name': "appyters-auth",
+  'namespace': 'appyter-catalog',
+  'host': "{0}.{1}".format("auth", os.environ['SERVER_NAME']),
+  'path': "/",
+  'serviceName': "appyters-auth",
+  'servicePort': 80
+}) }}
+{%- endif %}
+
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appyters
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appyters-executions
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: appyters-executions
+  namespace: appyters-executions
+spec:
+  hard:
+    pods: "5"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: appyters-executions
+  namespace: appyters
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: appyters-executions
+  namespace: appyters-executions
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: appyters-executions
+  namespace: appyters-executions
+subjects:
+- kind: ServiceAccount
+  name: appyters-executions
+  namespace: appyters
+roleRef:
+  kind: Role
+  name: appyters-executions
+  apiGroup: rbac.authorization.k8s.io
+---
+
+{%- for appyter in appyters %}
+{% with name="appyter-{}".format(appyter['name'].lower().replace('_', '-')) %}
+{{ create_deploy({
+  'name': name,
+  'namespace': "appyters",
+  'image': "{0}/appyter-{1}:{2}-{3}{4}".format(os.environ['DOCKER_REGISTRY'], appyter['name'].lower(), appyter['version'], os.environ['APPYTER_TAG'], os.environ['LIBRARY_VERSION']),
+  'env': {
+    "APPYTER_PREFIX": "/{0}/".format(appyter['name']),
+    "APPYTER_PORT": "5000",
+    "APPYTER_PROXY": "true",
+    "APPYTER_PUBLIC_URL": "http://{0}/{1}/".format(os.environ['SERVER_NAME'], appyter['name']),
+    "APPYTER_DATA_DIR": os.environ['APPYTERS_DATA_DIR'],
+    "APPYTER_EXECUTOR": "kube::{0}/appyter-{1}:{2}-{3}{4}#?namespace={5}".format(
+      os.environ['DOCKER_REGISTRY'], appyter['name'].lower(), appyter['version'], os.environ['APPYTER_TAG'], os.environ['LIBRARY_VERSION'], "appyters-executions"
+    )
+  },
+  'command': ["appyter-catalog-helper"],
+  'args': ["entrypoint"],
+  'serviceAccount': "appyters-executions"
+}) }}
+{{ create_service({
+  'name': name,
+  'namespace': "appyters",
+  'port': 80,
+  'targetPort': 5000
+}) }}
+{{ create_ingress({
+  'name': name,
+  'namespace': "appyters",
+  'host': os.environ['SERVER_NAME'],
+  'path': "/{0}/".format(appyter['name']),
+  'serviceName': name,
+  'servicePort': 80
+}) }}
+{% endwith %}
+{%- endfor %}

@@ -13,5 +13,4 @@ jinja2>=3.0,<3.1
 umap-learn
 scipy
 qnorm
-MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE
-react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2.1
+react-scatter-board @ git+https://github.com/maayanlab/react-scatter-board@v2

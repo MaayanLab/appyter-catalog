@@ -4,7 +4,7 @@ install.packages("RCurl")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
-BiocManager::install(version = '3.14', ask = FALSE)
+BiocManager::install(version = '3.16', ask = FALSE)
 
 BiocManager::install("limma")
 BiocManager::install("edgeR")

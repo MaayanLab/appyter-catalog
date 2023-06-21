@@ -47,9 +47,14 @@ app/.publish: app/.build
 app/.deploy: app/.build .env
 	docker-compose up -d appyters-catalog && touch $@
 
-.build: app/.build $(BUILD_APPYTERS)
-.publish: app/.publish $(PUBLISH_APPYTERS)
-.deploy: app/.deploy $(DEPLOY_APPYTERS)
+.build: app/.build docker-compose.yml
+	docker-compose build --paralell
+
+.publish: app/.publish docker-compose.yml
+	docker-compose push --ignore-push-failures
+
+.deploy: app/.deploy docker-compose.yml
+	docker-compose up -d
 
 .env: .env.example
 	test -f .env || ( echo "Warning: Using .env.example, please update .env as required" && cp .env.example .env )
