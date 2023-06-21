@@ -1,5 +1,4 @@
 #import packages
-from time import sleep
 from collections import defaultdict
 from IPython.display import display,FileLink, HTML, Markdown, IFrame
 import requests
@@ -148,7 +147,6 @@ def query_google_citation(name_of_researcher):
         display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
         summary_info = scholarly.fill(author, sections=['counts', 'indices'])
         # print(summary_info)
-        # Print the titles of the author's publications
         author = scholarly.fill(author)
         # print(len([pub['bib']['title'] for pub in author['publications']]))
         list_storing_citations_and_years = []
@@ -195,8 +193,6 @@ def query_semantic_scholar_citation(name_of_researcher):
                     id_of_researcher = id_now
                     running_count = paper_count
                     final_name = name_returned.replace(" ", "-")
-            # print(id_of_researcher)
-            # print(final_name)
             url_for_papers_final = f"https://api.semanticscholar.org/graph/v1/author/{id_of_researcher}?fields=name,citationCount,paperCount,hIndex,aliases,papers.year,papers.citationCount"
             citation_response = requests.get(url_for_papers_final)
             if citation_response.status_code == 200:
