@@ -9,8 +9,8 @@ from scholarly import scholarly
 import datetime
 import math
 from bs4 import BeautifulSoup
-plotly.offline.init_notebook_mode()
-
+import plotly.io as pio
+pio.renderers.default = 'notebook'
 
 def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, source_title=''):
     dict_for_graph = defaultdict(list)
