@@ -55,7 +55,7 @@ app/.deploy: app/.build .env
 .test: $(TEST_APPYTERS)
 
 .build: app/.build docker-compose.yml
-	docker-compose build --paralell
+	docker-compose build --parallel
 
 .publish: app/.publish docker-compose.yml
 	docker-compose push --ignore-push-failures
