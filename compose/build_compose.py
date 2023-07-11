@@ -24,7 +24,6 @@ def build_compose(tls, minio, auth, aws_proxy):
     for path in glob.glob(os.path.join(appyter_path, '*', 'appyter.json'))
   ]
   env = Environment(
-    extensions=['jinja2.ext.with_'],
     loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
   )
   template = env.get_template('docker-compose.yml.j2')
