@@ -209,24 +209,25 @@ def query_semantic_scholar_citation(name_of_researcher):
                         paper_list_data = res.json()
                         string_of_ids = ""
                         array_holding_ids = []
-                        for paper in paper_list_data['data']:
-                            string_of_ids += paper['paperId'] + ","
-                            array_holding_ids.append(paper['paperId'])
-                        dict_for_holding_ids[key_for_dict] = array_holding_ids
-                        key_for_dict += 1
-                        total += len(paper_list_data['data'])
-                        if 'next' in paper_list_data:
-                            offset = paper_list_data['next']
-                        for key_ in dict_for_holding_ids:
-                            url_for_multiple_paper_info = 'https://api.semanticscholar.org/graph/v1/paper/batch'
-                            parameters = {'fields': 'year,citationCount,title'}
-                            data_dict = {"ids": dict_for_holding_ids[key_]}
-                            response = requests.post(url_for_multiple_paper_info,params=parameters,json=data_dict)
-                            output_data = response.json()
-                            for item in output_data:
-                                if 'year' and 'citationCount' in item:
-                                    if item['year'] != None:
-                                        citation_dict[item['year']] += item['citationCount']
+                        if 'data' in paper_list_data:
+                            for paper in paper_list_data['data']:
+                                string_of_ids += paper['paperId'] + ","
+                                array_holding_ids.append(paper['paperId'])
+                            dict_for_holding_ids[key_for_dict] = array_holding_ids
+                            key_for_dict += 1
+                            total += len(paper_list_data['data'])
+                            if 'next' in paper_list_data:
+                                offset = paper_list_data['next']
+                    for key_ in dict_for_holding_ids:
+                        url_for_multiple_paper_info = 'https://api.semanticscholar.org/graph/v1/paper/batch'
+                        parameters = {'fields': 'year,citationCount,title'}
+                        data_dict = {"ids": dict_for_holding_ids[key_]}
+                        response = requests.post(url_for_multiple_paper_info,params=parameters,json=data_dict)
+                        output_data = response.json()
+                        for item in output_data:
+                            if 'year' and 'citationCount' in item:
+                                if item['year'] != None:
+                                    citation_dict[item['year']] += item['citationCount']
 
                 else:
                     for paper in data['papers']:
@@ -360,8 +361,8 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
-    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     if wiki_institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(inst_image)
@@ -452,8 +453,8 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
-    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     if affiliation_from_google_scholar != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(inst_image)
@@ -536,8 +537,8 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype("Arial.ttf", title_font_size)
-    content_font = ImageFont.truetype("Arial.ttf", content_font_size)
+    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     if institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
