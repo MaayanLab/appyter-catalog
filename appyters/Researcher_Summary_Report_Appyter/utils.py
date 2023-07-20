@@ -38,12 +38,14 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
         yaxis=dict(title_font=dict(size=18)), 
         width = 750, 
         height = 500)
+    #Making sure the the x axis is linear when we have less than 35 data points
     if len(input_data_dict.keys()) < 35:
         fig.update_layout(xaxis = dict(
         tickmode = 'linear',
         dtick = 1, 
         title_font=dict(size=18)
         ))
+    #Otherwise skipping every 2 so the x axis is more readable. 
     else:
         fig.update_layout(xaxis = dict(
         tickmode = 'linear',
@@ -52,10 +54,12 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
         ))
     fig.update_layout(update_layout_params)
     fig.update_traces(marker_color='black')
-    fig.update_traces(width=0.99) 
+    fig.update_traces(width=0.99)
+    #Adding the source for all the plots except the drugshot and geneshot ones. 
     if type(list(input_data_dict.keys())[0]) != str:
         fig.update_layout(xaxis=dict(range=[min(input_data_dict.keys())-0.5, max(input_data_dict.keys())+0.5]))
             # add annotation
+        #Annotation at bottom right
         fig.add_annotation(dict(font=dict(color='black',size=12),
                                         x= 1.1,
                                         y = -.15,
@@ -66,6 +70,19 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
                                         yanchor='top',
                                         xref="paper",
                                         yref="paper")) 
+    else:
+        #Annotation on top right
+        fig.add_annotation(dict(font=dict(color='black',size=12),
+                                        x= 1.1,
+                                        y = 1.32,
+                                        showarrow=False,
+                                        text=source_title,
+                                        textangle=0,
+                                        xanchor='right',
+                                        yanchor='top',
+                                        xref="paper",
+                                        yref="paper")) 
+    #Fixing the y axis of the graphs when the values are on a smaller scale but still greater than frequency between 0 and 1. 
     if max(dict_for_graph[y_axis_title]) <= 10 and max(dict_for_graph[y_axis_title]) > 1:
         fig.update_layout(yaxis=dict(dtick=1))
     return fig
@@ -143,25 +160,24 @@ def display_figure_labels(counter, caption, title = None):
 def query_google_citation(name_of_researcher):
     search_query = scholarly.search_author(name_of_researcher)
     try:
+        #Obtain the researcher name in the try or return empty dictionary
         author  = next(search_query)
         display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
         summary_info = scholarly.fill(author, sections=['counts', 'indices'])
-        # print(summary_info)
         author = scholarly.fill(author)
-        # print(len([pub['bib']['title'] for pub in author['publications']]))
+        #List storing the citation and year for each publication to be used to calculate the AR index and h index. 
         list_storing_citations_and_years = []
         for pub in author['publications']:
-            # print(pub)
             if 'pub_year'in pub['bib']:
                 list_storing_citations_and_years.append([pub['bib']['title'], int(pub['bib']['pub_year']), int(pub['num_citations'])])
-        # print(len(list_storing_citations_and_years))
+
         citation_dict = summary_info['cites_per_year']
         affiliation_from_google_scholar = summary_info['affiliation']
         interests_from_google_scholar = summary_info['interests']
         total_times_cited = summary_info['citedby']
         h_index_from_google_scholar = summary_info['hindex']
         h_index_from_google_scholar_last_5 = summary_info['hindex5y']
-
+        #Sort by citation count and year in descending order. 
         list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
         ar_index = calculate_ar_index(list_storing_citations_and_years)
         # display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
@@ -183,21 +199,25 @@ def query_semantic_scholar_citation(name_of_researcher):
         final_name = None
         running_count = 0
         affil = None
+        #Loop through authors returned from the API Call. 
         if data['total'] > 0:
             for dict_author in data['data']:
                 id_now = dict_author['authorId']
                 name_returned = dict_author['name']
                 paper_count = dict_author['paperCount']
                 name_returned = name_returned.replace("’", "'")
+                #Currently using the author with the greatest number of papers and saving their information
                 if paper_count > running_count and name_of_researcher.split()[-1] in name_returned:
                     id_of_researcher = id_now
                     running_count = paper_count
                     final_name = name_returned.replace(" ", "-")
+            #Setting up API request to the author endpoint in order to get the citation counts for each paper and year of the researcher. 
             url_for_papers_final = f"https://api.semanticscholar.org/graph/v1/author/{id_of_researcher}?fields=name,citationCount,paperCount,hIndex,aliases,papers.year,papers.citationCount"
             citation_response = requests.get(url_for_papers_final)
             if citation_response.status_code == 200:
                 display(MyMarkdown("### Link to [Semantic Scholar Page](https://www.semanticscholar.org/author/{}/{}) for {}".format(final_name, id_of_researcher, name_of_researcher)))
                 data = citation_response.json()
+                #If there are more than 500 papers, have to go to the papers endpoint with a lst of papers in order to get that information since we have to use offsets
                 if data['paperCount'] > 500:
                     dict_for_holding_ids = {}
                     total = 0
@@ -228,25 +248,25 @@ def query_semantic_scholar_citation(name_of_researcher):
                             if 'year' and 'citationCount' in item:
                                 if item['year'] != None:
                                     citation_dict[item['year']] += item['citationCount']
-
+                #Add the year and citation count information if there are less than 500 papers. 
                 else:
                     for paper in data['papers']:
                         if type(paper['year']) == int:
                             citation_dict[paper['year']] += paper['citationCount']
+            #Error with the id of the reseacher in the API call. 
             else:
                 citation_dict = None
-                print("Error in getting the citation information for researcher.")
+                print("Error in getting the citation information for researcher by ID.")
 
         if citation_dict != None and len(citation_dict) != 0:
             # print(citation_dict)
             year_keys = list(citation_dict.keys())
             year_keys.sort()
             citation_dict = {year:citation_dict[year] for year in year_keys}
-            #Make the citation bar and line graph
             return citation_dict
         return citation_dict
     else:
-        print('Error in querying this researcher from Semantic Scholar. Their information may not be here. A manual search may help. ')
+        print('Error in querying this researcher from Semantic Scholar by name. Their information may not be here. A manual search may help. ')
         return citation_dict
 
 
@@ -353,7 +373,7 @@ def getting_information_from_wiki(name_of_researcher):
         print("Error in querying Wikipedia for the name of researcher")   
     return None      
 
-
+#Making the png image cards with text displayed on top of the png cards and saving those pngs as output. 
 def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
     display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
     display_list = []
@@ -363,6 +383,9 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
     image_height = 200
     title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
+    source_font_size = 10
+    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    source_title = 'Sourced from Wikipedia'
     if wiki_institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(inst_image)
@@ -376,7 +399,8 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("./output_images/wiki_image_1.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        inst_image.save("./output_images/card_wiki_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if len(wiki_awards) > 0: 
@@ -393,7 +417,8 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font= content_font, fill='black')
                 y += content_font_size
             y += 10
-        awards.save("./output_images/wiki_image_2.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        awards.save("./output_images/card_wiki_image_2.png")
         display_list.append(awards)
         # display(awards)
 
@@ -411,7 +436,8 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        known_for.save("./output_images/wiki_image_3.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        known_for.save("./output_images/card_wiki_image_3.png")
         display_list.append(known_for)
         # display(known_for)
 
@@ -429,10 +455,11 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 draw.text((5, y+10), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests.save("./output_images/wiki_image_4.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        interests.save("./output_images/card_wiki_image_4.png")
         display_list.append(interests)
         # display(interests)
-
+    #Creating a 1x3 figure with 1-based indexing to add to the add_subplot function
     fig = plt.figure(figsize=(10, 10))
     rows = 1
     columns = len(display_list)
@@ -455,6 +482,9 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
     image_height = 200
     title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
+    source_font_size = 10
+    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    source_title = 'Sourced from Google Scholar'
     if affiliation_from_google_scholar != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
         draw = ImageDraw.Draw(inst_image)
@@ -468,7 +498,8 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("./output_images/googlescholar_image_1.png")
+        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
+        inst_image.save("./output_images/card_googlescholar_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if h_index_from_google_scholar != None:
@@ -497,7 +528,8 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         for line in times_cited:
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
-        h_image.save("./output_images/googlescholar_image_2.png")
+        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
+        h_image.save("./output_images/card_googlescholar_image_2.png")
         display_list.append(h_image)
         # display(h_image)
     if len(interests_from_google_scholar) > 0:
@@ -515,7 +547,8 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests_image.save("./output_images/googlescholar_image_3.png")
+        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
+        interests_image.save("./output_images/card_googlescholar_image_3.png")
         display_list.append(interests_image)
         # display(interests_image)
 
@@ -539,6 +572,9 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     image_height = 200
     title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
+    source_font_size = 10
+    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    source_title = 'Sourced from OpenAlex'
     display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     if institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
@@ -553,7 +589,8 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        inst_image.save("./output_images/openalex_image_1.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        inst_image.save("./output_images/card_openalex_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if h_index != None:
@@ -577,7 +614,8 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         for line in times_cited:
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
-        h_image.save("./output_images/openalex_image_2.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        h_image.save("./output_images/card_openalex_image_2.png")
         display_list.append(h_image)
         # display(h_image)
     if len(interests) > 0:
@@ -595,7 +633,8 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
-        interests_image.save("./output_images/openalex_image_3.png")
+        draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
+        interests_image.save("./output_images/card_openalex_image_3.png")
         display_list.append(interests_image)
         # display(interests_image)
     
@@ -609,6 +648,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     plt.show()
     return display_list
 
+#Function to display data in a 3x3 matrix if data is returned from all three API calls for the card information. 
 def display_matrix(google_scholar_info, wiki_info, open_alex_info):
     wiki_info = wiki_info[:3]
     fig = plt.figure(figsize=(10, 10))
