@@ -26,6 +26,7 @@ class MyMarkdown:
     return self._markdown
     
 def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, source_title=''):
+    graph_title = '<br>'.join(textwrap.wrap(graph_title, 40))
     dict_for_graph = defaultdict(list)
     for key, value in input_data_dict.items():
         dict_for_graph[x_axis_title].append(key)
@@ -34,7 +35,7 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
     update_layout_params = dict(
         font = dict(size = 12),
         plot_bgcolor="rgba(255,255,255,0)",
-        title_font_size=18,
+        title_font_size=32,
         yaxis=dict(title_font=dict(size=18)), 
         width = 750, 
         height = 500)
@@ -88,6 +89,7 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
     return fig
 
 def make_line_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, source_title=''):
+    graph_title = '<br>'.join(textwrap.wrap(graph_title, 40))
     dict_for_graph = defaultdict(list)
     running_sum = 0
     for key, value in input_data_dict.items():
@@ -98,7 +100,7 @@ def make_line_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sou
     update_layout_params = dict(
         font = dict(size = 12),
         plot_bgcolor="rgba(255,255,255,0)",
-        title_font_size=18,
+        title_font_size=32,
         yaxis=dict(title_font=dict(size=18)), 
         width = 750, 
         height = 500)
@@ -381,7 +383,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     source_font_size = 10
     source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
@@ -480,7 +482,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     source_font_size = 10
     source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
@@ -570,7 +572,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     content_font_size = 16
     image_width = 200
     image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Regular.ttf', title_font_size)
+    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
     content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
     source_font_size = 10
     source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
