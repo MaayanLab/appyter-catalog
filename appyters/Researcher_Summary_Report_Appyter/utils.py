@@ -24,7 +24,7 @@ class MyMarkdown:
     self._markdown = markdown
   def _repr_markdown_(self):
     return self._markdown
-    
+#255,255,255
 def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, source_title=''):
     graph_title = '<br>'.join(textwrap.wrap(graph_title, 40))
     dict_for_graph = defaultdict(list)
@@ -34,7 +34,7 @@ def make_bar_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sour
     fig = px.bar(dict_for_graph, x = x_axis_title, y=y_axis_title, title=graph_title)
     update_layout_params = dict(
         font = dict(size = 12),
-        plot_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="rgba(240, 238, 240,0)",
         title_font_size=32,
         yaxis=dict(title_font=dict(size=18)), 
         width = 750, 
@@ -99,7 +99,7 @@ def make_line_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sou
     fig = px.line(dict_for_graph, x = x_axis_title, y=y_axis_title, title=graph_title, markers = True)
     update_layout_params = dict(
         font = dict(size = 12),
-        plot_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="rgba(240, 238, 240,0)",
         title_font_size=32,
         yaxis=dict(title_font=dict(size=18)), 
         width = 750, 
@@ -159,7 +159,7 @@ def display_figure_labels(counter, caption, title = None):
     return counter
 
 
-def query_google_citation(name_of_researcher):
+def query_google_citation(name_of_researcher, output_folder):
     search_query = scholarly.search_author(name_of_researcher)
     try:
         #Obtain the researcher name in the try or return empty dictionary
@@ -183,7 +183,7 @@ def query_google_citation(name_of_researcher):
         list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
         ar_index = calculate_ar_index(list_storing_citations_and_years)
         # display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
-        display_list = display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
+        display_list = display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher,output_folder)
         return (citation_dict, display_list)
     except:
         print("No Google Scholar information for {}".format(name_of_researcher))
@@ -272,7 +272,7 @@ def query_semantic_scholar_citation(name_of_researcher):
         return citation_dict
 
 
-def getting_information_from_openalex(name_of_researcher):
+def getting_information_from_openalex(name_of_researcher,output_folder):
     url_link = "https://api.openalex.org/authors?search={}".format(name_of_researcher)
     response  = requests.get(url_link)
     if response.status_code == 200:
@@ -291,13 +291,13 @@ def getting_information_from_openalex(name_of_researcher):
                     h_index = first_result['summary_stats']['h_index']
                 if 'i10_index' in first_result['summary_stats']:
                     i10_index = first_result['summary_stats']['i10_index']
-                if 'last_known_institution' in first_result:
+                if 'last_known_institution' in first_result and first_result['last_known_institution'] != None:
                     institution = first_result['last_known_institution']['display_name']
                 for concept in first_result['x_concepts'][:5]:
                     interests.append(concept['display_name'])
             
             # display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
-            return display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
+            return display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher,output_folder)
 
         else:
             print("No matching information for this researcher from OpenAlex")
@@ -306,7 +306,7 @@ def getting_information_from_openalex(name_of_researcher):
     return None
 
 
-def getting_information_from_wiki(name_of_researcher):
+def getting_information_from_wiki(name_of_researcher, output_folder):
     wiki_institution = ''
     wiki_known_for = []
     wiki_field_interests = []
@@ -361,7 +361,7 @@ def getting_information_from_wiki(name_of_researcher):
                                             wiki_awards.append(content.text)
                                             # print(content.text)
                         # display_summary_text_from_wikipedia(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
-                        return display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher)
+                        return display_summary_text_from_wikipedia_png(wiki_institution, wiki_known_for, wiki_field_interests, wiki_awards, name_of_researcher, output_folder)
                     else:
                         print("No data to show")
                 except:
@@ -374,9 +374,9 @@ def getting_information_from_wiki(name_of_researcher):
     else:
         print("Error in querying Wikipedia for the name of researcher")   
     return None      
-
+#Old image color (221, 224, 237)
 #Making the png image cards with text displayed on top of the png cards and saving those pngs as output. 
-def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None):
+def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None, output_folder = None):
     display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
     display_list = []
     title_font_size = 18
@@ -389,7 +389,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
     source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
     source_title = 'Sourced from Wikipedia'
     if wiki_institution != '':
-        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(inst_image)
         text_1 = textwrap.wrap("Institution Affiliation", width = 25)
         text_2 = textwrap.wrap(wiki_institution, width = 20)
@@ -402,11 +402,11 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save("./output_images/card_wiki_image_1.png")
+        inst_image.save(output_folder + "card_wiki_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if len(wiki_awards) > 0: 
-        awards = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        awards = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(awards)
         text_1 = textwrap.wrap("Awards", width = 20)
         y = 0
@@ -420,12 +420,12 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        awards.save("./output_images/card_wiki_image_2.png")
+        awards.save(output_folder + "card_wiki_image_2.png")
         display_list.append(awards)
         # display(awards)
 
     if len(wiki_known_for) > 0:
-        known_for = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        known_for = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(known_for)
         text_1 = textwrap.wrap("Known For", width = 20)
         y = 0
@@ -439,12 +439,12 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        known_for.save("./output_images/card_wiki_image_3.png")
+        known_for.save(output_folder + "card_wiki_image_3.png")
         display_list.append(known_for)
         # display(known_for)
 
     if len(wiki_field_interests) > 0:
-        interests = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        interests = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(interests)
         text_1 = textwrap.wrap("Research Fields", width = 20)
         y = 0
@@ -458,7 +458,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests.save("./output_images/card_wiki_image_4.png")
+        interests.save(output_folder + "card_wiki_image_4.png")
         display_list.append(interests)
         # display(interests)
     #Creating a 1x3 figure with 1-based indexing to add to the add_subplot function
@@ -475,7 +475,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
 
 
 
-def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None):
+def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
     display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
     display_list = []
     title_font_size = 18
@@ -488,7 +488,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
     source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
     source_title = 'Sourced from Google Scholar'
     if affiliation_from_google_scholar != '':
-        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(inst_image)
         text_1 = textwrap.wrap("Institution Affiliation", width = 25)
         text_2 = textwrap.wrap(affiliation_from_google_scholar, width = 20)
@@ -501,11 +501,11 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save("./output_images/card_googlescholar_image_1.png")
+        inst_image.save(output_folder + "card_googlescholar_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if h_index_from_google_scholar != None:
-        h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        h_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(h_image)
         title = 'Metrics'
         h_index = textwrap.wrap(f'H-index: {h_index_from_google_scholar}', width = 25)
@@ -531,11 +531,11 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        h_image.save("./output_images/card_googlescholar_image_2.png")
+        h_image.save(output_folder + "card_googlescholar_image_2.png")
         display_list.append(h_image)
         # display(h_image)
     if len(interests_from_google_scholar) > 0:
-        interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        interests_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(interests_image)
         title = textwrap.wrap('Research Interests', width = 25)
         y = 0
@@ -550,7 +550,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
                 y += content_font_size
             y += 10
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save("./output_images/card_googlescholar_image_3.png")
+        interests_image.save(output_folder + "card_googlescholar_image_3.png")
         display_list.append(interests_image)
         # display(interests_image)
 
@@ -566,7 +566,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
 
 
 
-def display_summary_text_from_openalex_png(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None):
+def display_summary_text_from_openalex_png(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
     display_list = []
     title_font_size = 18
     content_font_size = 16
@@ -579,7 +579,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
     source_title = 'Sourced from OpenAlex'
     display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     if institution != '':
-        inst_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(inst_image)
         text_1 = textwrap.wrap("Institution Affiliation", width = 25)
         text_2 = textwrap.wrap(institution, width = 20)
@@ -592,11 +592,11 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save("./output_images/card_openalex_image_1.png")
+        inst_image.save(output_folder + "card_openalex_image_1.png")
         display_list.append(inst_image)
         # display(inst_image)
     if h_index != None:
-        h_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        h_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(h_image)
         title = 'Metrics'
         h_index = textwrap.wrap(f'H-index: {h_index}', width = 25)
@@ -617,11 +617,11 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        h_image.save("./output_images/card_openalex_image_2.png")
+        h_image.save(output_folder + "card_openalex_image_2.png")
         display_list.append(h_image)
         # display(h_image)
     if len(interests) > 0:
-        interests_image = Image.new("RGB", (image_width, image_height), (221, 224, 237))
+        interests_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(interests_image)
         title = textwrap.wrap('Research Interests', width = 25)
         y = 0
@@ -636,7 +636,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save("./output_images/card_openalex_image_3.png")
+        interests_image.save(output_folder + "card_openalex_image_3.png")
         display_list.append(interests_image)
         # display(interests_image)
     
