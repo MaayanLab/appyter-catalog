@@ -1,1 +1,2 @@
 fonts-open-sans
+fonts-liberation
