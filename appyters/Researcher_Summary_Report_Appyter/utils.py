@@ -151,10 +151,10 @@ def calculate_ar_index(citations):
     return math.sqrt(running_sum)
 
 #Displaying the figure number and if a title is given, then displaying the download link. 
-def display_figure_labels(counter, caption, title = None):
+def display_figure_labels(output_folder, counter, caption, title = None):
     display(MyMarkdown("*Figure {}. {}*".format(counter, caption)))
     if title != None:
-        display(FileLink("output_images/"+title+'.png' , result_html_prefix=str('Download Figure {} (PNG): '.format(counter))))
+        display(FileLink(output_folder+title+'.png' , result_html_prefix=str('Download Figure {} (PNG): '.format(counter))))
     counter += 1
     return counter
 
@@ -376,18 +376,29 @@ def getting_information_from_wiki(name_of_researcher, output_folder):
     return None      
 #Old image color (221, 224, 237)
 #Making the png image cards with text displayed on top of the png cards and saving those pngs as output. 
+font_for_title = 'LiberationSans-Bold.ttf'
+font_for_content = 'LiberationSans-Regular.ttf'
+# font_for_title = 'OpenSans-Bold.ttf'
+# font_for_content = 'OpenSans-Regular.ttf'
+title_font_size_ = 18
+content_font_size_ = 16
+source_font_size_ = 10
+image_width_  = 200
+image_height_ = 200
+dpi_value_ = (200,200)
 def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_for = [], wiki_field_interests = [], wiki_awards = [], name_of_researcher = None, output_folder = None):
     display(MyMarkdown("## Text Summary Information for {} (From Wikipedia) ##".format(name_of_researcher)))
     display_list = []
-    title_font_size = 18
-    content_font_size = 16
-    image_width = 200
-    image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
-    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
-    source_font_size = 10
-    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    title_font_size = title_font_size_
+    content_font_size = content_font_size_
+    image_width = image_width_
+    image_height = image_height_
+    title_font = ImageFont.truetype(font_for_title, title_font_size)
+    content_font = ImageFont.truetype(font_for_content, content_font_size)
+    source_font_size = source_font_size_
+    source_font = ImageFont.truetype(font_for_content, source_font_size)
     source_title = 'Sourced from Wikipedia'
+    dpi_value = dpi_value_
     if wiki_institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(inst_image)
@@ -402,7 +413,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save(output_folder + "card_wiki_image_1.png")
+        inst_image.save(output_folder + "card_wiki_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if len(wiki_awards) > 0: 
@@ -416,11 +427,11 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
         for award in wiki_awards:
             text_2 = textwrap.wrap(award, width = 20)
             for line in text_2:
-                draw.text((5, y+10), line, font= content_font, fill='black')
+                draw.text((5, y+10), line, font = content_font, fill='black')
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        awards.save(output_folder + "card_wiki_image_2.png")
+        awards.save(output_folder + "card_wiki_image_2.png", dpi=dpi_value)
         display_list.append(awards)
         # display(awards)
 
@@ -439,7 +450,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        known_for.save(output_folder + "card_wiki_image_3.png")
+        known_for.save(output_folder + "card_wiki_image_3.png", dpi=dpi_value)
         display_list.append(known_for)
         # display(known_for)
 
@@ -458,7 +469,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests.save(output_folder + "card_wiki_image_4.png")
+        interests.save(output_folder + "card_wiki_image_4.png", dpi=dpi_value)
         display_list.append(interests)
         # display(interests)
     #Creating a 1x3 figure with 1-based indexing to add to the add_subplot function
@@ -478,15 +489,16 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
 def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
     display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
     display_list = []
-    title_font_size = 18
-    content_font_size = 16
-    image_width = 200
-    image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
-    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
-    source_font_size = 10
-    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    title_font_size = title_font_size_
+    content_font_size = content_font_size_
+    image_width = image_width_
+    image_height = image_height_
+    title_font = ImageFont.truetype(font_for_title, title_font_size)
+    content_font = ImageFont.truetype(font_for_content, content_font_size)
+    source_font_size = source_font_size_
+    source_font = ImageFont.truetype(font_for_content, source_font_size)
     source_title = 'Sourced from Google Scholar'
+    dpi_value = dpi_value_
     if affiliation_from_google_scholar != '':
         inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
         draw = ImageDraw.Draw(inst_image)
@@ -494,14 +506,14 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
         text_2 = textwrap.wrap(affiliation_from_google_scholar, width = 20)
         y = 0
         for line in text_1:
-            draw.text((5, y), line, font=title_font, fill='black')
+            draw.text((5, y), line, font=title_font, fill='black', antialias=True)
             y += title_font_size
 
         for line in text_2:
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
-        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save(output_folder + "card_googlescholar_image_1.png")
+        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black', antialias=True)
+        inst_image.save(output_folder + "card_googlescholar_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if h_index_from_google_scholar != None:
@@ -531,7 +543,8 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        h_image.save(output_folder + "card_googlescholar_image_2.png")
+        h_image.info['dpi'] = dpi_value
+        h_image.save(output_folder + "card_googlescholar_image_2.png", dpi=dpi_value)
         display_list.append(h_image)
         # display(h_image)
     if len(interests_from_google_scholar) > 0:
@@ -550,7 +563,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
                 y += content_font_size
             y += 10
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save(output_folder + "card_googlescholar_image_3.png")
+        interests_image.save(output_folder + "card_googlescholar_image_3.png", dpi=dpi_value)
         display_list.append(interests_image)
         # display(interests_image)
 
@@ -568,15 +581,16 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
 
 def display_summary_text_from_openalex_png(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
     display_list = []
-    title_font_size = 18
-    content_font_size = 16
-    image_width = 200
-    image_height = 200
-    title_font = ImageFont.truetype('OpenSans-Bold.ttf', title_font_size)
-    content_font = ImageFont.truetype('OpenSans-Regular.ttf', content_font_size)
-    source_font_size = 10
-    source_font = ImageFont.truetype('OpenSans-Regular.ttf', source_font_size)
+    title_font_size = title_font_size_
+    content_font_size = content_font_size_
+    image_width = image_width_
+    image_height = image_height_
+    title_font = ImageFont.truetype(font_for_title, title_font_size)
+    content_font = ImageFont.truetype(font_for_content, content_font_size)
+    source_font_size = source_font_size_
+    source_font = ImageFont.truetype(font_for_content, source_font_size)
     source_title = 'Sourced from OpenAlex'
+    dpi_value = dpi_value_
     display(MyMarkdown("## Text Summary Information for {} (From OpenAlex API) ##".format(name_of_researcher)))
     if institution != '':
         inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
@@ -592,7 +606,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save(output_folder + "card_openalex_image_1.png")
+        inst_image.save(output_folder + "card_openalex_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if h_index != None:
@@ -617,7 +631,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        h_image.save(output_folder + "card_openalex_image_2.png")
+        h_image.save(output_folder + "card_openalex_image_2.png", dpi=dpi_value)
         display_list.append(h_image)
         # display(h_image)
     if len(interests) > 0:
@@ -636,7 +650,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save(output_folder + "card_openalex_image_3.png")
+        interests_image.save(output_folder + "card_openalex_image_3.png", dpi=dpi_value)
         display_list.append(interests_image)
         # display(interests_image)
     
@@ -673,3 +687,4 @@ def display_matrix(google_scholar_info, wiki_info, open_alex_info):
         plt.imshow(img)
         plt.axis('off')
     plt.show()
+
