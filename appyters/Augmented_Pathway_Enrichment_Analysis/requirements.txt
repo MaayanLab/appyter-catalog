@@ -1,5 +1,4 @@
-appyter @ git+https://github.com/Maayanlab/appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.6
 pandas
 matplotlib
 seaborn

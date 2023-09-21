@@ -6,6 +6,7 @@ __pycache__
 .ipynb_checkpoints
 .publish
 .pyc
+.test
 *-checkpoint.ipynb
 \.tmp/
 app/public/appyters.json
