@@ -424,7 +424,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
         elif method == "edgeR":
             edgeR = robjects.r['edgeR']
             
-            edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+            edgeR_results = pandas2ri.conversion.rpy2py(edgeR(pandas2ri.conversion.py2rpy(expr_df.loc[:, cls1_sample_ids+cls2_sample_ids]), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
             
             signature = pd.DataFrame(edgeR_results[0])
             signature.index = edgeR_results[1]
@@ -432,7 +432,7 @@ def get_signatures(classes, dataset, normalization, method, meta_class_column_na
         elif method == "DESeq2":
             # deseq2 receives raw counts
             DESeq2 = robjects.r['deseq2']
-            DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(expr_df), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
+            DESeq2_results = pandas2ri.conversion.rpy2py(DESeq2(pandas2ri.conversion.py2rpy(expr_df.loc[:, cls1_sample_ids+cls2_sample_ids]), pandas2ri.conversion.py2rpy(cls1_sample_ids), pandas2ri.conversion.py2rpy(cls2_sample_ids)))
             
             signature = pd.DataFrame(DESeq2_results[0])
             signature.index = DESeq2_results[1]
