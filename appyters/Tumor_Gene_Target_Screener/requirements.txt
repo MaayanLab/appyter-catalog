@@ -3,7 +3,7 @@ maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinforma
 matplotlib
 matplotlib_venn
 numpy
-pandas
+pandas==2.0
 plotly
 qnorm
 rpy2
