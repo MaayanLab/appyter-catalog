@@ -9,3 +9,4 @@ jinja2>=3.0,<3.1
 pybase64
 statsmodels
 requests
+networkx
