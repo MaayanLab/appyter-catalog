@@ -1,10 +1,11 @@
 appyter
-maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.9
 matplotlib
 matplotlib_venn
 numpy
-pandas
+pandas==2.0
 plotly
 qnorm
 rpy2
+s3fs
 scikit-learn

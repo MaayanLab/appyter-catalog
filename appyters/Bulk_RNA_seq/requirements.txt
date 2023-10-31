@@ -2,7 +2,7 @@ appyter @ git+https://github.com/Maayanlab/appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 ipykernel
 rpy2==3.4.5
-pandas
+pandas<2.0
 requests
 plotly
 matplotlib

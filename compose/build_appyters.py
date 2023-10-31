@@ -19,19 +19,19 @@ def get_appyters(appyter_path):
       long_description=open(os.path.join(path, 'README.md'), 'r').read(),
       # find the oldest commit containing the appyter's README (follow for detecting renames)
       creation_timestamp=str(sh.tail(
-        sh.git.log(
+        '-n1',
+        _in=sh.git.log(
           '--follow', r'--pretty=format:%aI', '--', os.path.join(path, 'README.md'),
           _tty_out=False,
         ),
-        '-n1'
       )).strip(),
       # find the most recent commit containing the appyter's directory
       update_timestamp=str(sh.head(
-        sh.git.log(
+        '-n1',
+        _in=sh.git.log(
           r'--pretty=format:%aI', '--', path,
           _tty_out=False,
         ),
-        '-n1'
       )).strip(),
     )
 
