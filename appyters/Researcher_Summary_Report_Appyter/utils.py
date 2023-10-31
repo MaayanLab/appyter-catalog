@@ -163,7 +163,10 @@ def query_google_citation(name_of_researcher, output_folder):
     search_query = scholarly.search_author(name_of_researcher)
     try:
         #Obtain the researcher name in the try or return empty dictionary
-        author  = next(search_query)
+        author = next(search_query)
+        if name_of_researcher.split()[0] not in author['name'] or name_of_researcher.split()[-1] not in author['name']:
+            print("No Google Scholar information for {}".format(name_of_researcher))
+            return None
         display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
         summary_info = scholarly.fill(author, sections=['counts', 'indices'])
         author = scholarly.fill(author)
@@ -182,7 +185,6 @@ def query_google_citation(name_of_researcher, output_folder):
         #Sort by citation count and year in descending order. 
         list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
         ar_index = calculate_ar_index(list_storing_citations_and_years)
-        # display_summary_text_from_google_scholar(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher)
         display_list = display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher,output_folder)
         return (citation_dict, display_list)
     except:
@@ -274,7 +276,7 @@ def query_semantic_scholar_citation(name_of_researcher):
 
 def getting_information_from_openalex(name_of_researcher,output_folder):
     url_link = "https://api.openalex.org/authors?search={}".format(name_of_researcher)
-    response  = requests.get(url_link)
+    response = requests.get(url_link)
     if response.status_code == 200:
         interests = []
         h_index = None
@@ -283,24 +285,30 @@ def getting_information_from_openalex(name_of_researcher,output_folder):
         institution = ''
 
         data = response.json()
-        if data['meta']['count'] > 0:
-            first_result = data['results'][0]
-            if name_of_researcher.split()[0] in first_result['display_name'] and name_of_researcher.split()[-1] in first_result['display_name']:
-                total_times_cited = first_result['cited_by_count']
-                if 'h_index' in first_result['summary_stats']:
-                    h_index = first_result['summary_stats']['h_index']
-                if 'i10_index' in first_result['summary_stats']:
-                    i10_index = first_result['summary_stats']['i10_index']
-                if 'last_known_institution' in first_result and first_result['last_known_institution'] != None:
-                    institution = first_result['last_known_institution']['display_name']
-                for concept in first_result['x_concepts'][:5]:
-                    interests.append(concept['display_name'])
-            
-            # display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
-            return display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher,output_folder)
+        try:
+            if data['meta']['count'] > 0:
+                first_result = data['results'][0]
+                if name_of_researcher.split()[0] in first_result['display_name'] and name_of_researcher.split()[-1] in first_result['display_name']:
+                    total_times_cited = first_result['cited_by_count']
+                    if 'h_index' in first_result['summary_stats']:
+                        h_index = first_result['summary_stats']['h_index']
+                    if 'i10_index' in first_result['summary_stats']:
+                        i10_index = first_result['summary_stats']['i10_index']
+                    if 'last_known_institution' in first_result and first_result['last_known_institution'] != None:
+                        institution = first_result['last_known_institution']['display_name']
+                    for concept in first_result['x_concepts'][:5]:
+                        interests.append(concept['display_name'])
+                else:
+                    print("Name returned from OpenAlex API doesnt match name of researcher.")
+                
+                # display_summary_text_from_openalex(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher)
+                return display_summary_text_from_openalex_png(institution,interests, h_index,i10_index, total_times_cited, name_of_researcher,output_folder)
 
-        else:
-            print("No matching information for this researcher from OpenAlex")
+            else:
+                print("No matching information for this researcher from OpenAlex")
+        except:
+            print("Error in the OpenAlex response JSON")
+            return None
     else:
         print("Error in querying from OpenAlex API.")
     return None
@@ -413,7 +421,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save(output_folder + "card_wiki_image_1.png", dpi=dpi_value)
+        inst_image.save(output_folder + "1card_wiki_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if len(wiki_awards) > 0: 
@@ -431,7 +439,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        awards.save(output_folder + "card_wiki_image_2.png", dpi=dpi_value)
+        awards.save(output_folder + "1card_wiki_image_2.png", dpi=dpi_value)
         display_list.append(awards)
         # display(awards)
 
@@ -450,7 +458,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        known_for.save(output_folder + "card_wiki_image_3.png", dpi=dpi_value)
+        known_for.save(output_folder + "1card_wiki_image_3.png", dpi=dpi_value)
         display_list.append(known_for)
         # display(known_for)
 
@@ -469,7 +477,7 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests.save(output_folder + "card_wiki_image_4.png", dpi=dpi_value)
+        interests.save(output_folder + "1card_wiki_image_4.png", dpi=dpi_value)
         display_list.append(interests)
         # display(interests)
     #Creating a 1x3 figure with 1-based indexing to add to the add_subplot function
@@ -513,7 +521,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black', antialias=True)
-        inst_image.save(output_folder + "card_googlescholar_image_1.png", dpi=dpi_value)
+        inst_image.save(output_folder + "1card_googlescholar_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if h_index_from_google_scholar != None:
@@ -544,7 +552,7 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             y += content_font_size
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
         h_image.info['dpi'] = dpi_value
-        h_image.save(output_folder + "card_googlescholar_image_2.png", dpi=dpi_value)
+        h_image.save(output_folder + "1card_googlescholar_image_2.png", dpi=dpi_value)
         display_list.append(h_image)
         # display(h_image)
     if len(interests_from_google_scholar) > 0:
@@ -557,13 +565,13 @@ def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar
             y += title_font_size
         y += 15
         for interest in interests_from_google_scholar:
-            interest_text = textwrap.wrap(interest, width=25)
+            interest_text = textwrap.wrap(interest, width=20)
             for line in interest_text:
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
         draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save(output_folder + "card_googlescholar_image_3.png", dpi=dpi_value)
+        interests_image.save(output_folder + "1card_googlescholar_image_3.png", dpi=dpi_value)
         display_list.append(interests_image)
         # display(interests_image)
 
@@ -606,7 +614,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y+10), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        inst_image.save(output_folder + "card_openalex_image_1.png", dpi=dpi_value)
+        inst_image.save(output_folder + "1card_openalex_image_1.png", dpi=dpi_value)
         display_list.append(inst_image)
         # display(inst_image)
     if h_index != None:
@@ -631,7 +639,7 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             draw.text((5, y), line, font=content_font, fill='black')
             y += content_font_size
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        h_image.save(output_folder + "card_openalex_image_2.png", dpi=dpi_value)
+        h_image.save(output_folder + "1card_openalex_image_2.png", dpi=dpi_value)
         display_list.append(h_image)
         # display(h_image)
     if len(interests) > 0:
@@ -644,13 +652,13 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
             y += title_font_size
         y += 15
         for interest in interests:
-            interest_text = textwrap.wrap(interest, width=25)
+            interest_text = textwrap.wrap(interest, width=20)
             for line in interest_text:
                 draw.text((5, y), line, font=content_font, fill='black')
                 y += content_font_size
             y += 10
         draw.text((image_width*0.35, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save(output_folder + "card_openalex_image_3.png", dpi=dpi_value)
+        interests_image.save(output_folder + "1card_openalex_image_3.png", dpi=dpi_value)
         display_list.append(interests_image)
         # display(interests_image)
     
