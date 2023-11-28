@@ -1,0 +1,8 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+pandas
+numpy
+matplotlib
+seaborn
+networkx
+fastcluster
+pyvis
