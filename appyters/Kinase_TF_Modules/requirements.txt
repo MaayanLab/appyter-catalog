@@ -1,8 +1,9 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-pandas
-numpy
-matplotlib
-seaborn
-networkx
 fastcluster
+matplotlib
+networkx
+numpy
+pandas
 pyvis
+scipy
+seaborn
