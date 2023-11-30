@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "Kinase_TF_Modules",
+  "title": "Kinase Transcription Factor Module Analysis",
+  "version": "0.0.1",
+  "description": "Utilize paired phosphoproteomic and transcriptomic data to identify differentially activated kinase and transcription modules.",
+  "image": "thumbnail.png",
+  "authors": [
+    {
+      "name": "Giacomo Marino",
+      "email": "giacomo.marino@mssm.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog",
+  "tags": [
+    "rna-seq", "phospho", "chea3", "kea3", "kinase", "tf", "transcription factor", "modules"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "public": false,
+  "appyter": {
+    "file": "Kinase-TF-Modules.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "toc",
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}
