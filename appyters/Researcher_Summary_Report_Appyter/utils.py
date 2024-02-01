@@ -4,7 +4,6 @@ from IPython.display import display,FileLink, HTML, Markdown, IFrame
 import requests
 import plotly.express as px
 import plotly
-from scholarly import scholarly
 import datetime
 import math
 from bs4 import BeautifulSoup
