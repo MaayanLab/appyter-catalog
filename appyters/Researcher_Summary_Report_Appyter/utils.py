@@ -137,6 +137,7 @@ def make_line_plot(input_data_dict, x_axis_title, y_axis_title, graph_title, sou
 def calculate_ar_index(citations):
     """
     Calculate the AR index as based in the paper from BiHui et al. 
+    AR-index calculated by taking into account the years that passed
     """
     h_index = 0
     running_sum = 0
