@@ -160,39 +160,6 @@ def display_figure_labels(output_folder, counter, caption, title = None):
     return counter
 
 
-def query_google_citation(name_of_researcher, output_folder):
-    search_query = scholarly.search_author(name_of_researcher)
-    try:
-        #Obtain the researcher name in the try or return empty dictionary
-        author = next(search_query)
-        if name_of_researcher.split()[0] not in author['name'] or name_of_researcher.split()[-1] not in author['name']:
-            print("No Google Scholar information for {}".format(name_of_researcher))
-            return None
-        display(MyMarkdown("### Link to [Google Scholar Page](https://scholar.google.com/citations?user={}) for {}".format(author['scholar_id'], name_of_researcher)))
-        summary_info = scholarly.fill(author, sections=['counts', 'indices'])
-        author = scholarly.fill(author)
-        #List storing the citation and year for each publication to be used to calculate the AR index and h index. 
-        list_storing_citations_and_years = []
-        for pub in author['publications']:
-            if 'pub_year'in pub['bib']:
-                list_storing_citations_and_years.append([pub['bib']['title'], int(pub['bib']['pub_year']), int(pub['num_citations'])])
-
-        citation_dict = summary_info['cites_per_year']
-        affiliation_from_google_scholar = summary_info['affiliation']
-        interests_from_google_scholar = summary_info['interests']
-        total_times_cited = summary_info['citedby']
-        h_index_from_google_scholar = summary_info['hindex']
-        h_index_from_google_scholar_last_5 = summary_info['hindex5y']
-        #Sort by citation count and year in descending order. 
-        list_storing_citations_and_years = sorted(list_storing_citations_and_years, key = lambda x:(x[2], x[1]), reverse=True)
-        ar_index = calculate_ar_index(list_storing_citations_and_years)
-        display_list = display_summary_text_from_google_scholar_png(affiliation_from_google_scholar, h_index_from_google_scholar, interests_from_google_scholar, h_index_from_google_scholar_last_5, ar_index, total_times_cited, name_of_researcher,output_folder)
-        return (citation_dict, display_list)
-    except:
-        print("No Google Scholar information for {}".format(name_of_researcher))
-        return None
-
-
 def query_semantic_scholar_citation(name_of_researcher):
     citation_dict = defaultdict(int)
     #Retrieving the most likely author id based off the name of the input passed in from the semantic Scholar API. 
@@ -494,100 +461,6 @@ def display_summary_text_from_wikipedia_png(wiki_institution = '', wiki_known_fo
     return display_list
 
 
-
-def display_summary_text_from_google_scholar_png(affiliation_from_google_scholar = None, h_index_from_google_scholar = None, interests_from_google_scholar = [], h_index_from_google_scholar_last_5 = None, ar_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
-    display(MyMarkdown("## Text Summary Information for {} (From Google Scholar) ##".format(name_of_researcher)))
-    display_list = []
-    title_font_size = title_font_size_
-    content_font_size = content_font_size_
-    image_width = image_width_
-    image_height = image_height_
-    title_font = ImageFont.truetype(font_for_title, title_font_size)
-    content_font = ImageFont.truetype(font_for_content, content_font_size)
-    source_font_size = source_font_size_
-    source_font = ImageFont.truetype(font_for_content, source_font_size)
-    source_title = 'Sourced from Google Scholar'
-    dpi_value = dpi_value_
-    if affiliation_from_google_scholar != '':
-        inst_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
-        draw = ImageDraw.Draw(inst_image)
-        text_1 = textwrap.wrap("Institution Affiliation", width = 25)
-        text_2 = textwrap.wrap(affiliation_from_google_scholar, width = 20)
-        y = 0
-        for line in text_1:
-            draw.text((5, y), line, font=title_font, fill='black', antialias=True)
-            y += title_font_size
-
-        for line in text_2:
-            draw.text((5, y+10), line, font=content_font, fill='black')
-            y += content_font_size
-        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black', antialias=True)
-        inst_image.save(output_folder + "1card_googlescholar_image_1.png", dpi=dpi_value)
-        display_list.append(inst_image)
-        # display(inst_image)
-    if h_index_from_google_scholar != None:
-        h_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
-        draw = ImageDraw.Draw(h_image)
-        title = 'Metrics'
-        h_index = textwrap.wrap(f'H-index: {h_index_from_google_scholar}', width = 25)
-        h_index_5 = textwrap.wrap(f'H-index over last 5 years: {h_index_from_google_scholar_last_5}', width = 25)
-        ar_index = textwrap.wrap(f'Age Related Index: {int(ar_index)}', width=25)
-        times_cited = textwrap.wrap('Total Citations: '+str(total_times_cited), width=25)
-        y = 0
-        draw.text((5, y), title, font=title_font, fill='black')
-        y += title_font_size + 10
-        for line in h_index:
-            draw.text((5, y), line, font=content_font, fill='black')
-            y += content_font_size
-        y += 10
-        for line in h_index_5:
-            draw.text((5, y), line, font=content_font, fill='black')
-            y += content_font_size
-        y += 10
-        for line in ar_index:
-            draw.text((5, y), line, font=content_font, fill='black')
-            y += content_font_size
-        y += 10
-        for line in times_cited:
-            draw.text((5, y), line, font=content_font, fill='black')
-            y += content_font_size
-        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        h_image.info['dpi'] = dpi_value
-        h_image.save(output_folder + "1card_googlescholar_image_2.png", dpi=dpi_value)
-        display_list.append(h_image)
-        # display(h_image)
-    if len(interests_from_google_scholar) > 0:
-        interests_image = Image.new("RGB", (image_width, image_height), (240, 238, 240))
-        draw = ImageDraw.Draw(interests_image)
-        title = textwrap.wrap('Research Interests', width = 25)
-        y = 0
-        for line in title:
-            draw.text((5, y), line, font=title_font, fill='black')
-            y += title_font_size
-        y += 15
-        for interest in interests_from_google_scholar:
-            interest_text = textwrap.wrap(interest, width=20)
-            for line in interest_text:
-                draw.text((5, y), line, font=content_font, fill='black')
-                y += content_font_size
-            y += 10
-        draw.text((image_width*0.25, image_height-15), source_title, font=source_font, fill='black')
-        interests_image.save(output_folder + "1card_googlescholar_image_3.png", dpi=dpi_value)
-        display_list.append(interests_image)
-        # display(interests_image)
-
-    fig = plt.figure(figsize=(10, 10))
-    rows = 1
-    columns = len(display_list)
-    for idx, img in enumerate(display_list):
-        fig.add_subplot(rows, columns, idx + 1)
-        plt.imshow(img)
-        plt.axis('off')
-    plt.show()
-    return display_list
-
-
-
 def display_summary_text_from_openalex_png(institution = '', interests = [], h_index = None, i10_index = None, total_times_cited = None, name_of_researcher = None, output_folder = None):
     display_list = []
     title_font_size = title_font_size_
@@ -672,28 +545,4 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         plt.axis('off')
     plt.show()
     return display_list
-
-#Function to display data in a 3x3 matrix if data is returned from all three API calls for the card information. 
-def display_matrix(google_scholar_info, wiki_info, open_alex_info):
-    wiki_info = wiki_info[:3]
-    fig = plt.figure(figsize=(10, 10))
-    rows = 3
-    columns = len(google_scholar_info)
-    count  =1
-    for idx, img in enumerate(google_scholar_info):
-        fig.add_subplot(rows, columns, count)
-        count += 1 
-        plt.imshow(img)
-        plt.axis('off')
-    for idx, img in enumerate(wiki_info):
-        fig.add_subplot(rows, columns, count)
-        count += 1 
-        plt.imshow(img)
-        plt.axis('off')
-    for idx, img in enumerate(open_alex_info):
-        fig.add_subplot(rows, columns, count)
-        count += 1 
-        plt.imshow(img)
-        plt.axis('off')
-    plt.show()
 
