@@ -544,4 +544,139 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         plt.axis('off')
     plt.show()
     return display_list
+from Bio import Entrez
+# Setting Entrez tool parameter
+Entrez.email = 'nasheath.ahmed@mssm.edu'
+Entrez.tool = 'Demoscript'
+from urllib.parse import urlencode
+def query_pubmed_citations(pubmed_name, name_of_researcher_first_and_last):
+    params = {
+        'term': "{}".format(pubmed_name)
+    }
+    pmid_citation_dict = defaultdict(int)
+    #Get the pubmed publications for the researcher with the pmids
+    info = Entrez.esearch(db="PubMed", term= pubmed_name, retmax = "5000") 
+    info = Entrez.read(info)
+    identifiers = info['IdList'] # Get list of identifiers which are pmids
+    if len(identifiers) == 0:
+        print("This name does not have any publications to search for citations returned from PubMed.")
+        return pmid_citation_dict
+    else:
+        print("This may take a minute or two.")
+        display(MyMarkdown("### Link to [PubMed Query](https://pubmed.ncbi.nlm.nih.gov/?{}) for {}".format(urlencode(params), name_of_researcher_first_and_last)))
+        # Use the Entrez module efetch for the publication records for the PMIDs with text information included for each. 
+        records = Entrez.efetch(db="pubmed", id=identifiers, rettype="medline", retmode="text")
+        publications = records.read().split("\n\n")
+        for pub in publications:
+            try:
+                year_published = int(pub.split("DP  - ")[1].split('\n')[0].split()[0].strip()[:4])
+                pmid = pub.split("PMID-")[1].split('\n')[0].strip()
+                handle = Entrez.elink(dbfrom="pubmed", id=pmid, linkname="pubmed_pmc_refs")
+                record = Entrez.read(handle)
+                if len(record[0]["LinkSetDb"]) != 0:
+                    # print(record[0]["LinkSetDb"][0]["Link"])
+                    list_of_ids = []
+                    for id_dict in record[0]["LinkSetDb"][0]["Link"]:
+                        list_of_ids.append(id_dict['Id'])
+                    handle = Entrez.esummary(db="pmc", id=','.join(list_of_ids), retmode="xml")
+                    pub_records = Entrez.parse(handle)
+                    for record in pub_records:
+                        if 'PubDate' in record:
+                            if record['PubDate'][:4].isdigit():
+                                year_article_published = int(record['PubDate'][:4])
+                                pmid_citation_dict[year_article_published] += 1
+            except:
+                continue
+        if len(pmid_citation_dict) == 0:
+            print("This name does not have any publications to search for citations returned from PubMed.")
+        return pmid_citation_dict
 
+
+# from serpapi import GoogleSearch
+# from serpapi import GoogleScholarSearch
+# import os
+# from parsel import Selector
+# import requests, json, re
+# from urllib.parse import urlsplit, parse_qsl
+# def serpapi_scrape_all_authors(name_of_researcher):
+#     params = {
+#         # https://docs.python.org/3/library/os.html
+#         'api_key': '5d728fd1a3c62a85ebe7d31f50b6eb13d1a2cd8fa30381df01d30fd6c578de49',      # SerpApi API key
+#         'engine': 'google_scholar_profiles',  # profile results search engine
+#         'mauthors': name_of_researcher_first_and_last            # search query
+#     }
+#     search = GoogleSearch(params)
+#     citation_dict = {}
+#     profiles_is_present = True
+#     # try:
+#     while profiles_is_present:
+
+#         profile_results = search.get_dict()
+#         print(profile_results.keys())
+#         print(profile_results)
+
+#         for profile in profile_results['profiles']:
+
+#             print(f'Currently extracting {profile["name"]} with {profile["author_id"]} ID.')
+
+#             thumbnail = profile['thumbnail']
+#             name = profile['name']
+#             link = profile['link']
+#             author_id = profile['author_id']
+#             affiliations = profile['affiliations']
+#             email = profile.get('email')
+#             cited_by = profile.get('cited_by')
+#             interests = profile.get('interests')
+#             if name_of_researcher.split()[0] in name and name_of_researcher.split()[-1] in name:
+#                 params = {
+#                     # https://docs.python.org/3/library/os.html
+#                     'api_key': '5d728fd1a3c62a85ebe7d31f50b6eb13d1a2cd8fa30381df01d30fd6c578de49',
+#                     'engine': 'google_scholar_author',
+#                     'author_id': author_id,
+#                     'hl': 'en'
+#                 }
+
+#                 search = GoogleScholarSearch(params)
+#                 results = search.get_dict()
+
+#                 data = {
+#                     'cited_by': [],
+#                     'public_access': {},
+#                     'graph': []
+#                 }
+
+#                 data['cited_by'] = results['cited_by']['table']
+#                 data['public_access']['link'] = results['public_access']['link']
+#                 data['public_access']['articles_available'] = results['public_access']['available']
+#                 data['public_access']['articles_not_available'] = results['public_access']['not_available']
+
+#                 data['graph'] = results['cited_by']['graph']
+                
+#                 for year_dict in results['cited_by']['graph']:
+#                     citation_dict[year_dict['year']] = year_dict['citations']
+#                 year_keys = list(citation_dict.keys())
+#                 year_keys.sort()
+#                 citation_dict = {year:citation_dict[year] for year in year_keys}
+#                 fig = make_bar_plot(citation_dict,'Year', "Citations", f"Citations per Year", "Sourced from Google Scholar")
+#                 fig_line = make_line_plot(citation_dict, 'Year', "Citations", f"Cumulative Citations", "Sourced from Google Scholar")
+#                 fig.show()
+#                 fig.write_image(output_folder+'citations_bar_google_scholar.png')
+#                 # figure_counter = display_figure_labels(output_folder, figure_counter, "Citations that are connected to the publications each year for {}.".format(name_of_researcher_first_and_last), title = 'citations_bar_google_scholar')
+
+#                 fig_line.show()
+#                 fig_line.write_image(output_folder+'citations_line_graph_google_scholar.png')
+#                 # figure_counter = display_figure_labels(output_folder, figure_counter, "The cumulative citations that are connected to the publications each year for {}".format(name_of_researcher_first_and_last), title = 'citations_line_graph_google_scholar')
+#                 return citation_dict
+
+#             # # check if the next page is present in 'serpapi_pagination' dict key
+#             if 'pagination' in profile_results and 'next' in profile_results['pagination']:
+#                 # split URL in parts as a dict() and update search 'params' variable to a new page
+#                 search.params_dict.update(dict(parse_qsl(urlsplit(profile_results['pagination']['next']).query)))
+#             else:
+#                 profiles_is_present = False
+#     # except:
+#     #     print("Error in api calls")
+
+#     print("no researcher matched")
+
+#     return citation_dict
