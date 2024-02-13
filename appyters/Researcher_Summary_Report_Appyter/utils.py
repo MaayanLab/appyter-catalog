@@ -680,3 +680,60 @@ def query_pubmed_citations(pubmed_name, name_of_researcher_first_and_last):
 #     print("no researcher matched")
 
 #     return citation_dict
+
+
+
+
+
+# PUBMED CITATION EXTRACTION
+
+# params = {
+#     'term': "{}".format(pubmed_name)
+# }
+# pmid_citation_dict = defaultdict(int)
+# #Get the pubmed publications for the researcher with the pmids
+# info = Entrez.esearch(db="PubMed", term= pubmed_name, retmax = "5000") 
+# info = Entrez.read(info)
+# identifiers = info['IdList'] # Get list of identifiers which are pmids
+# if len(identifiers) == 0:
+#     print("This name does not have any publications to search for citations returned from PubMed.")
+# else:
+#     print("Searching for Citation Information from Pubmed for {}".format(name_of_researcher_first_and_last))
+#     print("This may take a minute or two.")
+#     display(MyMarkdown("### Link to [PubMed Query](https://pubmed.ncbi.nlm.nih.gov/?{}) for {}".format(urlencode(params), name_of_researcher_first_and_last)))
+#     # Use the Entrez module efetch for the publication records for the PMIDs with text information included for each. 
+#     records = Entrez.efetch(db="pubmed", id=identifiers, rettype="medline", retmode="text")
+#     publications = records.read().split("\n\n")
+#     for pub in publications:
+#         try:
+#             year_published = int(pub.split("DP  - ")[1].split('\n')[0].split()[0].strip()[:4])
+#             pmid = pub.split("PMID-")[1].split('\n')[0].strip()
+#             handle = Entrez.elink(dbfrom="pubmed", id=pmid, linkname="pubmed_pmc_refs")
+#             record = Entrez.read(handle)
+#             if len(record[0]["LinkSetDb"]) != 0:
+#                 # print(record[0]["LinkSetDb"][0]["Link"])
+#                 list_of_ids = []
+#                 for id_dict in record[0]["LinkSetDb"][0]["Link"]:
+#                     list_of_ids.append(id_dict['Id'])
+#                 handle = Entrez.esummary(db="pmc", id=','.join(list_of_ids), retmode="xml")
+#                 pub_records = Entrez.parse(handle)
+#                 for record in pub_records:
+#                     if 'PubDate' in record:
+#                         if record['PubDate'][:4].isdigit():
+#                             year_article_published = int(record['PubDate'][:4])
+#                             pmid_citation_dict[year_article_published] += 1
+#         except:
+#             continue
+    
+#     year_keys = list(pmid_citation_dict.keys())
+#     year_keys.sort()
+#     pmid_citation_dict = {year:pmid_citation_dict[year] for year in year_keys}
+#     fig = make_bar_plot(pmid_citation_dict,'Year', "Citations", f"Citations per Year", "Sourced from Pubmed")
+#     fig_line = make_line_plot(pmid_citation_dict, 'Year', "Citations", f"Cumulative Citations", "Sourced from Pubmed")
+#     fig.show()
+#     fig.write_image(output_folder+'citations_bar_pubmed.png')
+#     figure_counter = display_figure_labels(output_folder, figure_counter, "Citations that are connected to the publications each year for {}.".format(name_of_researcher_first_and_last), title = 'citations_bar_pubmed')
+
+#     fig_line.show()
+#     fig_line.write_image(output_folder+'citations_line_graph_pubmed.png')
+#     figure_counter = display_figure_labels(output_folder, figure_counter, "The cumulative citations that are connected to the publications each year for {}".format(name_of_researcher_first_and_last), title = 'citations_line_graph_pubmed')
