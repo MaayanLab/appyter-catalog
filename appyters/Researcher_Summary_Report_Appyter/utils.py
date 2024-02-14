@@ -544,4 +544,49 @@ def display_summary_text_from_openalex_png(institution = '', interests = [], h_i
         plt.axis('off')
     plt.show()
     return display_list
-
+from Bio import Entrez
+# Setting Entrez tool parameter
+Entrez.email = 'nasheath.ahmed@mssm.edu'
+Entrez.tool = 'Demoscript'
+from urllib.parse import urlencode
+def query_pubmed_citations(pubmed_name, name_of_researcher_first_and_last):
+    params = {
+        'term': "{}".format(pubmed_name)
+    }
+    pmid_citation_dict = defaultdict(int)
+    #Get the pubmed publications for the researcher with the pmids
+    info = Entrez.esearch(db="PubMed", term= pubmed_name, retmax = "5000") 
+    info = Entrez.read(info)
+    identifiers = info['IdList'] # Get list of identifiers which are pmids
+    if len(identifiers) == 0:
+        print("This name does not have any publications to search for citations returned from PubMed.")
+        return pmid_citation_dict
+    else:
+        print("This may take over a minute or two.")
+        display(MyMarkdown("### Link to [PubMed Query](https://pubmed.ncbi.nlm.nih.gov/?{}) for {}".format(urlencode(params), name_of_researcher_first_and_last)))
+        # Use the Entrez module efetch for the publication records for the PMIDs with text information included for each. 
+        records = Entrez.efetch(db="pubmed", id=identifiers, rettype="medline", retmode="text")
+        publications = records.read().split("\n\n")
+        for pub in publications:
+            try:
+                year_published = int(pub.split("DP  - ")[1].split('\n')[0].split()[0].strip()[:4])
+                pmid = pub.split("PMID-")[1].split('\n')[0].strip()
+                handle = Entrez.elink(dbfrom="pubmed", id=pmid, linkname="pubmed_pmc_refs")
+                record = Entrez.read(handle)
+                if len(record[0]["LinkSetDb"]) != 0:
+                    # print(record[0]["LinkSetDb"][0]["Link"])
+                    list_of_ids = []
+                    for id_dict in record[0]["LinkSetDb"][0]["Link"]:
+                        list_of_ids.append(id_dict['Id'])
+                    handle = Entrez.esummary(db="pmc", id=','.join(list_of_ids), retmode="xml")
+                    pub_records = Entrez.parse(handle)
+                    for record in pub_records:
+                        if 'PubDate' in record:
+                            if record['PubDate'][:4].isdigit():
+                                year_article_published = int(record['PubDate'][:4])
+                                pmid_citation_dict[year_article_published] += 1
+            except:
+                continue
+        if len(pmid_citation_dict) == 0:
+            print("This name does not have any publications to search for citations returned from PubMed.")
+        return pmid_citation_dict
