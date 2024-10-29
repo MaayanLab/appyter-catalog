@@ -211,6 +211,12 @@ services:
         - appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@${APPYTER_TAG:-v}${LIBRARY_VERSION}
     image: ${DOCKER_REGISTRY:-maayanlab}/appyter-{{ appyter['name'].lower() }}:{{ appyter['version'] }}-${APPYTER_TAG:-}${LIBRARY_VERSION}
     command: appyter-catalog-helper entrypoint
+    healthcheck:
+      test: curl --fail http://localhost:5000 || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
     restart: unless-stopped
     #depends_on:
     #  - appyters-ingress
