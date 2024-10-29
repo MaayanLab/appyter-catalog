@@ -3,74 +3,58 @@
 #  Would have used a variable, but Docker doesn't
 #  seem to have a simple way to do this (:
 
-FROM ubuntu
-
-ENV DEBIAN_FRONTEND "noninteractive"
-ENV TZ "America/New_York"
-
-RUN set -x \
-  && echo "Preparing system..." \
-  && apt-get -y update \
-  && apt-get -y install \
-    curl \
-    fuse \
-    git \
-    nginx \
-    python3-dev \
-    python3-pip \
-  && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --no-cache-dir --upgrade pip
-
-RUN set -x \
-  && echo "Installing jupyter kernel..." \
-  && pip3 install --no-cache-dir ipython_genutils ipykernel \
-  && python3 -m ipykernel install
+{%- if os.path.isfile(os.path.join(appyter_path, 'setup.R')) %}
+FROM maayanlab/appyter-base:rpy
+{%- else %}
+FROM maayanlab/appyter-base:py
+{% endif %}
 
 {%- if os.path.isfile(os.path.join(appyter_path, 'deps.txt')) %}
 
-ADD deps.txt /app/deps.txt
+COPY deps.txt /app/deps.txt
 RUN set -x \
   && echo "Installing system dependencies from deps.txt..." \
   && apt-get -y update \
   && apt-get -y install $(grep -v '^#' /app/deps.txt) \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && rm /app/deps.txt
 
 {%- endif %}
 
+RUN --mount=type=cache,target=/root/.cache/pip set -x \
+  && echo "Installing jupyter kernel..." \
+  && pip install ipython_genutils ipykernel \
+  && python -m ipykernel install
+
 {%- if os.path.isdir(os.path.join(appyter_path, 'deps')) %}
 
-ADD deps/ /app/deps/
+COPY deps/ /app/deps/
 RUN set -x \
   && echo "Installing .dep files from deps/*..." \
   && dpkg -i /app/deps/*.deb || true \
   && apt-get -y update \
   && apt-get -y install -f \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && rm -r /app/deps/
 
 {%- endif %}
 
 {%- if os.path.isfile(os.path.join(appyter_path, 'setup.R')) %}
-
-ADD setup.R /app/setup.R
+COPY setup.R /app/setup.R
 RUN set -x \
-  && echo "Installing R..." \
-  && apt-get -y update \
-  && apt-get -y install r-base \
-  && rm -rf /var/lib/apt/lists/* \
   && echo "Setting up R with setup.R..." \
   && R -e "source('/app/setup.R')" \
   && rm /app/setup.R
-
 {%- endif %}
 
 {%- if os.path.isfile(os.path.join(appyter_path, 'requirements.txt')) %}
 
-ADD requirements.txt /app/requirements.txt
-RUN set -x \
+COPY requirements.txt /app/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip set -x \
   && echo "Installing python dependencies from requirements.txt..." \
-  && pip3 install --no-cache-dir -r /app/requirements.txt \
+  && pip install --use-pep517 -r /app/requirements.txt \
   && rm /app/requirements.txt
 
 {%- endif %}
@@ -78,7 +62,7 @@ RUN set -x \
 ARG appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter
 RUN set -x \
   && echo "Installing appyter..." \
-  && pip3 install --no-cache-dir --upgrade ${appyter_version}
+  && pip install --upgrade ${appyter_version}
 
 # BEGIN CATALOG
 COPY catalog_helper.py /bin/appyter-catalog-helper

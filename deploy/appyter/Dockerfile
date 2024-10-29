@@ -1,22 +1,22 @@
-FROM ubuntu
+FROM maayanlab/appyter-base:py
 
-ENV DEBIAN_FRONTEND "noninteractive"
-ENV TZ "America/New_York"
+RUN --mount=type=cache,target=/root/.cache/pip set -x \
+  && echo "Installing jupyter kernel..." \
+  && pip install ipython_genutils ipykernel \
+  && python -m ipykernel install
+
+ARG appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter
+RUN --mount=type=cache,target=/root/.cache/pip set -x \
+  && echo "Installing appyter..." \
+  && pip install ${appyter_version}
 
 RUN set -x \
   && echo "Preparing system..." \
   && apt-get -y update \
-  && apt-get -y install \
-    curl \
-    fuse \
-    git \
-    nginx \
-    python3-dev \
-    python3-pip \
-    rclone \
+  && apt-get -y install rclone \
   && curl https://get.docker.com | sh \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --no-cache-dir --upgrade pip \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
 
 RUN set -x \
@@ -25,16 +25,6 @@ RUN set -x \
   && adduser app docker \
   && groupadd fuse \
   && adduser app fuse
-
-RUN set -x \
-  && echo "Installing jupyter kernel..." \
-  && pip3 install --no-cache-dir ipython_genutils ipykernel \
-  && python3 -m ipykernel install
-
-ARG appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter
-RUN set -x \
-  && echo "Installing appyter..." \
-  && pip3 install --no-cache-dir ${appyter_version}
 
 WORKDIR /app
 

@@ -1,0 +1,9 @@
+services:
+  appyter-base-py:
+    build:
+      target: py
+    image: maayanlab/appyter-base:py
+  appyter-base-rpy:
+    build:
+      target: rpy
+    image: maayanlab/appyter-base:rpy
