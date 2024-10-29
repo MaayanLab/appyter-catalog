@@ -236,5 +236,7 @@ services:
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.certresolver=letsencrypt-prod"
       - "traefik.http.routers.{{ appyter['name'].lower() }}.tls.domains[0].main=${SERVER_NAME}"
 {% endif %}
+    volumes:
+      - $HOME/.cache/pip-docker/:/root/.cache/pip
     logging: *default-logging
 {%- endfor %}
