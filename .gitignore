@@ -10,5 +10,5 @@ __pycache__
 \.tmp/
 app/public/appyters.json
 data/
-docker-compose.yml
+/docker-compose.yml
 venv
