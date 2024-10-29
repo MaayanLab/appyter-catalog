@@ -1,8 +1,8 @@
-datapackage
+datapackage==1.15.4
 deriva-datapackage @ git+https://github.com/nih-cfde/deriva-datapackage@v1.0.5
-fsspec
-matplotlib
-pandas
-pyyaml
-requests
-sqlalchemy
+fsspec==2024.10.0
+matplotlib==3.7.5
+pandas==2.0.3
+PyYAML==6.0.2
+requests==2.32.3
+SQLAlchemy==2.0.36

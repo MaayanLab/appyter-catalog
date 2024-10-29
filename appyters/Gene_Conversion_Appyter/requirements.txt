@@ -1,5 +1,5 @@
-numpy
-odfpy
-openpyxl
-pandas
-xlrd
+numpy==1.24.4
+odfpy==1.4.1
+openpyxl==3.1.5
+pandas==2.0.3
+xlrd==2.0.1

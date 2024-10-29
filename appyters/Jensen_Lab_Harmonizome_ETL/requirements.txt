@@ -1,6 +1,6 @@
 appyter @ git+https://github.com/MaayanLab/appyter
 harmonizome-helper @ git+https://github.com/MaayanLab/ETL-appyter-utilities
-numpy
-pandas
-matplotlib
-xlrd
+numpy==1.24.4
+pandas==2.0.3
+matplotlib==3.7.5
+xlrd==2.0.1

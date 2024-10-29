@@ -1,9 +1,9 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 clustergrammer @ git+https://github.com/maayanlab/clustergrammer-py@patch
-numpy
-pandas
-scipy
-ipywidgets
-matplotlib
-statsmodels
+numpy==1.24.4
+pandas==2.0.3
+scipy==1.10.1
+ipywidgets==8.1.5
+matplotlib==3.7.5
+statsmodels==0.14.1

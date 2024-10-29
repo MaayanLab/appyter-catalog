@@ -1,8 +1,8 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-ipython
-jupyter
+ipython==8.12.3
+jupyter==1.1.1
 pandas==1.0.3
-numpy
-scipy
-seaborn
-requests
+numpy==1.24.4
+scipy==1.10.1
+seaborn==0.12.2
+requests==2.32.3

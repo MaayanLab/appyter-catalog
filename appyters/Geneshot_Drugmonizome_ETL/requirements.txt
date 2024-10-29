@@ -1,7 +1,7 @@
 appyter @ git+https://github.com/MaayanLab/appyter
 harmonizome-helper @ git+https://github.com/MaayanLab/ETL-appyter-utilities
-pandas
-numpy
-requests
-tqdm
+pandas==2.0.3
+numpy==1.24.4
+requests==2.32.3
+tqdm==4.66.6
 

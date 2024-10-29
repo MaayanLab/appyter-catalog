@@ -1,7 +1,7 @@
 appyter @ git+https://github.com/MaayanLab/appyter
-pandas
-numpy
-requests
-tqdm
-matplotlib
-seaborn
+pandas==2.0.3
+numpy==1.24.4
+requests==2.32.3
+tqdm==4.66.6
+matplotlib==3.7.5
+seaborn==0.13.2

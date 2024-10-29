@@ -1,4 +1,4 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-requests
-pandas
-tqdm
+requests==2.32.3
+pandas==2.0.3
+tqdm==4.66.6

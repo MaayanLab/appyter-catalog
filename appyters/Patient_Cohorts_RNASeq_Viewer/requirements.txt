@@ -1,17 +1,17 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-requests
-pandas
-numpy
+requests==2.32.3
+pandas==2.0.3
+numpy==1.24.4
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 
-seaborn
-matplotlib
-umap-learn
-scipy
-qnorm
-scikit-learn
-plotly
-plotly_express
+seaborn==0.13.2
+matplotlib==3.7.5
+umap-learn==0.5.7
+scipy==1.10.1
+qnorm==0.8.1
+scikit-learn==1.3.2
+plotly==5.24.1
+plotly-express==0.4.1
 jupyter-d3 @ git+https://github.com/nicolemoiseyev/jupyter-d3@v0.0.4
-fastcluster
-lifelines
+fastcluster==1.2.6
+lifelines==0.27.8

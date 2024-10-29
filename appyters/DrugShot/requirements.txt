@@ -1,8 +1,8 @@
-pandas
-numpy
+pandas==2.0.3
+numpy==1.24.4
 appyter @ git+https://github.com/Maayanlab/appyter
-requests
-plotly
-scikit-learn
-seaborn
-matplotlib
+requests==2.32.3
+plotly==5.24.1
+scikit-learn==1.3.2
+seaborn==0.13.2
+matplotlib==3.7.5

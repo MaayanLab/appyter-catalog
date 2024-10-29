@@ -1,10 +1,10 @@
 appyter @ git+https://github.com/Maayanlab/appyter
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 
-pandas
-numpy
-ipython
-matplotlib
+pandas==2.0.3
+numpy==1.24.4
+ipython==8.12.3
+matplotlib==3.7.5
 bokeh==2.0.2
 jinja2>=3.0,<3.1
-umap
+umap==0.1.1

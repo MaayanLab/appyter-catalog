@@ -3,10 +3,10 @@ gseapy @ git+https://github.com/BioNinja/gseapy#egg=gseapy
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 geode @ git+https://github.com/Maayanlab/geode
 blitzgsea @ git+https://github.com/Maayanlab/blitzgsea
-pandas
-numpy
-scipy
-ipython
-plotly
-appyter
-rpy2
+pandas==2.0.3
+numpy==1.24.4
+scipy==1.10.1
+ipython==8.12.3
+plotly==5.24.1
+appyter==0.19.27
+rpy2==3.5.16

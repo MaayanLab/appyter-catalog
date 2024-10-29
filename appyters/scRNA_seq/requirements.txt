@@ -1,17 +1,18 @@
 anndata==0.7.8
-appyter
+appyter==0.19.27
 bbknn==1.5.1
 bokeh==2.4.2
-jinja2>=3.0,<3.1
 colorcet==3.0.0
 fa2==0.3.5
 geode @ git+https://github.com/Maayanlab/geode
+jinja2>=3.0,<3.1
 kaleido==0.2.1
 leidenalg==0.8.8
 maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics@v0.5.5
 magic-impute==3.0.0
-matplotlib_venn==0.11.6
+matplotlib-venn==0.11.6
 matplotlib==3.5.1
+MulticoreTSNE @ git+https://github.com/maayanlab/Multicore-TSNE@6c79479
 numba==0.55.0
 numpy==1.21.5
 palantir==1.0.0

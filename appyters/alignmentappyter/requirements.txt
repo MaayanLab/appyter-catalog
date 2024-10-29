@@ -1,5 +1,5 @@
-jupyter
-matplotlib
-numpy
-pandas
+jupyter==1.1.1
+matplotlib==3.7.5
+numpy==1.24.4
+pandas==2.0.3
 xalign @ git+https://github.com/Maayanlab/xalign.git@v0.1.66

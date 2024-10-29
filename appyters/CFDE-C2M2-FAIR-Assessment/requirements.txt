@@ -1,8 +1,8 @@
-datapackage
+datapackage==1.15.4
 deriva-datapackage @ git+https://github.com/nih-cfde/deriva-datapackage@v1.0.5
-matplotlib
-pandas
-requests
-seaborn
-sqlalchemy
-tqdm
+matplotlib==3.7.5
+pandas==2.0.3
+requests==2.32.3
+seaborn==0.13.2
+SQLAlchemy==2.0.36
+tqdm==4.66.6
