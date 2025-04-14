@@ -1134,6 +1134,7 @@ def plot_protrack(libraries, tmp_adata, bool_plot_rug=True, bool_plot_dendrogram
             adata_heatmap.obs = adata_heatmap.obs.T.drop_duplicates().T
             new_library_filename = extract_library_name(library_filename)
             library_name = library_filename+"_0"
+            if library_name not in adata_heatmap.obs.columns: continue
             clean_library_filename = {library_name: new_library_filename}
             new_cols = list()
             for col in adata_heatmap.obs.columns:
