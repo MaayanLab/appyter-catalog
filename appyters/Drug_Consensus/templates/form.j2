@@ -1,0 +1,29 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+   <div class="mt-3 row align-items-center">
+        <div class="col-3">
+            <img src="{{ url_for('static', filename='consensus_drugs.png') }}" style="width:150px" class="img-fluid float-right">
+        </div>
+        <div class="col-7">
+            <h1>Drugs Consensus Appyter</h1>
+            <p>Submit a gene set or a pair of up/down gene sets to L2S2 and DRUG-seqr to identify FDA approved drugs that mimic or reverse their expression. Overlapping drugs are extracted from the significantly overlapping FDA-approved L2S2 signatures, and FDA-approved DRUG-seqr signatures producing a list of final candidate drugs. To rank the overlapping drugs, the top ranking signature for each is used to compute a mean p-value from L2S2 and DRUG-seqr. Additionally the targets and mechanisms of actions (MOAs) of the consensus drugs are assessed using DrugEnrichr.</p>
+            <p class="my-0"></p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}
