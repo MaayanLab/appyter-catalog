@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
-  "name": "Drugs_Consensus",
+  "name": "Drug_Consensus",
   "title": "Drugs Consensus Appyter",
   "version": "0.0.1",
   "description": "L2S2 & DRUG-seqr overlap",
-  "image": "drugs_consensus.png",
+  "image": "consensus_drugs.png",
   "authors": [
     {
       "name": "Giacomo Marino",
