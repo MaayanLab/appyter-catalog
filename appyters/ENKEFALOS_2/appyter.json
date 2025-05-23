@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json"
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
   "name": "ENKEFALOS_2",
   "title": "ENKEFALOS (Electrophysiological NetworKs Elicited From ALtered OmicS) - Part 2",
   "version": "1.0.0",
