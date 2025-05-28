@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "ENKEFALOS_1",
+  "title": "ENKEFALOS (Electrophysiological NetworKs Elicited From ALtered OmicS) - Part 1",
+  "version": "1.0.0",
+  "description": "An appyter that allows visualization of gene expression correlation with neural electrophysiological/morphological measures.",
+  "image": "Enkefalos.png",
+  "authors": [
+    {
+      "name": "Krish Upadhyay",
+      "email": "krishu@sas.upenn.edu"
+    },
+    {
+      "name": "Dylan Ukasik",
+      "email": "gw4458@wayne.edu"
+    },
+    {
+      "name": "Douglas Craig",
+      "email": "craigdou@med.umich.edu"
+    },
+    {
+      "name": "Alan Dombkowski",
+      "email": "domski@wayne.edu"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/appyter-catalog/tree/main/appyters/ENKEFALOS_1/",
+  "tags": [
+    "ENKEFALOS",
+    "Transcriptomics",
+    "Computational Neuroscience"
+  ],
+  "public": true,
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "ENKEFALOS_appyter.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "hide-code",
+      "toggle-code"
+    ]
+  }
+}
