@@ -1,0 +1,9 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+requests
+numpy
+pandas
+matplotlib
+requests
+matplotlib_venn
+scipy
+seaborn

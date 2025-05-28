@@ -8,7 +8,7 @@ __pycache__
 .pyc
 *-checkpoint.ipynb
 \.tmp/
-app/public/appyters.json
-data/
-docker-compose.yml
-venv
+/app/public/appyters.json
+/data
+/docker-compose.yml
+/venv
