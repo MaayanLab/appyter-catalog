@@ -13,7 +13,7 @@ RUN set -x \
   && apt-get -y update \
   && apt-get -y install \
     curl \
-    fuse \
+    fuse libfuse2 \
     git \
     nginx \
   && rm -rf /var/lib/apt/lists/* \
