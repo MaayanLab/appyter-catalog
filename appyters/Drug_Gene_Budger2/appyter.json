@@ -4,7 +4,7 @@
     "title": "Drug Gene Budger (DGB) 2",
     "version": "0.0.1",
     "description": "An appyter that retrieves drugs that up-regulate and down-regulate a single input gene across Connectivity Mapping datasets",
-    "image": "dgb_log.png",
+    "image": "dgb_logo.png",
     "authors": [
         {
             "name": "Lily Taub",
