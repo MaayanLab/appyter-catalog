@@ -1,7 +1,6 @@
 appyter @ git+https://github.com/Maayanlab/appyter
-pandas
 numpy
-warnings
+pandas
 requests
 IPython
 upsetplot
