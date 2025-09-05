@@ -1,6 +1,6 @@
 # Drug Gene Budger (DGB) 2
 
-This appyter takes a single gene as input and identifies up-regulating and down-regulating drugs from three connectivity mapping resources.
+The Drug Gene Budger 2 (DGB2) Appyter takes a single human gene as input, and returns ranked up- and down-regulating drugs from three Connectivity Mapping resources that were shown to maximally increase or decrease the mRNA expression of the gene in human cell lines. The three Connectivity Mapping resources are:
 
 - [Ginkgo GDPx1 and GDPx2 datasets](https://huggingface.co/ginkgo-datapoints)
 
