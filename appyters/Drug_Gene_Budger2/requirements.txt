@@ -6,4 +6,5 @@ requests
 IPython
 upsetplot
 matplotlib
+matplotlib_venn
 bokeh
