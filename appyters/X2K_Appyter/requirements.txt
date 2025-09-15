@@ -6,3 +6,4 @@ plotly
 kaleido
 observable_jupyter
 pandas
+glasbey

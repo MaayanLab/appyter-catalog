@@ -18,7 +18,6 @@ import matplotlib
 import matplotlib.pyplot as plt; plt.rcdefaults()
 from matplotlib import rcParams
 from matplotlib.lines import Line2D
-from matplotlib_venn import venn2, venn3
 import IPython
 from IPython.display import HTML, display, Markdown, IFrame, FileLink
 from itertools import combinations, permutations
@@ -81,9 +80,10 @@ def check_df(df, col):
 def load_seurat_files(mtx_filename, gene_filename, barcodes_filename):
     
     adata = anndata.read_mtx(mtx_filename).T
-    with open(barcodes_filename, "r") as f:
-        cells = f.readlines()
-        cells = [x.strip() for x in cells]
+    # with open(barcodes_filename, "r") as f:
+    #     cells = f.readlines()
+    #     cells = [x.strip() for x in cells]
+    cells = pd.read_csv(barcodes_filename, header=None)[0].tolist()
     genes = pd.read_csv(
         gene_filename,
         header=None,
@@ -451,8 +451,8 @@ def submit_enrichr_geneset(geneset, label):
     }
     response = requests.post(ENRICHR_URL, files=payload)
     if not response.ok:
-        raise Exception('Error analyzing gene list')
-    time.sleep(0.5)
+        raise Exception('Error analyzing gene list', response.text)
+    time.sleep(1)
     data = json.loads(response.text)
     return data
 
@@ -484,8 +484,8 @@ def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True,
                        query_string % (user_list_id, gene_set_library)
                 )
         if not response.ok:
-            raise Exception('Error fetching enrichment results')
-
+            raise Exception('Error fetching enrichment results', response.text)
+        time.sleep(1)
         data = json.loads(response.text)
         resultDataframe = pd.DataFrame(data[gene_set_library], columns=[
                                        'rank', 'term_name', 'pvalue', 'zscore', 'combined_score', 'overlapping_genes', 'FDR', 'old_pvalue', 'old_FDR'])
@@ -500,30 +500,66 @@ def get_enrichr_results(user_list_id, gene_set_libraries, overlappingGenes=True,
         concatenatedDataframe['geneset'] = geneset
     return concatenatedDataframe
 
+def get_libraries():
+    libs = {
+                'GO_Biological_Process': 'GO_Biological_Process_2025',
+                'MGI_Mammalian_Phenotype_Level_4': 'MGI_Mammalian_Phenotype_Level_4_2024',
+                'KEGG': 'KEGG_2021_Human',
+                'HuBMAP_ASCTplusB_augmented': 'HuBMAP_ASCTplusB_augmented_2022',
+                'GWAS_Catalog': 'GWAS_Catalog_2023',
+                'ChEA': 'ChEA_2016',
+                'KEA': 'KEA_2015',
+                'ARCHS4_Kinases_Coexp': 'ARCHS4_Kinases_Coexp',
+                'TargetScan_microRNA': 'TargetScan_microRNA_2017',
+                'miRTarBase': 'miRTarBase_2017',
+                }
+    res = requests.get("https://maayanlab.cloud/speedrichr/api/datasetStatistics")
+    if not res.ok:
+        print(res.text)
+        return libs
+    
+    else:
+        for i in res.json()['statistics']:
+            lib = i['libraryName']
+            if "Mouse" not in lib:
+                for key in libs.keys():
+                    if key in lib:
+                        if libs[key] == '' or lib > libs[key]:
+                            libs[key] = lib
+        print("Using the following libraries:")
+        for k,v in libs.items():
+            print(f'{k}: {v}')
+        return libs
+                        
 
 
-def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='interactive', library_type='go', version='2018', sort_results_by='pvalue'):
-
+def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='interactive', library_type='go', version='2025', sort_results_by='pvalue'):
+    libs = get_libraries()
     # Libraries
     if library_type == 'go':
         go_version = str(version)
+        go = libs['GO_Biological_Process']
+        mgi = libs['MGI_Mammalian_Phenotype_Level_4']
         libraries = {
-            'GO_Biological_Process_'+go_version: 'Gene Ontology Biological Process ('+go_version+' version)',
-            'MGI_Mammalian_Phenotype_Level_4_2019': 'MGI Mammalian Phenotype Level 4 2019'
+            go: go.replace("_", "_").replace("GO", "Gene Ontology"),
+            mgi: mgi.replace("_", "_"),
         }
     elif library_type == "pathway":
         # Libraries
+        kegg = libs['KEGG']
         libraries = {
-            'KEGG_2019_Human': 'KEGG Pathways',
+            kegg: 'KEGG Pathways',
         }
     elif library_type == "celltype":
         # Libraries
+        asct = libs['HuBMAP_ASCTplusB_augmented']
         libraries = {
-            'HuBMAP_ASCT_plus_B_augmented_w_RNAseq_Coexpression': 'HuBMAP ASCT+B Cell Type'
+            asct: 'HuBMAP ASCT+B Cell Type'
         }
     elif library_type=="disease":
+        gwas = libs['GWAS_Catalog']
         libraries = {
-            'GWAS_Catalog_2019': 'GWAS Catalog',
+            gwas: 'GWAS Catalog',
         }
     # Get Enrichment Results
     enrichment_results = {geneset: get_enrichr_results(enrichr_results[geneset]['userListId'], gene_set_libraries=libraries, geneset=geneset) for geneset in ['upregulated', 'downregulated']}
@@ -536,23 +572,23 @@ def get_enrichr_results_by_library(enrichr_results, signature_label, plot_type='
 
 
 def get_enrichr_result_tables_by_library(enrichr_results, signature_label, library_type='tf'):
-
+    libs = get_libraries()
     # Libraries
     if library_type == 'tf':
         # Libraries
         libraries = {
-            'ChEA_2016': 'ChEA (experimentally validated targets)',
+            libs['ChEA']: 'ChEA (experimentally validated targets)',
         }
     elif library_type == "ke":
         # Libraries
         libraries = {
-            'KEA_2015': 'KEA (experimentally validated targets)',
-            'ARCHS4_Kinases_Coexp': 'ARCHS4 (coexpressed genes)'
+            libs['KEA']: 'KEA (experimentally validated targets)',
+            libs['ARCHS4_Kinases_Coexp']: 'ARCHS4 (coexpressed genes)'
         }
     elif library_type == "mirna":
         libraries = {
-        'TargetScan_microRNA_2017': 'TargetScan (experimentally validated targets)',
-        'miRTarBase_2017': 'miRTarBase (experimentally validated targets)'
+        libs['TargetScan_microRNA']: 'TargetScan (experimentally validated targets)',
+        libs['miRTarBase']: 'miRTarBase (experimentally validated targets)'
         }
 
 
@@ -825,7 +861,7 @@ def clustering(adata, dataset, umap_n_neighbors, umap_min_dist, bool_plot, figur
         category_list_dict["Cluster"] = list(sorted(adata.obs["leiden"].unique()))
         figure_counter = plot_scatter(umap_df, values_dict, ["Cluster"], adata.obs.index.tolist(), "Scatter plot of the samples. Each dot represents a sample and it is colored by ", category_list_dict=category_list_dict, category=True, dropdown=False, figure_counter=figure_counter)
 
-        display(create_download_link(adata.obs["leiden"], filename=f"clustering_{dataset}.csv"))
+    display(create_download_link(adata.obs["leiden"], filename=f"clustering_{dataset}.csv"))
     return adata, figure_counter
 
 
@@ -962,7 +998,7 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
         results['go_enrichment'] = {}
         for label, signature in signatures.items():
             # Run analysis
-            results['go_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='go', version='2018')
+            results['go_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='go', version='2025')
             
     if "Pathway" in enrichr_libraries:
         # Initialize results
@@ -1004,7 +1040,7 @@ def visualize_enrichment_analysis(adata, signatures, meta_class_column_name, dif
         results['disease_enrichment'] = {}
         for label, signature in signatures.items():
             # Run analysis
-            results['disease_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='disease', version='2018')
+            results['disease_enrichment'][label] = get_enrichr_results_by_library(results['enrichr'][label], label, library_type='disease', version='2025')
     
     library_option_list = set()
     topk_enriched_terms_dict = defaultdict(list)

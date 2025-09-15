@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "chea_kg_appyter",
+  "title": "ChEA-KG_Appyter",
+  "version": "0.0.1",
+  "description": "An Appyter that identifies enriched regulatory subnetworks of TFs using the ChEA-KG GRN and characterizes the TFs with the GSFM.",
+  "image": "cheakg_appyter.png",
+  "authors": [
+    {
+      "name": "Anna Byrd",
+      "email": "anna.i.byrd28@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/chea-kg-appyter",
+  "tags": [
+    "Enrichment Analysis",
+    "Gene Regulatory Network",
+    "Transcription Factors",
+    "ChEA-KG"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "chea_kg_appyter.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "ipywidgets", 
+      "toggle-code",
+      "hide-code"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+appyter @ git+https://github.com/Maayanlab/appyter
+numpy
+pandas
+pyarrow
+requests
+IPython
+upsetplot
+matplotlib
+matplotlib_venn
+bokeh

@@ -1,0 +1,27 @@
+{% extends "biojupies/form.j2" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+    h1 {
+        text-align: center;
+        margin: 25px
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-sm-12">
+<div class="container">
+    <h1><img src="../static/dgb_logo_small.png" style="width:75x;height:75px;margin:0px 10px;"/>Dr. Gene Budger 2 (DBG2)</h1>
+    <p style="margin:15px; text-align:center;"> Submit a human gene symbol and explore drugs that maximally increase or decrease the mRNA expression of the input gene based on data from a collection of Connectivity Mapping resources</p>
+</div>
+</div>
+</div>
+{{ super() }}
+{% endblock %}

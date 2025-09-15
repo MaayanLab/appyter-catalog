@@ -1,0 +1,3 @@
+# ChEA-KG_Appyter
+
+The ChEA-KG Appyter predicts regulatory subnetworks of transcription factors (TFs) for an input gene set. The query gene sets are compared against libaries of TF target gene sets in ChEA3 to identify the most likely regulating TFs. The TFs are then connected via edges in the ChEA-KG background gene regulatory network (GRN). This network was constructed by submitting thousands of gene expression signatures from RummaGEO to ChEA3 for transcription factor enrichment analysis. The functions of enriched TFs are predicted using the Gene Set Foundation Model. 
