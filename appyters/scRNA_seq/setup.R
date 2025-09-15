@@ -1,3 +1,5 @@
+install.packages("R.utils")
+install.packages("RCurl")
 install.packages("dplyr")
 install.packages("tibble")
 install.packages("Matrix")
@@ -10,9 +12,9 @@ install.packages("statmod")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
+BiocManager::install("DESeq2")
 BiocManager::install("limma")
 BiocManager::install("edgeR")
-BiocManager::install("DESeq2")
 
 install.packages("https://cran.r-project.org/src/contrib/Archive/XML/XML_3.98-1.20.tar.gz")
 
