@@ -2,9 +2,9 @@
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
     "name": "Drug_Gene_Budger2",
     "title": "DrugRanger",
-    "version": "0.0.9",
+    "version": "0.1.0",
     "description": "An appyter that retrieves drugs that up-regulate and down-regulate a single input gene or gene set across Connectivity Mapping datasets",
-    "image": "DR-logo-small.png",
+    "image": "DR_logo.png",
     "authors": [
         {
             "name": "Lily Taub",
