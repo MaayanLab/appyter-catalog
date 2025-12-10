@@ -10,3 +10,4 @@ matplotlib
 matplotlib_venn
 bokeh
 seaborn
+tqdm
