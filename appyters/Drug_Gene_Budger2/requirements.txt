@@ -2,9 +2,12 @@ appyter @ git+https://github.com/Maayanlab/appyter
 numpy
 pandas
 pyarrow
+polars
 requests
 IPython
 upsetplot
 matplotlib
 matplotlib_venn
 bokeh
+seaborn
+tqdm

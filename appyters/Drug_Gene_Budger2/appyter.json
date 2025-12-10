@@ -1,10 +1,10 @@
 {
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
     "name": "Drug_Gene_Budger2",
-    "title": "Dr. Gene Budger (DGB) 2",
-    "version": "0.0.8",
-    "description": "An appyter that retrieves drugs that up-regulate and down-regulate a single input gene across Connectivity Mapping datasets",
-    "image": "dgb_logo.png",
+    "title": "DrugRanger",
+    "version": "0.1.0",
+    "description": "An appyter that retrieves drugs that up-regulate and down-regulate a single input gene or gene set across Connectivity Mapping datasets",
+    "image": "DR_logo.png",
     "authors": [
         {
             "name": "Lily Taub",
@@ -13,7 +13,6 @@
     ],
     "url": "https://github.com/MaayanLab/appyter-catalog",
     "tags": [
-        "L1000",
         "DRUG-seq",
         "RNA-seq"
     ],
