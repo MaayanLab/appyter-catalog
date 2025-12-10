@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
-    "name": "Drug_Gene_Budger2",
+    "name": "DrugRanger",
     "title": "DrugRanger",
     "version": "0.1.0",
     "description": "An appyter that retrieves drugs that up-regulate and down-regulate a single input gene or gene set across Connectivity Mapping datasets",
@@ -19,7 +19,7 @@
     "license": "CC-BY-NC-SA-4.0",
     "public": false,
     "appyter": {
-        "file": "drug_gene_budger2_appyter.ipynb",
+        "file": "drug_ranger.ipynb",
         "profile": "biojupies",
         "extras": [
             "toc",
