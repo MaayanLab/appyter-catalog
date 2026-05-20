@@ -1,0 +1,25 @@
+# python dependencies should be collected and kept in this file
+#  one line for each dependency. this file can be used to install
+#  dependencies with `pip install -r requirements.txt`
+appyter
+python-dotenv
+flask
+gunicorn
+numpy
+pandas
+ipython
+requests
+ipycytoscape
+dash
+dash_cytoscape
+plotly
+scikit-learn
+igraph
+leidenalg
+scanpy
+anndata
+bokeh
+selenium
+Pillow
+maayanlab-bioinformatics @ git+https://github.com/Maayanlab/maayanlab-bioinformatics
+pydeseq2

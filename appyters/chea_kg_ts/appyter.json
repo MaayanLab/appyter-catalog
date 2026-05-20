@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/main/schema/appyter-validator.json",
+  "name": "chea_kg_ts",
+  "title": "ChEA-KG-TS",
+  "version": "0.0.1",
+  "description": "An Appyter that visualizes the enriched TFs at each time point from time series RNA-seq data using a regulatory subnetwork and UMAP plot.",
+  "image": "TODO",
+  "authors": [
+    {
+      "name": "Andrew Van Dusen",
+      "email": "avandusen30@gmail.com"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/chea_kg_ts",
+  "tags": [
+    "Enrichment Analysis",
+    "Transcription Factors",
+    "Gene Regulatory Network",
+    "Time Series",
+    "RNA-seq",
+    "Differential Expression Analysis",
+    "ChEA-KG"
+  ],
+  "license": "CC-BY-NC-SA-4.0",
+  "appyter": {
+    "file": "chea_kg_ts_appyter.ipynb",
+    "profile": "biojupies",
+    "extras": [
+      "ipywidgets",
+      "toggle-code",
+      "hide-code"
+    ]
+  },
+  "public": true
+}
