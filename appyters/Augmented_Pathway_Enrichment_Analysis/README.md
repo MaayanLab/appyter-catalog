@@ -1,6 +1,6 @@
 # Augmented Pathway Enrichment Analysis
 
-Augmented Pathway Enrichment Analysis Appyter performs enrichment analysis with augmented pathway libraries. The required input is a gene set. The Appyter performs the Fisher exact test to compute enrichment p-value and q-values, and reports the results as a bar graph along with a sorted table. If a combined library is chosen, the results for separate pathway databases are shown on the bottom as well. Unaugmented and augmented results are shown.
+Augmented Pathway Enrichment Analysis Appyter performs enrichment analysis with augmented pathway libraries. The required input is a gene set. The Appyter performs the Fisher exact test to compute enrichment p-value and q-values, and reports the results as a bar graph along with a sorted table and a tiebow graph. If a combined library is chosen, the results for separate pathway databases are shown on the bottom as well. Unaugmented and augmented results are shown.
 
 ## **File Format**
 To run the Appyter, a set of genes is required as input. There is an example gene set for use as well.
